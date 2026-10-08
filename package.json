@@ -1,7 +1,14 @@
 {
-  "name": "cursor-territory-online",
-  "version": "1.0.0",
+  "name": "territory-control",
+  "version": "13.0.0",
   "private": true,
-  "scripts": { "start": "node server.js" },
-  "engines": { "node": ">=18" }
+  "scripts": {
+    "start": "node server.js"
+  },
+  "optionalDependencies": {
+    "pg": "^8.11.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
 }

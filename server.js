@@ -1,81 +1,206 @@
-// Cursor Territory online server v2. No dependencies. Run: node server.js
+// Cursor Territory server v3: menu, lobbies, bot games, database, rewards. No required dependencies.
+// Run: node server.js   (set DATABASE_URL to a Postgres database to keep stats permanently)
 const http=require('http'),fs=require('fs'),path=require('path'),crypto=require('crypto'),vm=require('vm');
-const PORT=+process.env.PORT||3000,CD=+process.env.CD||10,MATCH=+process.env.MATCH||120,RES=+process.env.RES||12,GW=39,GH=69;
+const PORT=+process.env.PORT||3000,CD=+process.env.CD||10,RCD=+process.env.RCD||3,MATCH=+process.env.MATCH||120,RES=+process.env.RES||20,GW=101,GH=177;
 const DIR=__dirname,SELF=process.env.RENDER_EXTERNAL_URL;
 const SRC=fs.readFileSync(path.join(DIR,'index.html'),'utf8').match(/<script>([\s\S]*?)<\/script>/)[1];
+const PRE='const Math=globalThis.Math,JSON=globalThis.JSON,Uint8Array=globalThis.Uint8Array,Int16Array=globalThis.Int16Array,Int32Array=globalThis.Int32Array,Float32Array=globalThis.Float32Array;';
 const MT={'.html':'text/html; charset=utf-8','.png':'image/png','.webmanifest':'application/manifest+json'};
 const D=new Proxy(function(){},{get:(t,k)=>k==='clientWidth'?400:k==='clientHeight'?700:k===Symbol.toPrimitive?()=>0:D,apply:()=>D,set:()=>true});
-// Runs inside each match: the same game rules as the client, driven by real players.
-const OV=`
-LASTO='';
-layout=function(){W=39;H=69};
-MPS=function(n){newGame();state='play';tl=TL;
- for(let i=n+1;i<=5;i++){const p=P[i];for(let k=0;k<own.length;k++)if(own[k]===i)own[k]=0;p.alive=false;p.rt=1e9}
- for(let i=1;i<=n;i++)IN[i]={x:P[i].x,y:P[i].y,b:0,en:1}};
-DROP=function(i){const p=P[i];for(let k=0;k<own.length;k++){if(own[k]===i)own[k]=0;if(tr[k]===i)tr[k]=0}p.alive=false;p.trail=[];p.rt=1e9;IN[i]=null};
-upd=function(dt){tl-=dt;FX.length=0;PO.length=0;FD.length=0;
- for(let i=1;i<=5;i++){const p=P[i],t=IN[i];p.sh-=dt;
-  if(!p.alive){if((p.rt-=dt)<=0){spawn(p);if(t){t.x=p.x;t.y=p.y}}continue}
-  if(!t)continue;
-  const b=t.b&&t.en>0;t.en=b?Math.max(0,t.en-dt*.5):Math.min(1,t.en+dt*.2);
-  const dx=t.x-p.x,dy=t.y-p.y,d=Math.hypot(dx,dy);
-  if(d>.2){const m=Math.min(11*(b?1.6:1)*dt,d),n=Math.ceil(m/.4);for(let k=0;k<n&&p.alive;k++)move(p,p.x+dx/d*m/n,p.y+dy/d*m/n)}}};
-SNAP=function(f){const o=own.join('');const s=JSON.stringify({t:'s',tl:+tl.toFixed(1),p:P.slice(1).map((p,i)=>[+p.x.toFixed(2),+p.y.toFixed(2),p.alive?1:0,+Math.max(0,p.sh).toFixed(1),p.trail,IN[i+1]?+IN[i+1].en.toFixed(2):1]),o:(f||o!==LASTO)?o:undefined});if(!f)LASTO=o;return s};
-`;
-function mk(){const sb={document:{getElementById:()=>D,documentElement:D,addEventListener(){},hidden:false},addEventListener(){},getComputedStyle:()=>D,requestAnimationFrame(){},setTimeout(){},clearTimeout(){},setInterval(){},devicePixelRatio:1,navigator:{},CanvasRenderingContext2D:{prototype:{roundRect:1}},IN:[],DT:0,TL:MATCH};
- vm.createContext(sb);vm.runInContext(SRC,sb,{timeout:3000});vm.runInContext(OV,sb);return sb}
+const BOTN=['Blaze','Mira','Kabir','Nova','Zed'];
+const CITIES={Hyderabad:'Telangana',Bengaluru:'Karnataka',Chennai:'Tamil Nadu',Mumbai:'Maharashtra',Delhi:'Delhi',Pune:'Maharashtra',Kolkata:'West Bengal',Ahmedabad:'Gujarat',Jaipur:'Rajasthan',Lucknow:'Uttar Pradesh',Kochi:'Kerala',Visakhapatnam:'Andhra Pradesh',Vijayawada:'Andhra Pradesh',Coimbatore:'Tamil Nadu',Indore:'Madhya Pradesh',Chandigarh:'Chandigarh',Surat:'Gujarat',Nagpur:'Maharashtra',Patna:'Bihar',Bhubaneswar:'Odisha',Guwahati:'Assam',Warangal:'Telangana',Mysuru:'Karnataka',Thiruvananthapuram:'Kerala'};
+const TIERS=[[2200,'Legend'],[2000,'Grandmaster'],[1800,'Master'],[1600,'Diamond'],[1400,'Platinum'],[1200,'Gold'],[1000,'Silver'],[0,'Bronze']];
+const ABIL=['boost','dash','shield','recall','ghost','trap','emp','grab'],SKINS={sport:1,muscle:2,rally:3,hyper:5,f1:7},TRAILS={glow:1,neon:2,dash:4,fire:6};
 
-const players=new Map(),rooms=new Map();let pn=0;
+// ---------- match engine: the same game rules as the client, driven by real players and optional bots ----------
+function mk(){const sb={document:{getElementById:()=>D,documentElement:D,addEventListener(){},hidden:false},addEventListener(){},getComputedStyle:()=>D,requestAnimationFrame(){},setTimeout(){},clearTimeout(){},setInterval(){},devicePixelRatio:1,navigator:{},CanvasRenderingContext2D:{prototype:{roundRect:1}},IN:[],AL:[],DT:0,TL:MATCH,SRV:true};
+ vm.createContext(sb);vm.runInContext(PRE,sb);vm.runInContext(SRC,sb,{timeout:3000});return sb}
+
+// ---------- database: Postgres when DATABASE_URL is set, otherwise a local SQLite file ----------
+let DB=null;
+const SCHEMA=[
+ "CREATE TABLE IF NOT EXISTS players(pid TEXT PRIMARY KEY,name TEXT,created BIGINT,seen BIGINT,games INTEGER DEFAULT 0,wins INTEGER DEFAULT 0,kills INTEGER DEFAULT 0,deaths INTEGER DEFAULT 0,best INTEGER DEFAULT 0,streak INTEGER DEFAULT 0,bstreak INTEGER DEFAULT 0,xp INTEGER DEFAULT 0,coins INTEGER DEFAULT 0,daily TEXT DEFAULT '',dstreak INTEGER DEFAULT 0,ach TEXT DEFAULT '')",
+ "CREATE TABLE IF NOT EXISTS matches(id TEXT PRIMARY KEY,mode TEXT,room TEXT,started BIGINT,ended BIGINT,humans INTEGER,total INTEGER)",
+ "CREATE TABLE IF NOT EXISTS match_players(match_id TEXT,pid TEXT,name TEXT,place INTEGER,pct REAL,kills INTEGER,deaths INTEGER,xp INTEGER,coins INTEGER,PRIMARY KEY(match_id,pid))",
+ "CREATE INDEX IF NOT EXISTS mp_pid ON match_players(pid)",
+ "CREATE TABLE IF NOT EXISTS city_points(season TEXT,city TEXT,pts INTEGER DEFAULT 0,PRIMARY KEY(season,city))"];
+const ADDCOLS=["city TEXT DEFAULT ''","clock TEXT DEFAULT ''","rating INTEGER DEFAULT 800","rgames INTEGER DEFAULT 0","peak INTEGER DEFAULT 800","ab TEXT DEFAULT 'boost,dash'","skin TEXT DEFAULT 'sport'","trail TEXT DEFAULT 'glow'","dtop TEXT DEFAULT ''"];
+async function initDB(){
+ const url=process.env.DATABASE_URL;
+ if(url){try{const {Pool}=require('pg');const pool=new Pool({connectionString:url,max:4,...(/sslmode=/.test(url)||/localhost|127\.0\.0\.1/.test(url)?{}:{ssl:{rejectUnauthorized:false}})});
+   pool.on('error',e=>console.error('pg pool',e.message));await pool.query('select 1');
+   DB={kind:'postgres',all:async(q,a)=>(await pool.query(q,a)).rows,run:async(q,a)=>{await pool.query(q,a)}}}
+  catch(e){console.error('Postgres unavailable:',e.message)}}
+ if(!DB){try{const {DatabaseSync}=require('node:sqlite');const f=new DatabaseSync(process.env.DB_FILE||path.join(__dirname,'data.db')),cv=q=>q.replace(/\$(\d+)/g,'?$1');
+   DB={kind:'sqlite',all:async(q,a=[])=>f.prepare(cv(q)).all(...a),run:async(q,a=[])=>{f.prepare(cv(q)).run(...a)}}}
+  catch(e){console.error('No database available, stats will not be saved:',e.message)}}
+ if(DB){try{for(const q of SCHEMA)await DB.run(q,[]);for(const c of ADDCOLS){try{await DB.run('ALTER TABLE players ADD COLUMN '+c,[])}catch(e){}}}catch(e){console.error('Schema error:',e.message);DB=null}}
+ console.log('Database:',DB?DB.kind:'none')}
+
+// ---------- players, rewards ----------
+const players=new Map(),rooms=new Map();
 const clean=(s,n)=>String(s==null?'':s).replace(/[<>&"'`\\\u0000-\u001f]/g,'').trim().slice(0,n);
+const lvl=xp=>1+Math.floor(Math.sqrt((xp||0)/100));
+const today=()=>new Date().toISOString().slice(0,10),yest=()=>new Date(Date.now()-864e5).toISOString().slice(0,10),season=()=>today().slice(0,7);
+const tier=r=>TIERS.find(t=>r>=t[0])[1];
+function eloPair(a,b,sa){const ea=1/(1+Math.pow(10,(b.rating-a.rating)/400)),ka=a.rgames<10?40:24,kb=b.rgames<10?40:24;
+ const da=Math.round(ka*(sa-ea)),db=Math.round(kb*((1-sa)-(1-ea)));
+ a.rating=Math.max(0,a.rating+da);b.rating=Math.max(0,b.rating+db);a.rgames++;b.rgames++;a.peak=Math.max(a.peak,a.rating);b.peak=Math.max(b.peak,b.rating);return [da,db]}
+function contrib(w,pts){const d=today();let top=String(w.dtop||'').startsWith(d+':')?w.dtop.slice(11).split(',').filter(Boolean).map(Number):[],delta=0;
+ if(top.length<5){top.push(pts);delta=pts}else{const mi=top.indexOf(Math.min(...top));if(pts>top[mi]){delta=pts-top[mi];top[mi]=pts}}
+ w.dtop=d+':'+top.join(',');return delta}
+if(require.main!==module){module.exports={mk,CITIES,tier,eloPair,contrib,lvl};return}
+const ACH=[['first',w=>w.wins>=1],['m10',w=>w.games>=10],['w10',w=>w.wins>=10],['k25',w=>w.kills>=25],['h50',w=>w.best>=50],['s3',w=>w.bstreak>=3]];
+const blank=p=>({pid:p.pid,name:p.name,games:0,wins:0,kills:0,deaths:0,best:0,streak:0,bstreak:0,xp:0,coins:0,daily:'',dstreak:0,ach:'',city:'',clock:'',rating:800,rgames:0,peak:800,ab:'boost,dash',skin:'sport',trail:'glow',dtop:''});
+function meMsg(p){const w=p.row||blank(p),xp=w.xp|0,lv=lvl(xp),lo=100*(lv-1)*(lv-1),hi=100*lv*lv,rt=w.rating|0;
+ return {t:'me',name:p.name,lv,pr:Math.round((xp-lo)*100/(hi-lo)),xp,coins:w.coins|0,games:w.games|0,wins:w.wins|0,kills:w.kills|0,deaths:w.deaths|0,best:w.best|0,streak:w.streak|0,bstreak:w.bstreak|0,dst:w.dstreak|0,dok:w.daily!==today(),ach:String(w.ach||'').split(',').filter(Boolean),db:DB?DB.kind:'none',
+  city:w.city||'',state:CITIES[w.city]||'',locked:!!w.city&&w.clock===season(),rating:rt,tier:tier(rt),rgames:w.rgames|0,peak:w.peak|0,ab:String(w.ab||'boost,dash').split(','),skin:SKINS[w.skin]?w.skin:'sport',trail:w.trail||'glow'}}
+async function loadRow(p){
+ let r=null;
+ if(DB)try{r=(await DB.all('SELECT * FROM players WHERE pid=$1',[p.pid]))[0];
+  if(!r)await DB.run('INSERT INTO players(pid,name,created,seen) VALUES($1,$2,$3,$4)',[p.pid,p.name,Date.now(),Date.now()]);
+  else await DB.run('UPDATE players SET name=$2,seen=$3 WHERE pid=$1',[p.pid,p.name,Date.now()])}
+ catch(e){console.error('db load',e.message);r=null}
+ p.row=Object.assign(blank(p),r||{},{name:p.name});
+ for(const k of ['games','wins','kills','deaths','best','streak','bstreak','xp','coins','dstreak','rating','rgames','peak'])p.row[k]=Number(p.row[k])||0;
+ send(p,meMsg(p))}
+async function daily(p){const w=p.row;if(!w||w.daily===today())return send(p,meMsg(p));
+ w.dstreak=w.daily===yest()?w.dstreak+1:1;const bonus=50+Math.min(w.dstreak,7)*10;w.coins+=bonus;w.daily=today();
+ send(p,{t:'rew',daily:bonus,xp:0,coins:bonus,ach:[]});send(p,meMsg(p));
+ if(DB)try{await DB.run('UPDATE players SET daily=$2,dstreak=$3,coins=$4 WHERE pid=$1',[p.pid,w.daily,w.dstreak,w.coins])}catch(e){console.error(e.message)}}
+async function rename(p,nm){const n=clean(nm,12);if(!n||n===p.name)return;p.name=n;if(p.row)p.row.name=n;if(p.room&&p.room.st==='lobby')lobby(p.room);
+ if(DB)try{await DB.run('UPDATE players SET name=$2 WHERE pid=$1',[p.pid,n])}catch(e){console.error(e.message)}}
+async function stats(p){let recent=[],top=[];
+ if(DB)try{recent=(await DB.all('SELECT m.ended AS ended,m.mode AS mode,m.total AS total,x.place AS place,x.pct AS pct,x.kills AS kills FROM match_players x JOIN matches m ON m.id=x.match_id WHERE x.pid=$1 ORDER BY m.ended DESC LIMIT 8',[p.pid])).map(r=>[Number(r.ended),r.mode,Number(r.place),Number(r.total),Number(r.pct),Number(r.kills)]);
+  top=(await DB.all('SELECT name,xp,wins,games FROM players WHERE games>0 ORDER BY xp DESC LIMIT 10',[])).map(r=>[r.name,lvl(Number(r.xp)),Number(r.wins),Number(r.games)])}
+ catch(e){console.error(e.message)}
+ send(p,{t:'stats',recent,top})}
+const save=p=>{const w=p.row;return DB.run('UPDATE players SET name=$2,seen=$3,games=$4,wins=$5,kills=$6,deaths=$7,best=$8,streak=$9,bstreak=$10,xp=$11,coins=$12,ach=$13,rating=$14,rgames=$15,peak=$16,clock=$17,dtop=$18 WHERE pid=$1',[p.pid,p.name,Date.now(),w.games,w.wins,w.kills,w.deaths,w.best,w.streak,w.bstreak,w.xp,w.coins,w.ach,w.rating,w.rgames,w.peak,w.clock,w.dtop])};
+async function settle(r){
+ const res=JSON.parse(vm.runInContext('RESU()',r.sb)),N=res.N||GW*GH,S=season();
+ const slots=r.mode==='bots'?[1,2,3,4,5]:Array.from({length:r.h0},(_,i)=>i+1);
+ const order=slots.slice().sort((a,b)=>res.cn[b]-res.cn[a]),mult=r.mode==='bots'?.5:1,out=[],hum=r.cl.filter(x=>x.slot&&x.row),rd={};
+ let duo=[];
+ if(r.kind==='ranked'&&r.mode==='pvp'){duo=[...hum];if(r.forf&&r.forf.row&&!duo.includes(r.forf))duo.push(r.forf);
+  if(duo.length===2){const [a,b]=duo,ca=res.cn[a.slot]||0,cb=r.forf===b?0:(res.cn[b.slot]||0);
+   const sa=r.forf===b?1:r.forf===a?0:(ca===cb?.5:ca>cb?1:0);const [da,db]=eloPair(a.row,b.row,sa);rd[a.pid]=da;rd[b.pid]=db}}
+ for(const p of hum){const i=p.slot,w=p.row,place=order.indexOf(i)+1,k=res.k[i],d=res.d[i],pct=Math.round(res.cn[i]*1000/N)/10;
+  const xp=Math.round((20+pct*1.5+k*10+(place===1?60:place===2?25:0))*mult);let coins=Math.round((10+k*5+(place===1?50:0))*mult);
+  const lv0=lvl(w.xp);w.games++;w.kills+=k;w.deaths+=d;w.best=Math.max(w.best,Math.round(pct));
+  if(r.mode==='pvp'){if(place===1){w.wins++;w.streak++;w.bstreak=Math.max(w.bstreak,w.streak)}else w.streak=0}
+  w.xp+=xp;const have=new Set(String(w.ach||'').split(',').filter(Boolean)),fresh=[];
+  for(const [id,f] of ACH)if(!have.has(id)&&f(w)){have.add(id);fresh.push(id);coins+=100}
+  w.coins+=coins;w.ach=[...have].join(',');
+  let cpts=0;if((r.kind==='quick'||r.kind==='ranked')&&r.mode==='pvp'&&r.h0>=2&&w.city){cpts=contrib(w,Math.round(pct*10)+k*25+(place===1?100:0));w.clock=S}
+  out.push({p,place,k,d,pct,xp,coins,cpts});
+  send(p,{t:'rew',xp,coins,place,total:slots.length,lv0,lv1:lvl(w.xp),ach:fresh,rd:rd[p.pid]||0,rating:w.rating,tier:tier(w.rating),cpts,city:w.city});send(p,meMsg(p))}
+ if(!DB)return;
+ try{const id=crypto.randomBytes(6).toString('hex');
+  await DB.run('INSERT INTO matches(id,mode,room,started,ended,humans,total) VALUES($1,$2,$3,$4,$5,$6,$7)',[id,r.kind,r.code,r.t0,Date.now(),r.h0,slots.length]);
+  for(const o of out){
+   await DB.run('INSERT INTO match_players(match_id,pid,name,place,pct,kills,deaths,xp,coins) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)',[id,o.p.pid,o.p.name,o.place,o.pct,o.k,o.d,o.xp,o.coins]);
+   if(o.cpts>0)await DB.run('INSERT INTO city_points(season,city,pts) VALUES($1,$2,$3) ON CONFLICT(season,city) DO UPDATE SET pts=city_points.pts+EXCLUDED.pts',[S,o.p.row.city,o.cpts])}
+  for(const p of [...out.map(o=>o.p),...duo.filter(x=>!out.some(o=>o.p===x))])await save(p)}
+ catch(e){console.error('db save',e.message)}}
+async function setField(p,col,val){p.row[col]=val;if(DB)try{await DB.run('UPDATE players SET '+col+'=$2 WHERE pid=$1',[p.pid,val])}catch(e){console.error(e.message)}}
+async function setCity(p,city){const w=p.row;if(!w)return;
+ if(city&&!CITIES[city])return send(p,{t:'err',msg:'Unknown city.'});
+ if(w.city&&city!==w.city&&w.clock===season())return send(p,{t:'err',msg:'Your city is locked for this season. You can change it next month.'});
+ await setField(p,'city',city);send(p,meMsg(p))}
+async function setAb(p,a){if(!p.row)return;a=Array.isArray(a)?a.map(String).slice(0,2):[];if(a.length!==2||a[0]===a[1]||!a.every(x=>ABIL.includes(x)))return;await setField(p,'ab',a.join(','));send(p,meMsg(p))}
+async function setCos(p,col,v,tab){const w=p.row;if(!w||!tab[v]||lvl(w.xp)<tab[v])return;await setField(p,col,v);send(p,meMsg(p))}
+async function war(p){const w=p.row||blank(p),S=season();let cities=[],states=[],top=[];const my={india:0,state:0,city:0};
+ if(DB)try{
+  const rows=await DB.all('SELECT city,pts FROM city_points WHERE season=$1 ORDER BY pts DESC',[S]);
+  cities=rows.slice(0,10).map(r=>[r.city,CITIES[r.city]||'',Number(r.pts)]);
+  const st={};for(const r of rows){const s=CITIES[r.city];if(s)st[s]=(st[s]||0)+Number(r.pts)}
+  states=Object.entries(st).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  top=(await DB.all('SELECT name,rating,city FROM players WHERE rgames>0 ORDER BY rating DESC LIMIT 10',[])).map(r=>[r.name,Number(r.rating),r.city||'']);
+  if(w.rgames>0){
+   my.india=1+Number((await DB.all('SELECT COUNT(*) AS c FROM players WHERE rgames>0 AND rating>$1',[w.rating]))[0].c);
+   if(w.city){my.city=1+Number((await DB.all('SELECT COUNT(*) AS c FROM players WHERE rgames>0 AND city=$1 AND rating>$2',[w.city,w.rating]))[0].c);
+    const cs=Object.keys(CITIES).filter(c=>CITIES[c]===CITIES[w.city]);
+    my.state=1+Number((await DB.all('SELECT COUNT(*) AS c FROM players WHERE rgames>0 AND rating>$1 AND city IN ('+cs.map((_,i)=>'$'+(i+2)).join(',')+')',[w.rating,...cs]))[0].c)}}
+ }catch(e){console.error(e.message)}
+ send(p,{t:'war',season:S,cities,states,top,my})}
+
+// ---------- rooms and lobbies ----------
 function send(p,o){const s=p.s;if(!s||s.destroyed)return;const b=Buffer.from(typeof o==='string'?o:JSON.stringify(o)),n=b.length;let h;
  if(n<126)h=Buffer.from([129,n]);else if(n<65536)h=Buffer.from([129,126,n>>8,n&255]);else{h=Buffer.alloc(10);h[0]=129;h[1]=127;h.writeBigUInt64BE(BigInt(n),2)}
  try{s.write(Buffer.concat([h,b]))}catch(e){}}
-const LM=r=>({t:'lobby',room:r.code,n:r.cl.filter(p=>p.s).length,cd:r.cd,pl:r.cl.map(p=>[p.name,p.w,p.g])});
-function lobby(r){const m=LM(r);for(const p of r.cl)send(p,m)}
-function mkRoom(code,pub){const r={code,pub,st:'lobby',cl:[],cd:-1,sb:null,last:0,tk:0,until:0,names:[]};rooms.set(code,r);return r}
+const LM=(r,p)=>({t:'lobby',room:r.code,kind:r.kind,n:r.cl.filter(x=>x.s).length,cd:r.cd,host:r.cl[0]===p&&r.kind!=='ranked',pub:r.pub,pl:r.cl.map(x=>[x.name,lvl(x.row?x.row.xp:0),x.s?1:0,x.row?x.row.rating:800])});
+function lobby(r){for(const p of r.cl)send(p,LM(r,p))}
+function codeGen(){const A='ABCDEFGHJKMNPQRSTUVWXYZ23456789';for(;;){let c='';for(let i=0;i<4;i++)c+=A[crypto.randomInt(A.length)];if(!rooms.has(c))return c}}
+function mkRoom(code,pub,kind){kind=kind||'quick';const r={code,pub,kind,max:kind==='ranked'?2:5,st:'lobby',cl:[],cd:-1,sb:null,last:0,tk:0,until:0,names:[],cos:[],mode:'pvp',h0:0,t0:0,created:Date.now(),forf:null};rooms.set(code,r);return r}
 function sync(p){const r=p.room;
- if(r.st!=='play')return send(p,LM(r));
- if(p.slot){send(p,{t:'start',W:GW,H:GH,you:p.slot,names:r.names});send(p,vm.runInContext('SNAP(1)',r.sb))}
+ if(r.st!=='play')return send(p,LM(r,p));
+ if(p.slot){send(p,{t:'start',W:GW,H:GH,you:p.slot,names:r.names,cos:r.cos,kind:r.kind,seed:r.seed});send(p,vm.runInContext('SNAP(1)',r.sb))}
  else send(p,{t:'wait',room:r.code,left:Math.ceil(vm.runInContext('tl',r.sb))})}
-function snap(r){const m=vm.runInContext('SNAP()',r.sb);for(const p of r.cl)if(p.slot)send(p,m)}
-function end(r){if(r.st!=='play')return;try{snap(r)}catch(e){}r.st='done';r.until=Date.now()+RES*1000;for(const p of r.cl)if(p.slot)send(p,{t:'end'})}
-function leaveRoom(p){const r=p.room;if(!r)return;p.room=null;r.cl=r.cl.filter(x=>x!==p);
- if(r.st==='play'&&p.slot){try{vm.runInContext('DROP('+p.slot+')',r.sb)}catch(e){}p.slot=0;if(r.cl.filter(x=>x.slot).length<2)end(r)}
- p.slot=0;
- if(!r.cl.length){if(rooms.get(r.code)===r)rooms.delete(r.code)}else if(r.st==='lobby')lobby(r)}
-function join(conn,m){
- const pid=clean(m.pid,64);if(!pid)return;
- let p=players.get(pid);
- if(!p){p={pid,name:'',g:0,w:0,s:null,room:null,slot:0,off:0};players.set(pid,p)}
- if(p.s&&p.s!==conn.s){try{p.s.destroy()}catch(e){}}
- p.s=conn.s;conn.p=p;p.off=0;
- p.name=clean(m.name,12)||p.name||'Player';
- if(m.st&&typeof m.st==='object'){p.g=Math.max(0,m.st.g|0);p.w=Math.max(0,m.st.w|0)}
- const code=clean(m.room,8).toUpperCase().replace(/[^A-Z0-9]/g,'');
- const cur=p.room&&rooms.get(p.room.code)===p.room?p.room:null;
- if(cur&&(!code||code===cur.code)){sync(p);if(cur.st==='lobby')lobby(cur);return}
- if(cur)leaveRoom(p);
- let r=code?rooms.get(code):[...rooms.values()].find(x=>x.pub&&x.cl.length<5&&x.st!=='play');
- if(!r)r=code?mkRoom(code,0):mkRoom('P'+(++pn),1);
- if(r.cl.length>=5){send(p,{t:'full'});return}
+function joinRoom(p,r){
+ if(r.cl.length>=r.max){send(p,{t:'full'});return}
  p.room=r;p.slot=0;r.cl.push(p);
  if(r.st==='lobby')lobby(r);else sync(p)}
-function start(r){
- const act=r.cl.filter(p=>p.s).slice(0,5),sb=mk();vm.runInContext('MPS('+act.length+')',sb);
- r.sb=sb;r.st='play';r.last=Date.now();r.tk=0;r.names=['',...act.map(p=>p.name)];
+function quick(p){joinRoom(p,[...rooms.values()].find(x=>x.kind==='quick'&&x.pub&&x.cl.length<5&&x.st!=='play')||mkRoom(codeGen(),1,'quick'))}
+function ranked(p){const rt=p.row?p.row.rating:800,now=Date.now();
+ joinRoom(p,[...rooms.values()].find(x=>x.kind==='ranked'&&x.st==='lobby'&&x.cl.length===1&&Math.abs((x.cl[0].row?x.cl[0].row.rating:800)-rt)<=150+30*((now-x.created)/1000))||mkRoom(codeGen(),1,'ranked'))}
+function leaveRoom(p){const r=p.room;if(!r)return;p.room=null;r.cl=r.cl.filter(x=>x!==p);
+ if(r.st==='play'&&p.slot){if(r.kind==='ranked')r.forf=p;try{vm.runInContext('DROP('+p.slot+')',r.sb)}catch(e){}p.slot=0;if(r.mode==='pvp'&&r.cl.filter(x=>x.slot).length<2)end(r);else if(!r.cl.some(x=>x.slot))end(r)}
+ p.slot=0;
+ if(!r.cl.length){if(rooms.get(r.code)===r)rooms.delete(r.code)}else if(r.st==='lobby')lobby(r)}
+function start(r,bots){
+ const act=r.cl.filter(p=>p.s).slice(0,5),h=act.length,sb=mk();
+ sb.AL=[null,...act.map(p=>String((p.row&&p.row.ab)||'boost,dash').split(','))];
+ const seed=crypto.randomInt(1,2e9);vm.runInContext('MPS('+h+','+(bots?1:0)+',undefined,'+seed+')',sb);r.seed=seed;
+ r.sb=sb;r.st='play';r.last=Date.now();r.tk=0;r.t0=Date.now();r.mode=bots?'bots':'pvp';r.h0=h;r.forf=null;
+ r.names=['',...act.map(p=>p.name)];
+ const cs=(p,k,tab,d)=>{const v=p.row&&p.row[k];return tab[v]&&lvl(p.row.xp)>=tab[v]?v:d};
+ r.cos=[null,...act.map(p=>[cs(p,'skin',SKINS,'sport'),cs(p,'trail',TRAILS,'glow')])];
+ if(bots)for(let i=h+1;i<=5;i++){r.names.push('\u{1F916} '+BOTN[i-1]);r.cos.push([['muscle','rally','hyper','f1'][(i-2)%4],'glow'])}
  for(const p of r.cl)p.slot=0;
  act.forEach((p,i)=>{p.slot=i+1});
- for(const p of act)send(p,{t:'start',W:GW,H:GH,you:p.slot,names:r.names});
+ for(const p of act)send(p,{t:'start',W:GW,H:GH,you:p.slot,names:r.names,cos:r.cos,kind:r.kind,seed:r.seed});
  snap(r)}
+function snap(r){const m=vm.runInContext('SNAP()',r.sb);for(const p of r.cl)if(p.slot)send(p,m)}
+function end(r){if(r.st!=='play')return;try{snap(r)}catch(e){}r.st='done';r.until=Date.now()+RES*1000;
+ for(const p of r.cl)if(p.slot)send(p,{t:'end'});
+ settle(r).catch(e=>console.error('settle',e.message))}
+
+// ---------- messages ----------
 function onMsg(conn,t){let m;try{m=JSON.parse(t)}catch(e){return}
  if(!m||typeof m!=='object')return;
- if(m.t==='join')return join(conn,m);
+ const now=Date.now();if(now-conn.t0>1000){conn.t0=now;conn.n=0}if(++conn.n>90)return;
+ if(m.t==='hello'){const pid=clean(m.pid,64);if(!pid)return;
+  let p=players.get(pid);if(!p){p={pid,name:'',s:null,room:null,slot:0,off:0,row:null};players.set(pid,p)}
+  if(p.s&&p.s!==conn.s){try{p.s.destroy()}catch(e){}}
+  p.s=conn.s;conn.p=p;p.off=0;p.name=clean(m.name,12)||p.name||'Player'+(100+crypto.randomInt(900));
+  loadRow(p).then(()=>{const r=p.room;if(r&&rooms.get(r.code)===r){sync(p);if(r.st==='lobby')lobby(r)}}).catch(e=>console.error(e.message));return}
  const p=conn.p;if(!p||p.s!==conn.s)return;
- if(m.t==='p')send(p,'{"t":"p"}');
- else if(m.t==='st'){p.g=Math.max(0,m.g|0);p.w=Math.max(0,m.w|0)}
- else if(m.t==='x'){leaveRoom(p);players.delete(p.pid)}
- else if(m.t==='in'&&p.room&&p.room.st==='play'&&p.slot){const i=p.room.sb.IN[p.slot];
-  if(i&&Number.isFinite(m.x)&&Number.isFinite(m.y)){i.x=Math.max(0,Math.min(GW,m.x));i.y=Math.max(0,Math.min(GH,m.y));i.b=m.b?1:0}}}
+ switch(m.t){
+  case 'p':send(p,'{"t":"p"}');break;
+  case 'in':{const r=p.room;if(r&&r.st==='play'&&p.slot){const i=r.sb.IN[p.slot];
+   if(i&&Number.isFinite(m.a)){i.a=Math.max(-7,Math.min(7,m.a));i.b=m.b?1:0}}break}
+  case 'quick':leaveRoom(p);quick(p);break;
+  case 'ranked':leaveRoom(p);ranked(p);break;
+  case 'create':leaveRoom(p);joinRoom(p,mkRoom(codeGen(),0,'private'));break;
+  case 'join':{const c=clean(m.room,8).toUpperCase().replace(/[^A-Z0-9]/g,'');if(!c||(p.room&&p.room.code===c))break;
+   let r=rooms.get(c);if(!r){if(m.make)r=mkRoom(c,0,'private');else{send(p,{t:'err',msg:'Room not found. Check the code and try again.'});break}}
+   if(r.kind==='ranked'){send(p,{t:'err',msg:'Ranked matches are found through the Ranked button.'});break}
+   leaveRoom(p);joinRoom(p,r);break}
+  case 'leave':leaveRoom(p);send(p,meMsg(p));break;
+  case 'bots':{leaveRoom(p);const r=mkRoom(codeGen(),0,'bots');joinRoom(p,r);start(r,1);break}
+  case 'go':{const r=p.room;if(r&&r.st==='lobby'&&r.kind!=='ranked'&&r.cl[0]===p&&(m.bots||r.cl.filter(x=>x.s).length>1))start(r,m.bots?1:0);break}
+  case 'use':{const r=p.room;if(r&&r.st==='play'&&p.slot){try{vm.runInContext('USE('+p.slot+','+(m.s===2?2:1)+')',r.sb)}catch(e){}}break}
+  case 'pw':{const r=p.room,k=String(m.k||'');if(r&&r.st==='play'&&p.slot&&(k==='cannon'||k==='fort'||k==='strike')){try{vm.runInContext('POW('+p.slot+',"'+k+'")',r.sb)}catch(e){}}break}
+  case 'challenge':{leaveRoom(p);const r=mkRoom(codeGen(),0,'private');joinRoom(p,r);send(p,{t:'ch',room:r.code});break}
+  case 'city':setCity(p,String(m.city||'')).catch(e=>console.error(e.message));break;
+  case 'ab':setAb(p,m.a).catch(e=>console.error(e.message));break;
+  case 'skin':setCos(p,'skin',String(m.v||''),SKINS).catch(e=>console.error(e.message));break;
+  case 'trail':setCos(p,'trail',String(m.v||''),TRAILS).catch(e=>console.error(e.message));break;
+  case 'war':war(p).catch(e=>console.error(e.message));break;
+  case 'daily':daily(p).catch(e=>console.error(e.message));break;
+  case 'name':rename(p,m.name).catch(e=>console.error(e.message));break;
+  case 'stats':stats(p).catch(e=>console.error(e.message));break;
+ }}
 function frame(c){const b=c.buf;if(b.length<2)return null;
  let n=b[1]&127,o=2;
  if(n===126){if(b.length<4)return null;n=b.readUInt16BE(2);o=4}
@@ -89,18 +214,19 @@ function frame(c){const b=c.buf;if(b.length<2)return null;
  if(op===9){if(n<126)try{c.s.write(Buffer.concat([Buffer.from([138,n]),p]))}catch(e){}return ''}
  return op===1?p.toString():''}
 
+// ---------- http + websocket plumbing ----------
 const srv=http.createServer((q,r)=>{
  let u='/';try{u=decodeURIComponent(q.url.split('?')[0])}catch(e){}
- if(u==='/healthz'){r.writeHead(200);return r.end('ok')}
+ if(u==='/healthz'){r.writeHead(200,{'Content-Type':'application/json'});return r.end(JSON.stringify({ok:1,db:DB?DB.kind:'none',rooms:rooms.size,players:players.size}))}
  if(u==='/')u='/index.html';
  const f=path.join(DIR,path.normalize(u));
  if(!f.startsWith(DIR+path.sep)||!MT[path.extname(f)]||!fs.existsSync(f)||fs.statSync(f).isDirectory()){r.writeHead(404);return r.end('Not found')}
- r.writeHead(200,{'Content-Type':MT[path.extname(f)],'Cache-Control':'no-cache'});fs.createReadStream(f).pipe(r)});
+ r.writeHead(200,{'Content-Type':MT[path.extname(f)],'Cache-Control':'no-cache','X-Content-Type-Options':'nosniff'});fs.createReadStream(f).pipe(r)});
 srv.on('upgrade',(q,s,head)=>{
  const k=q.headers['sec-websocket-key'];if(!k){s.destroy();return}
  s.write('HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: '+crypto.createHash('sha1').update(k+'258EAFA5-E914-47DA-95CA-C5AB0DC85B11').digest('base64')+'\r\n\r\n');
  s.setNoDelay(true);s.setKeepAlive(true,30000);
- const conn={s,buf:head&&head.length?Buffer.from(head):Buffer.alloc(0),p:null};
+ const conn={s,buf:head&&head.length?Buffer.from(head):Buffer.alloc(0),p:null,t0:0,n:0};
  const pump=()=>{let m;while((m=frame(conn))!==null)if(m)onMsg(conn,m)};
  s.on('data',d=>{conn.buf=Buffer.concat([conn.buf,d]);try{pump()}catch(e){console.error(e)}});
  s.on('close',()=>{const p=conn.p;if(p&&p.s===s){p.s=null;p.off=Date.now()}});
@@ -109,10 +235,10 @@ srv.on('upgrade',(q,s,head)=>{
 setInterval(()=>{const now=Date.now();
  for(const p of [...players.values()])if(p.off&&now-p.off>(p.room&&p.room.st==='play'&&p.slot?60000:20000)){leaveRoom(p);players.delete(p.pid)}
  for(const r of [...rooms.values()]){
-  if(r.st==='done'){if(now>=r.until){r.st='lobby';r.sb=null;r.cd=-1;for(const p of r.cl)p.slot=0;lobby(r)}continue}
+  if(r.st==='done'){if(now>=r.until){if(r.kind==='ranked'){for(const p of r.cl){p.room=null;p.slot=0;send(p,meMsg(p))}rooms.delete(r.code);continue}r.st='lobby';r.sb=null;r.cd=-1;for(const p of r.cl)p.slot=0;lobby(r)}continue}
   if(r.st==='play'){const left=Math.ceil(vm.runInContext('tl',r.sb));for(const p of r.cl)if(p.s&&!p.slot)send(p,{t:'wait',room:r.code,left});continue}
   const n=r.cl.filter(p=>p.s).length;
-  if(n<2)r.cd=-1;else if(r.cd<0)r.cd=n>=5?3:CD;else if(n>=5&&r.cd>3)r.cd=3;else if(--r.cd<=0){try{start(r)}catch(e){console.error(e);r.cd=-1}continue}
+  if(n<2)r.cd=-1;else if(r.cd<0)r.cd=r.kind==='ranked'?RCD:n>=5?3:CD;else if(n>=5&&r.cd>3)r.cd=3;else if(--r.cd<=0){try{start(r,0)}catch(e){console.error(e);r.cd=-1}continue}
   lobby(r)}},1000);
 setInterval(()=>{const now=Date.now();
  for(const r of [...rooms.values()]){if(r.st!=='play')continue;
@@ -123,4 +249,4 @@ setInterval(()=>{const now=Date.now();
    if(vm.runInContext('tl<=0',r.sb))end(r)}catch(e){console.error('room error',e);end(r)}}},33);
 if(SELF)setInterval(()=>{if(players.size)fetch(SELF+'/healthz').catch(()=>{})},240000);
 process.on('uncaughtException',e=>console.error('uncaught',e));
-srv.listen(PORT,()=>console.log('Cursor Territory on http://localhost:'+PORT));
+Promise.race([initDB(),new Promise(r=>setTimeout(r,8000))]).catch(e=>console.error(e.message)).then(()=>srv.listen(PORT,()=>console.log('Territory Control on http://localhost:'+PORT)));
