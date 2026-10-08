@@ -1,6 +1,6 @@
 {
   "name": "territory-control",
-  "version": "13.0.0",
+  "version": "14.0.0",
   "private": true,
   "scripts": {
     "start": "node server.js"
@@ -9,6 +9,6 @@
     "pg": "^8.11.0"
   },
   "engines": {
-    "node": ">=18"
+    "node": "22.x"
   }
 }
