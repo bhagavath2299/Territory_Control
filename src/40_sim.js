@@ -13,7 +13,7 @@ addEventListener('keydown',e=>{if(e.repeat||(e.target&&e.target.tagName==='INPUT
  if(e.code==='Space'||e.key==='Shift'){abDown(1);e.preventDefault()}else if(e.key==='e'||e.key==='E'||e.key==='2')abDown(2);else if(e.key==='f'||e.key==='F')firePow('cannon');else if(e.key==='q'||e.key==='Q')firePow('fort');else if(e.key==='r'||e.key==='R')firePow('strike')});
 addEventListener('keyup',e=>{if(e.code==='Space'||e.key==='Shift')abUp(1);else if(e.key==='e'||e.key==='E'||e.key==='2')abUp(2)});
 addEventListener('resize',()=>{if(P)fit()});
-function abDown(s){if(state!=='play'||RPL)return;const a=AB_[s-1];if(a==='boost')setBoost(1);else if(a){if(MP)tx({t:'use',s});else if(IN[1])ABU(1,s)}}
+function abDown(s){if(state!=='play'||RPL)return;const a=AB_[s-1];if(a==='boost')setBoost(1);else if(a){if(MP)ncUse(s);else if(IN[1])ABU(1,s)}}
 function abUp(s){if(AB_[s-1]==='boost')setBoost(0)}
 function firePow(k){if(state!=='play'||!me||!me.alive||RPL)return;if(MP)tx({t:'pw',k});else PWU(1,k)}
 function aim(){if(!me)return;const hx=me.rx,hy=me.ry;
@@ -71,20 +71,13 @@ function localMatch(nb,kind){MP=0;VS=1;FF=0;RPL=null;QUIET=0;KIND=kind||'local';
  DEATH='';SCORCH=[];RINGS=[];CAM.vz=70;CAM.fy=.5;MPS(1,true,nb);recStart();buildIsland();me=P[1];tg.x=ptr.x=me.x;tg.y=ptr.y=me.y;tg.a=me.a;boost=0;en=1;shake=0;lastSec=99;wasAlive=true;score=kills=streak=0;ACC=0;snapPrev();interp(0);
  CAM.x=me.x;CAM.y=me.y;hideOv();scr='play';snd('start')}
 
-// ---------- online prediction: your own car reacts at once, the server's snapshots keep it honest ----------
-let inT=0,sentA=0,sentB=0;
+// ---------- online: see 32_netc.js. Each frame the phone reads the steering, moves your car at once and shows the others a few ticks in the past ----------
 function mpStep(dt){
  fxStep(dt);
  if(state!=='play')return;
  aim();
- for(const s of SHV){s[0]+=s[2]*dt;s[1]+=s[3]*dt}for(const s of STV)s[2]-=dt;for(let i=1;i<=5;i++)if(PRV[i]>0)PRV[i]-=dt;
- for(let i=1;i<=5;i++){const p=P[i];if(!p.alive)continue;const age=Math.min(.12,clk-p.st);
-  if(p===me){const d=angd(p.ra,tg.a),m=TURN*dt;p.ra+=Math.abs(d)<m?d:Math.sign(d)*m;const v=SPD*(boost&&en>0?1.6:1)*((MYHOLD&8)?1.15:1);
-   p.rx=Math.min(WW-HR,Math.max(HR,p.rx+Math.cos(p.ra)*v*dt));p.ry=Math.min(WH-HR,Math.max(HR,p.ry+Math.sin(p.ra)*v*dt));
-   const tx=p.x+Math.cos(p.a)*SPD*age,ty=p.y+Math.sin(p.a)*SPD*age,k=Math.min(1,dt*9);p.rx+=(tx-p.rx)*k;p.ry+=(ty-p.ry)*k;
-   if(Math.hypot(tx-p.rx,ty-p.ry)>1.6){p.rx=tx;p.ry=ty}}
-  else{const tx=p.x+Math.cos(p.a)*SPD*.92*age,ty=p.y+Math.sin(p.a)*SPD*.92*age,k=Math.min(1,dt*14);p.rx+=(tx-p.rx)*k;p.ry+=(ty-p.ry)*k;p.ra+=angd(p.ra,p.a)*Math.min(1,dt*14)}}
- inT+=dt;if(ws&&ws.readyState===1&&(inT>.1||(inT>.033&&(Math.abs(angd(sentA,tg.a))>.06||boost!==sentB)))){inT=0;sentA=tg.a;sentB=boost;ws.send(JSON.stringify({t:'in',a:+tg.a.toFixed(2),b:boost?1:0}))}
+ for(const s of SHV){s[0]+=s[2]*dt;s[1]+=s[3]*dt}for(const s of STV)s[2]-=dt;
+ ncFrame(dt);
  $('bst').style.setProperty('--e',RDY[0]);$('a2').style.setProperty('--e',RDY[1])}
 
 // ---------- replays: the same engine, fed the recorded seed and inputs ----------
@@ -95,6 +88,7 @@ function replayBase(rec,slot){MP=0;FF=0;QUIET=0;KIND=rec.kind||'replay';const S=
 function startReplay(rec,slot,meta){
  if(!rec||!rec.ops||!rec.seed||!rec.fin){toast('This replay cannot be played');return false}
  if(rec.v>EVER){toast('Update the game to watch this replay');return false}
+ if(rec.v<EVER){toast('This match was recorded before the speed update, so it cannot be replayed',4500);return false}
  replayBase(rec,slot);RPL={rec,oi:0,speed:1,paused:false,done:false,seek:null,meta:meta||{},auto:false,evT:0};state='replay';scr='replay';
  AB_=[];$('qt').style.display=$('bst').style.display=$('a2').style.display='none';rpBar(true);return true}
 function rpToggle(){if(!RPL)return;if(RPL.done){rpRestart();return}RPL.paused=!RPL.paused;rpUpd()}

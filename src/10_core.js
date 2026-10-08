@@ -1,17 +1,19 @@
 if(!CanvasRenderingContext2D.prototype.roundRect)CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h){this.rect(x,y,w,h)};
 document.addEventListener('gesturestart',e=>e.preventDefault());
 const $=id=>document.getElementById(id),cv=$('cv'),ctx=cv.getContext('2d');
-const IS_SRV=typeof SRV!=='undefined',VER='14';
+const IS_SRV=typeof SRV!=='undefined',VER='15';
 const GOAL=35,COLS=['','#2f6bff','#ff4d5e','#1fbf75','#ffb020','#9b5cff'],DIRS=[[1,0],[0,1],[-1,0],[0,-1]];
-const WW=101,WH=177,MC=3,MW=WW*MC,MH=WH*MC,HR=.9,SPD=12,TURN=7.5,TSP=.55;
+// speed and handling. The turning circle stays the same as before (SPD/TURN = 1.6 units); the whole game is simply faster.
+const WW=101,WH=177,MC=3,MW=WW*MC,MH=WH*MC,HR=.9,SPD=18,TURN=11.2,TSP=.55,BSTM=1.45,DSHM=2.5,DSHT=.28,NITM=1.15,SLWM=.55;
 // MP: 1 while an online match is shown (the server decides). VS: the player whose view this is (1 in play, any slot in a replay). FF: 1 while a replay is being fast-forwarded (no sound or effects).
 let MP=0,VS=1,FF=0;
-let FX=[],PO=[],shake=0,score=0,kills=0,streak=0,streakT=0,en=1,boost=0,tl=120,CN=[0,0,0,0,0,0],FD=[],NM=['','You','Blaze','Mira','Kabir','Nova'],W=WW,H=WH,cs=10,dpr=1,own=new Uint8Array(MW*MH),P=[null],me=null,state='menu',T={},ptr={type:'mouse',x:0,y:0,px:0,py:0,ax:0,ay:0,down:0,id:null},tg={x:0,y:0,a:0},last=0,hudT=0,fr=0,best=0,MDIRTY=true,clk=0,TEXBG=null,PAT=[null];
-let CAM={x:WW/2,y:WH/2,z:15,vz:26,oy:0},vw=400,vh=700,TP=[null],MINI=null,PREV=null,FLASH=null,GP=null,PP=[null],SHC=null,SMC=null,RINGS=[],CURB=null,GRP=null,SDP=null,SEP=null,SEP2=null,LANDP=null,GRASSP=null,SHW=null,PALMS=[],ROCKS=[],CLOUDS=[],BIRDS=[],MNV=[],HEXP=null,SCORCH=[],ZMY=[],ZOWN=[],SHV=[],STV=[],MYHOLD=0,MYPW=[0,0,0],DOCKV='',DOCKS='';const SHP=4,PRV=[0,0,0,0,0,0],HOLDV=[0,0,0,0,0,0];
+let FX=[],PO=[],shake=0,score=0,kills=0,streak=0,streakT=0,en=1,boost=0,tl=120,CN=[0,0,0,0,0,0],FD=[],NM=['','You','Blaze','Mira','Kabir','Nova'],W=WW,H=WH,cs=10,dpr=1,own=new Uint8Array(MW*MH),P=[null],me=null,state='menu',T={},ptr={type:'mouse',x:0,y:0,px:0,py:0,ax:0,ay:0,down:0,id:null},tg={x:0,y:0,a:0},last=0,hudT=0,fr=0,best=0,MDIRTY=true,clk=0;
+let CAM={x:WW/2,y:WH/2,z:15,vz:26,oy:0},vw=400,vh=700,MINI=null,PREV=null,FLASH=null,RINGS=[],MNV=[],SCORCH=[],ZMY=[],ZOWN=[],SHV=[],STV=[],MYHOLD=0,MYPW=[0,0,0],DOCKV='',DOCKS='';const SHP=4,PRV=[0,0,0,0,0,0],HOLDV=[0,0,0,0,0,0];
 
 // ---------- settings and picture quality (saved on the phone) ----------
 const SET={music:1,sfx:1,vib:1,q:'auto',mvol:.8,svol:.9};
-const QLV={high:{fx:1,glow:1,decor:1,cloud:1,dpr:2,hi:1},med:{fx:.65,glow:1,decor:.7,cloud:1,dpr:1.5,hi:0},low:{fx:.35,glow:0,decor:.4,cloud:0,dpr:1,hi:0}};
+// dpr: sharpness of cars and HUD. gls: sharpness of the ground. tier: 1 adds floes, glitter and cracks to the ground. hi: extra sparks and sprays.
+const QLV={high:{fx:1,glow:1,dpr:2,gls:2,tier:1,hi:1},med:{fx:.65,glow:1,dpr:1.5,gls:1.4,tier:1,hi:0},low:{fx:.35,glow:0,dpr:1,gls:.9,tier:0,hi:0}};
 let QL=QLV.high,QNAME='high';
 function lsGet(k,d){try{const v=localStorage.getItem(k);return v==null?d:v}catch(e){return d}}
 function lsSet(k,v){try{localStorage.setItem(k,v);return true}catch(e){return false}}

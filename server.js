@@ -1,8 +1,10 @@
-// Territory Control server v14: menu, lobbies, bot games, database, rewards, 7-day match replays. No required dependencies.
+// Territory Control server v15: menu, lobbies, bot games, database, rewards, 7-day match replays. No required dependencies.
 // Run: node server.js   (set DATABASE_URL to a Postgres database to keep stats permanently)
 const http=require('http'),fs=require('fs'),path=require('path'),crypto=require('crypto'),vm=require('vm'),zlib=require('zlib');
 const PORT=+process.env.PORT||3000,CD=+process.env.CD||10,RCD=+process.env.RCD||3,MATCH=+process.env.MATCH||120,RES=+process.env.RES||20,FILL=+process.env.FILL_S||12,GW=101,GH=177;
-const DIR=__dirname,SELF=process.env.RENDER_EXTERNAL_URL;
+const DIR=__dirname,SELF=process.env.RENDER_EXTERNAL_URL,PROTO=15;
+// a phone whose connection backs up gets fresh snapshots instead of a growing queue of old ones (it is then resynced in one go)
+const BACKLOG=+process.env.BACKLOG||24000;
 // match replays are kept for a few days, then deleted (REPLAY_DAYS), with hard caps so the free database never fills up
 const STEPS=1/30,REPLAY_DAYS=+process.env.REPLAY_DAYS||7,REPLAY_MAX=+process.env.REPLAY_MAX||4000,REPLAY_MB=+process.env.REPLAY_MB||250,REPLAY_BYTES=300000,PURGE_MS=+process.env.PURGE_MS||3600e3;
 const SRC=fs.readFileSync(path.join(DIR,'index.html'),'utf8').match(/<script>([\s\S]*?)<\/script>/)[1].replace(/\/\/@@client[\s\S]*?\/\/@@end/g,'');
@@ -167,7 +169,7 @@ function codeGen(){const A='ABCDEFGHJKMNPQRSTUVWXYZ23456789';for(;;){let c='';fo
 function mkRoom(code,pub,kind){kind=kind||'quick';const r={code,pub,kind,max:kind==='ranked'?2:5,st:'lobby',cl:[],cd:-1,sb:null,last:0,acc:0,tk:0,until:0,names:[],cos:[],mode:'pvp',h0:0,t0:0,created:Date.now(),forf:null,hum:[],eng:null,aloneAt:0};rooms.set(code,r);return r}
 function sync(p){const r=p.room;
  if(r.st!=='play')return send(p,LM(r,p));
- if(p.slot){send(p,{t:'start',W:GW,H:GH,you:p.slot,names:r.names,cos:r.cos,kind:r.kind,seed:r.seed});send(p,vm.runInContext('SNAP(1)',r.sb))}
+ if(p.slot){send(p,{t:'start',W:GW,H:GH,you:p.slot,names:r.names,cos:r.cos,kind:r.kind,seed:r.seed,v:PROTO});p.ack=null;sendSnap(p,fullMsg(r,p))}
  else send(p,{t:'wait',room:r.code,left:Math.ceil(vm.runInContext('tl',r.sb))})}
 function joinRoom(p,r){
  if(r.cl.length>=r.max){send(p,{t:'full'});return}
@@ -184,17 +186,25 @@ function start(r,bots){
  const act=r.cl.filter(p=>p.s).slice(0,5),h=act.length,sb=mk();
  sb.AL=[null,...act.map(p=>okAb(p.row&&p.row.ab))];
  const seed=crypto.randomInt(1,2e9);vm.runInContext('MPS('+h+','+(bots?1:0)+',undefined,'+seed+');recStart()',sb);r.seed=seed;
- r.sb=sb;r.st='play';r.played=1;r.last=Date.now();r.acc=0;r.eng=null;r.tk=0;r.t0=Date.now();r.mode=bots?'bots':'pvp';r.h0=h;r.forf=null;
+ r.sb=sb;r.st='play';r.played=1;r.last=performance.now();r.acc=0;r.eng=null;r.tk=0;r.t0=Date.now();r.mode=bots?'bots':'pvp';r.h0=h;r.forf=null;
  r.names=['',...act.map(p=>p.name)];r.hum=act.map((p,i)=>({pid:p.pid,name:p.name,slot:i+1}));
  const cs=(p,k,tab,d)=>{const v=p.row&&p.row[k];return tab[v]&&lvl(p.row.xp)>=tab[v]?v:d};
  r.cos=[null,...act.map(p=>[cs(p,'skin',SKINS,'sport'),cs(p,'trail',TRAILS,'glow')])];
  if(bots)for(let i=h+1;i<=5;i++){r.names.push('\u{1F916} '+BOTN[i-1]);r.cos.push([['muscle','f1','sport','muscle'][(i-2)%4],['glow','neon','fire','neon'][(i-2)%4]])}
  for(const p of r.cl)p.slot=0;
  act.forEach((p,i)=>{p.slot=i+1});
- for(const p of act)send(p,{t:'start',W:GW,H:GH,you:p.slot,names:r.names,cos:r.cos,kind:r.kind,seed:r.seed});
- snap(r)}
-function snap(r){const m=vm.runInContext('SNAP()',r.sb);for(const p of r.cl)if(p.slot)send(p,m)}
-function end(r){if(r.st!=='play')return;try{snap(r)}catch(e){}r.st='done';r.until=Date.now()+RES*1000;
+ for(const p of act){p.ack=null;p.resync=0;send(p,{t:'start',W:GW,H:GH,you:p.slot,names:r.names,cos:r.cos,kind:r.kind,seed:r.seed,v:PROTO})}
+ broadcast(r)}
+// One snapshot per 1/30 s step. Everyone gets the shared part; each player's own part and input acknowledgement are added on the end.
+const ackTxt=(p,now)=>p.ack?p.ack.s+','+p.ack.c+','+(now-p.ack.t):'0,0,0';
+const ownMsg=(sn,p,now)=>sn.s+',"m":'+(sn.m[p.slot]||'null')+',"a":['+ackTxt(p,now)+']}';
+function fullMsg(r,p){const sn=vm.runInContext('SNAPF()',r.sb);return ownMsg(sn,p,Date.now())}
+function sendSnap(p,msg){const s=p.s;if(!s||s.destroyed)return;if(s.writableLength>BACKLOG){p.resync=1;return}send(p,msg)}
+function broadcast(r){const sn=vm.runInContext('SNAP()',r.sb),now=Date.now();
+ for(const p of r.cl){if(!p.slot||!p.s)continue;
+  if(p.resync){if(p.s.writableLength>BACKLOG/3)continue;p.resync=0;p.ack=p.ack||null;sendSnap(p,fullMsg(r,p));continue}
+  sendSnap(p,ownMsg(sn,p,now))}}
+function end(r){if(r.st!=='play')return;try{broadcast(r)}catch(e){}r.st='done';r.until=Date.now()+RES*1000;
  try{r.eng=JSON.parse(vm.runInContext('recEnd()',r.sb))}catch(e){console.error('record',e.message)}
  for(const p of r.cl)if(p.slot)send(p,{t:'end'});
  settle(r).catch(e=>console.error('settle',e.message)).then(()=>saveReplay(r))}
@@ -202,16 +212,19 @@ function end(r){if(r.st!=='play')return;try{snap(r)}catch(e){}r.st='done';r.unti
 // ---------- messages ----------
 function onMsg(conn,t){let m;try{m=JSON.parse(t)}catch(e){return}
  if(!m||typeof m!=='object')return;
- const now=Date.now();if(now-conn.t0>1000){conn.t0=now;conn.n=0}if(++conn.n>90)return;
+ const now=Date.now();if(now-conn.t0>1000){conn.t0=now;conn.n=0}if(++conn.n>150)return;
  if(m.t==='hello'){const pid=clean(m.pid,64);if(!pid)return;
+  if((+m.v||0)!==PROTO){const o=Buffer.from(JSON.stringify({t:'old',v:PROTO}));try{conn.s.write(Buffer.concat([Buffer.from([129,o.length]),o]))}catch(e){}return}
   let p=players.get(pid);if(!p){p={pid,name:'',s:null,room:null,slot:0,off:0,row:null};players.set(pid,p)}
   if(p.s&&p.s!==conn.s){try{p.s.destroy()}catch(e){}}
   p.s=conn.s;conn.p=p;p.off=0;p.name=clean(m.name,12)||p.name||'Player'+(100+crypto.randomInt(900));
   loadRow(p).then(()=>{const r=p.room;if(r&&rooms.get(r.code)===r){sync(p);if(r.st==='lobby')lobby(r)}}).catch(e=>console.error(e.message));return}
  const p=conn.p;if(!p||p.s!==conn.s)return;
  switch(m.t){
-  case 'p':send(p,'{"t":"p"}');break;
-  case 'in':{const r=p.room;if(r&&r.st==='play'&&p.slot&&Number.isFinite(m.a)){try{r.sb.INP(p.slot,Math.round(Math.max(-7,Math.min(7,m.a))*50),m.b?1:0)}catch(e){}}break}
+  case 'p':send(p,'{"t":"p","c":'+(Number(m.c)||0)+'}');break;
+  case 'in':{const r=p.room;if(r&&r.st==='play'&&p.slot&&Number.isFinite(m.a)){
+   try{r.sb.INP(p.slot,Math.round(Math.max(-7,Math.min(7,m.a))*50),m.b?1:0);if(m.u===1||m.u===2)r.sb.ABU(p.slot,m.u)}catch(e){}
+   p.ack={s:(+m.s||0)>>>0,c:(+m.c||0)>>>0,t:now}}break}
   case 'quick':leaveRoom(p);quick(p);break;
   case 'ranked':leaveRoom(p);ranked(p);break;
   case 'create':leaveRoom(p);joinRoom(p,mkRoom(codeGen(),0,'private'));break;
@@ -259,7 +272,17 @@ const srv=http.createServer((q,r)=>{
  if(u==='/')u='/index.html';
  const f=path.join(DIR,path.normalize(u));
  if(!f.startsWith(DIR+path.sep)||!MT[path.extname(f)]||!fs.existsSync(f)||fs.statSync(f).isDirectory()){r.writeHead(404);return r.end('Not found')}
- r.writeHead(200,{'Content-Type':MT[path.extname(f)],'Cache-Control':'no-cache','X-Content-Type-Options':'nosniff'});fs.createReadStream(f).pipe(r)});
+ // text files are compressed once and kept; the browser revalidates with an ETag, so a repeat visit downloads nothing
+ let e;try{e=fileEntry(f)}catch(x){r.writeHead(500);return r.end('Error')}
+ const h={'Content-Type':MT[path.extname(f)],'Cache-Control':'no-cache','ETag':e.etag,'Vary':'Accept-Encoding','X-Content-Type-Options':'nosniff'};
+ if(String(q.headers['if-none-match']||'').includes(e.etag)){r.writeHead(304,h);return r.end()}
+ if(e.gz&&/\bgzip\b/.test(String(q.headers['accept-encoding']||''))){h['Content-Encoding']='gzip';h['Content-Length']=e.gz.length;r.writeHead(200,h);return r.end(e.gz)}
+ h['Content-Length']=e.raw.length;r.writeHead(200,h);r.end(e.raw)});
+const FILES=new Map();
+function fileEntry(f){const s=fs.statSync(f);let e=FILES.get(f);
+ if(!e||e.mt!==s.mtimeMs||e.size!==s.size){const raw=fs.readFileSync(f);
+  e={mt:s.mtimeMs,size:s.size,raw,gz:/\.(html|js|json|webmanifest|svg|css)$/.test(f)?zlib.gzipSync(raw,{level:9}):null,etag:'W/"'+crypto.createHash('sha1').update(raw).digest('base64').slice(0,20)+'"'};FILES.set(f,e)}
+ return e}
 srv.on('upgrade',(q,s,head)=>{
  const k=q.headers['sec-websocket-key'];if(!k){s.destroy();return}
  s.write('HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: '+crypto.createHash('sha1').update(k+'258EAFA5-E914-47DA-95CA-C5AB0DC85B11').digest('base64')+'\r\n\r\n');
@@ -280,11 +303,12 @@ setInterval(()=>{const now=Date.now();
   if(n<2)r.cd=-1;else if(r.cd<0)r.cd=r.kind==='ranked'?RCD:n>=5?3:CD;else if(n>=5&&r.cd>3)r.cd=3;else if(--r.cd<=0){try{start(r,0)}catch(e){console.error(e);r.cd=-1}continue}
   lobby(r)}},1000);
 // Every match advances in exact 1/30 s steps (never a variable time), so a recorded match can be replayed identically.
-function stepRoom(r){vm.runInContext('STEPF()',r.sb,{timeout:500});if(++r.tk%2===0)snap(r);if(vm.runInContext('tl<=0',r.sb))end(r)}
-setInterval(()=>{const now=Date.now();
+function stepRoom(r){vm.runInContext('STEPF()',r.sb,{timeout:500});r.tk++;broadcast(r);if(vm.runInContext('tl<=0',r.sb))end(r)}
+// A short timer and a precise clock: a step starts within a few milliseconds of when it is due, so every player gets snapshots at an even 30 per second.
+setInterval(()=>{const now=performance.now();
  for(const r of [...rooms.values()]){if(r.st!=='play')continue;
   try{r.acc=Math.min(.25,r.acc+(now-r.last)/1000);r.last=now;for(let n=0;n<8&&r.acc>=STEPS&&r.st==='play';n++){r.acc-=STEPS;stepRoom(r)}}
-  catch(e){console.error('room error',e);end(r)}}},33);
+  catch(e){console.error('room error',e);end(r)}}},4);
 if(SELF)setInterval(()=>{if(players.size)fetch(SELF+'/healthz').catch(()=>{})},240000);
 process.on('uncaughtException',e=>console.error('uncaught',e));
 Promise.race([initDB(),new Promise(r=>setTimeout(r,8000))]).catch(e=>console.error(e.message)).then(()=>{purgeReplays();setInterval(purgeReplays,PURGE_MS);srv.listen(PORT,()=>console.log('Territory Control on http://localhost:'+PORT))});

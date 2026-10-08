@@ -2,6 +2,7 @@
 const BROWSER=typeof WebSocket!=='undefined'&&typeof location!=='undefined';
 let pid='',myName='';
 try{pid=localStorage.getItem('ct-pid')||'';if(!pid){pid=crypto.randomUUID?crypto.randomUUID():String(Math.random()).slice(2)+Date.now();localStorage.setItem('ct-pid',pid)}myName=localStorage.getItem('ct-name')||''}catch(e){pid=pid||String(Math.random()).slice(2)+Date.now()}
+const PROTO=15;
 let ws,online=0,MAP=[0,1,2,3,4,5],rcode='',room0='',replay0='',SERVER='',lastMsg=0,tries=0,rcT=0,scr='',LB=null,ST2=null,NETSTAT='off',WARD=null,LASTPC=0,LASTREP=null,RPLIST=null,netT0=0;
 let ME={name:'',lv:1,pr:0,coins:0,games:0,wins:0,kills:0,deaths:0,best:0,streak:0,bstreak:0,dst:0,dok:true,ach:[],db:'',city:'',state:'',locked:false,rating:800,tier:'Bronze',rgames:0,peak:800,ab:['boost','dash'],abl:['boost','dash','shield','recall'],rdays:7,skin:'sport',trail:'glow'};
 let COS=[null,['sport','glow'],['muscle','neon'],['f1','fire'],['sport','neon'],['muscle','glow']];
@@ -20,13 +21,13 @@ function conn(){
  clearTimeout(rcT);if(!netT0)netT0=Date.now();
  try{if(ws){ws.onclose=ws.onmessage=ws.onopen=null;ws.close()}}catch(e){}
  try{const w=ws=new WebSocket(SERVER||((location.protocol==='https:'?'wss://':'ws://')+location.host));
-  w.onopen=()=>{tries=0;lastMsg=Date.now();w.send(JSON.stringify({t:'hello',pid,name:myName.trim()}))};
+  w.onopen=()=>{tries=0;lastMsg=Date.now();w.send(JSON.stringify({t:'hello',pid,name:myName.trim(),v:PROTO}))};
   w.onmessage=e=>{lastMsg=Date.now();try{net(JSON.parse(e.data))}catch(x){console.error(x)}};
   w.onclose=()=>{if(ws===w)lost()}}catch(e){lost()}}
 function lost(){const was=online;online=0;setNet(Date.now()-netT0>3500?'wake':'off');if(was){$('rc').style.display='block';if(scr==='menu')menu()}clearTimeout(rcT);rcT=setTimeout(conn,Math.min(4000,400*(1<<Math.min(tries++,4))))}
-setInterval(()=>{if(!ws||ws.readyState!==1)return;ws.send('{"t":"p"}');if(Date.now()-lastMsg>9000){try{ws.onclose=null;ws.close()}catch(e){}lost()}},3000);
+setInterval(()=>{if(!ws||ws.readyState!==1)return;ws.send('{"t":"p","c":'+Math.round(now())+'}');if(Date.now()-lastMsg>9000){try{ws.onclose=null;ws.close()}catch(e){}lost()}},3000);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)return;wake();if(SERVER!=='none'&&(!ws||ws.readyState!==1||Date.now()-lastMsg>6000)){tries=0;conn()}});
-function unrle(r){let k=0;for(let i=0;i+1<r.length;i+=2){const n=r[i+1];own.fill(MAP[r[i]]||0,k,Math.min(own.length,k+n));k+=n}MDIRTY=true}
+function unrle(r){let k=0;for(let i=0;i+1<r.length;i+=2){const n=r[i+1],v=MAP[r[i]]||0;own.fill(v,k,Math.min(own.length,k+n));if(OWNS)OWNS.fill(v,k,Math.min(own.length,k+n));k+=n}MDIRTY=true}
 function net(m){
  $('rc').style.display='none';
  if(m.t==='me'){const first=!online;online=1;ME=m;setNet('on');
@@ -35,6 +36,8 @@ function net(m){
   if(m.name&&!myName){myName=m.name}
   if(first&&room0){const c=room0;room0='';try{history.replaceState(null,'',location.pathname)}catch(e){}tx({t:'join',room:c,make:1});waitUI()}
   else if(scr==='menu')menu();else if(scr==='rewards')rewardsUI();else if(scr==='stats')statsUI();else if(scr==='garage')garageUI(1)}
+ else if(m.t==='p'){const d=now()-m.c;if(d>=0&&d<5000)NC.ping=NC.ping?NC.ping+(d-NC.ping)*.3:d}
+ else if(m.t==='old'){online=0;setNet('off');try{ws.onclose=null;ws.close()}catch(e){}show('<div class="big-t">Update needed</div><p>A newer version of the game is available. Reload this page to get it.</p><button class="btn" data-a="reload">Reload</button>','old')}
  else if(m.t==='stats'){ST2=m;if(scr==='stats')statsUI()}
  else if(m.t==='war'){WARD=m;if(scr==='war')warUI()}
  else if(m.t==='ch'){rcode=m.room;shareChallenge()}
@@ -52,19 +55,7 @@ function net(m){
   me=P[1];MAP=[0];let k=2;for(let s=1;s<=5;s++)MAP[s]=s===m.you?1:k++;
   NM=['','','','','',''];for(let s=1;s<=5;s++)NM[MAP[s]]=s===m.you?'You':(m.names[s]||'');
   COS=[null];for(let s=1;s<=5;s++)COS[MAP[s]]=(m.cos&&m.cos[s])||['sport','glow'];
-  AB_=(ME.ab&&ME.ab.length===2)?ME.ab.slice():['boost','dash'];RDY=[1,1];setAbLabels();lastSec=99;
+  AB_=(ME.ab&&ME.ab.length===2)?ME.ab.slice():['boost','dash'];RDY=[1,1];setAbLabels();lastSec=99;ncReset(m.you);
   KIND=m.kind||'quick';DEATH='';CAM.vz=70;CAM.fy=.5;FX=[];PO=[];FD=[];score=kills=streak=0;en=1;boost=0;shake=0;state='play';scr='play';hideOv();snd('start');wake()}
- else if(m.t==='s'&&state==='play'){
-  if(m.f)for(const q of P)if(q)q.tr=[];
-  if(m.o)unrle(m.o);
-  tl=m.tl;
-  m.p.forEach((a,i)=>{const p=P[MAP[i+1]],was=p.alive;
-   p.x=a[0];p.y=a[1];p.a=a[2];p.alive=!!a[3];p.sh=a[4];p.st=clk;p.shd=a[8]||0;p.fl=a[9]||0;
-   if(a[5]!==p.rs){if(p.tr.length>3)p.ghost={tr:p.tr,t0:clk};p.tr=[];p.rs=a[5]}
-   const d=a[6]||[];for(let k=0;k<d.length;k++)p.tr.push(d[k]/20);
-   if(!was&&p.alive){p.rx=p.x;p.ry=p.y;p.ra=p.a;p.born=clk;if(p===me)tg.a=p.a}
-   if(was&&!p.alive){p.wreck={x:p.rx,y:p.ry,a:p.ra,t0:clk};burst(p.rx,p.ry,COLS[p.id],p===me?60:34,11);if(p===me){shake=16;snd('die');buzz(200)}else snd('ko')}
-   HOLDV[p.id]=a[10]||0;PRV[p.id]=a[12]||0;if(p===me){RDY=a[7]||[1,1];en=AB_[0]==='boost'?RDY[0]:AB_[1]==='boost'?RDY[1]:1;MYHOLD=a[10]||0;MYPW=a[11]||[0,0,0]}});
-  MNV=(m.mn||[]).map(v=>[v[0],v[1],MAP[v[2]],v[3]]);ZOWN=(m.z||[]).map(o=>MAP[o]||0);SHV=(m.sh||[]).map(v=>[v[0],v[1],v[2],v[3],MAP[v[4]]]);STV=(m.sk||[]).map(v=>[v[0],v[1],v[2],MAP[v[3]]]);
-  if(m.e)for(const [ty,s,x,y] of m.e){if(ty==='ko'){koMsg(MAP[s],x?MAP[x]:0,y);continue}if(ty==='zone'){zoneEv(s,MAP[x]||0,MAP[y]||0);continue}if(ty==='seize'){seizeEv(MAP[s],MAP[x],y);continue}if(ty==='strike'){strikeEv(MAP[s],MAP[x]);continue}const p=P[MAP[s]];if(p)evFx(ty,p===me,x,y)}}
+ else if(m.t==='s'&&state==='play'){ncOnSnap(m)}
  else if(m.t==='end'&&state==='play'){tl=0;hud(1);finish()}}

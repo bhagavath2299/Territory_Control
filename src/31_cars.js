@@ -1,5 +1,5 @@
 // ---------- the three cars: drawn once into sprites (body, wheels, shadow), plus shared light sprites and the trail styles ----------
-const CARK=1.14;                                        // cars are drawn a little larger than their hit size so the detail can be seen
+const CARK=1.22;                                        // cars are drawn a little larger than their hit size so the detail can be seen
 const CSW=4.0,CSH=2.5;                                  // sprite size in world units; the middle of the sprite is the middle of the car
 const CARSPR={},CARHI={},WHLSPR={},SHSPR={},GLWSPR=[null],LSPR={};
 const WHL={ // wheel centres and sizes in world units: front x, |y|, length, width; rear x, |y|, length, width
@@ -159,8 +159,11 @@ function buildLightSprites(){
  {const c=mkc(160,64),g=c.getContext('2d');g.translate(0,32);const gr=g.createLinearGradient(160,0,0,0);gr.addColorStop(0,'rgba(255,255,235,1)');gr.addColorStop(.18,'rgba(255,214,110,.95)');gr.addColorStop(.5,'rgba(255,120,30,.6)');gr.addColorStop(1,'rgba(255,60,10,0)');g.fillStyle=gr;g.beginPath();g.moveTo(160,-14);g.quadraticCurveTo(80,-20,0,0);g.quadraticCurveTo(80,20,160,14);g.closePath();g.fill();LSPR.flame=c;
   const c2=mkc(160,64),h=c2.getContext('2d');h.translate(0,32);const g2=h.createLinearGradient(160,0,0,0);g2.addColorStop(0,'rgba(235,250,255,1)');g2.addColorStop(.2,'rgba(150,215,255,.95)');g2.addColorStop(.55,'rgba(60,130,255,.55)');g2.addColorStop(1,'rgba(40,90,255,0)');h.fillStyle=g2;h.beginPath();h.moveTo(160,-14);h.quadraticCurveTo(80,-20,0,0);h.quadraticCurveTo(80,20,160,14);h.closePath();h.fill();LSPR.blue=c2}
  // smoke puff
- {const c=mkc(64,64),g=c.getContext('2d');g.fillStyle=rg(g,32,32,0,32,32,32,[[0,'rgba(235,238,245,.8)'],[.55,'rgba(200,205,215,.35)'],[1,'rgba(200,205,215,0)']]);g.fillRect(0,0,64,64);LSPR.smoke=c}}
-function buildCars(){buildLightSprites();
+ {const c=mkc(64,64),g=c.getContext('2d');g.fillStyle=rg(g,32,32,0,32,32,32,[[0,'rgba(120,132,156,.62)'],[.55,'rgba(140,152,176,.28)'],[1,'rgba(150,160,184,0)']]);g.fillRect(0,0,64,64);LSPR.smoke=c}}
+let CARSB=0;
+function buildCars(){buildLightSprites();CARSB=1;if(!(GLS.ok&&CARGL.ok))buildLegacyCars()}
+// the flat sprites: only needed on phones without the graphics chip path
+function buildLegacyCars(){if(CARSPR.sport1)return;
  for(const m of CARS){const w=WHL[m];
   const mkset=cu=>({cu,wf:wheelSprite(w.fl,w.fw,cu,m==='f1'),wr:wheelSprite(w.rl,w.rw,cu,m==='f1')});
   WHLSPR[m]=mkset(64);
@@ -228,22 +231,33 @@ function drawTrail(g,t,q,style,k,tm,al,hx,hy){
  g.restore()}
 
 // ---------- garage and menu pictures ----------
+// A snow plate with the car on it. Phones with the graphics chip get the real lit car and trail; others get the flat sprites.
 const GAR_L={sh:.4,lx:.5,ly:.8,glow:1,gk:1};
-function carThumb(c,m){const g=c.getContext('2d'),W=c.width,H=c.height;g.clearRect(0,0,W,H);g.imageSmoothingQuality='high';
+let PICT=null;
+function pictCanvas(w,h){if(!PICT)PICT=mkc(w,h);if(PICT.width!==w||PICT.height!==h){PICT.width=w;PICT.height=h}return PICT}
+function snowPlate(g,W,H,dark){g.save();
+ g.fillStyle=rg(g,W*.5,H*.46,W*.03,W*.5,H*.5,W*.66,[[0,'#ffffff'],[.62,'#f1f5fb'],[1,dark?'#c9d6e8':'#dbe5f2']]);g.fillRect(0,0,W,H);
+ if(typeof grainTile==='function'){g.globalAlpha=.5;g.fillStyle=g.createPattern(grainTile(),'repeat');g.fillRect(0,0,W,H);g.globalAlpha=1}
+ g.restore()}
+function glCar(m,x,y,a,st,sc,q){return{x,y,a,sc:sc||1.22,m,c:COLRGB[q||1],st:st||0,al:1,em:1}}
+function carThumb(c,m){const g=c.getContext('2d'),W=c.width,H=c.height;g.clearRect(0,0,W,H);g.imageSmoothingQuality='high';snowPlate(g,W,H);
+ if(GLS.ok&&CARGL.ok){const t=pictCanvas(W,H);if(carPicture(t,[glCar(m,0,0,-.3,0,1.22)],0,0,W*.158,MOODS[0])){g.drawImage(t,0,0);return}}
  g.fillStyle=rg(g,W/2,H*.58,4,W/2,H*.58,W*.45,[[0,'rgba(130,180,255,.4)'],[1,'rgba(130,180,255,0)']]);g.fillRect(0,0,W,H);
  const u=W*.255;g.save();g.translate(W/2,H*.52);g.scale(u,u);drawCar(g,0,0,-.32,1,m,0,1,1,1,GAR_L);g.restore()}
-function trailThumb(c,k){const g=c.getContext('2d'),W=c.width,H=c.height;g.clearRect(0,0,W,H);g.imageSmoothingQuality='high';
- const u=W*.062;g.save();g.translate(W/2,H/2);g.scale(u,u);const t=[];for(let i=0;i<=44;i++){const s=i/44;t.push(-2.9+s*5.4,Math.sin(s*5.4)*.62+(.5-s)*.2)}
- drawTrail(g,t,1,k,1,k==='fire'?.4:.8,1);
- const e=t.length,hx=t[e-2],hy=t[e-1],an=Math.atan2(hy-t[e-4],hx-t[e-6]);drawCar(g,hx+.2,hy,an,1,'sport',0,.62,1,1,GAR_L);g.restore()}
+function trailThumb(c,k){const g=c.getContext('2d'),W=c.width,H=c.height;g.clearRect(0,0,W,H);g.imageSmoothingQuality='high';snowPlate(g,W,H);
+ const t=[];for(let i=0;i<=44;i++){const s=i/44;t.push(-2.9+s*5.4,Math.sin(s*5.4)*.62+(.5-s)*.2)}
+ const e=t.length,hx=t[e-2],hy=t[e-1],an=Math.atan2(hy-t[e-4],hx-t[e-6]);
+ if(GLS.ok&&CARGL.ok&&TRL.ok){const pc=pictCanvas(W,H);if(carPicture(pc,[glCar('sport',hx+.2,hy,an,0,.8)],0,0,W*.105,MOODS[0],[{tr:t,hx:hx+.2,hy,c:COLRGB[1],st:k,al:1,k:1}],k==='fire'?.4:.8)){g.drawImage(pc,0,0);return}}
+ const u=W*.062;g.save();g.translate(W/2,H/2);g.scale(u,u);drawTrail(g,t,1,k,1,k==='fire'?.4:.8,1);drawCar(g,hx+.2,hy,an,1,'sport',0,.62,1,1,GAR_L);g.restore()}
 // the garage preview: your car drives a loop and leaves the trail you picked
 const GPT=[];
-function drawGaragePreview(c,tm){const g=c.getContext('2d'),W=c.width,H=c.height;g.clearRect(0,0,W,H);g.imageSmoothingQuality='high';
- g.fillStyle=rg(g,W/2,H*.55,10,W/2,H*.55,W*.5,[[0,'rgba(130,180,255,.32)'],[1,'rgba(130,180,255,0)']]);g.fillRect(0,0,W,H);
- const u=W/9.2,w=.85,pos=s=>[Math.sin(s*w)*2.55,Math.sin(s*w*2)*.95+.1];
+function drawGaragePreview(c,tm){const g=c.getContext('2d'),W=c.width,H=c.height;g.clearRect(0,0,W,H);g.imageSmoothingQuality='high';snowPlate(g,W,H);
+ const w=.85,pos=s=>[Math.sin(s*w)*2.55,Math.sin(s*w*2)*.95+.1];
  const t=[];const T=tm;for(let i=40;i>=0;i--){const p=pos(T-i*.07);t.push(p[0],p[1])}
  const p0=pos(T),p1=pos(T-.02),an=Math.atan2(p0[1]-p1[1],p0[0]-p1[0]);
  let st=0;{const pa=pos(T-.12),an2=Math.atan2(p1[1]-pa[1],p1[0]-pa[0]),d=an-an2;st=Math.max(-.4,Math.min(.4,(Math.abs(d)<3?d:0)*5))}
- g.save();g.translate(W/2,H/2);g.scale(u,u);
+ if(GLS.ok&&CARGL.ok&&TRL.ok){const pc=pictCanvas(W,H);if(carPicture(pc,[glCar(LOAD.skin,p0[0],p0[1],an,st,1.22)],0,0,W/12.6,MOODS[0],[{tr:t,hx:p0[0],hy:p0[1],c:COLRGB[1],st:LOAD.trail,al:1,k:1}],tm)){g.drawImage(pc,0,0);return}}
+ g.fillStyle=rg(g,W/2,H*.55,10,W/2,H*.55,W*.5,[[0,'rgba(130,180,255,.32)'],[1,'rgba(130,180,255,0)']]);g.fillRect(0,0,W,H);
+ const u=W/9.2;g.save();g.translate(W/2,H/2);g.scale(u,u);
  drawTrail(g,t,1,LOAD.trail,1,tm,1,p0[0],p0[1]);
  drawCar(g,p0[0],p0[1],an,1,LOAD.skin,st,1,1,1,GAR_L);g.restore()}

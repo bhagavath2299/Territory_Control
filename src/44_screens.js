@@ -135,6 +135,7 @@ function warUI(){const w=WARD,m=ME,my=(w&&w.my)||{};
 function act(a,v,el){
  switch(a){
   case 'start':bootStart();break;
+  case 'reload':location.reload();break;
   case 'quick':if(online){tx({t:'quick'});waitUI()}else localMatch(4,'bots');break;
   case 'ranked':if(online){tx({t:'ranked'});waitUI()}else localMatch(1,'ranked');break;
   case 'bots':localMatch(4,'bots');break;

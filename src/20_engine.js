@@ -15,7 +15,7 @@ function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a
 // ---------- deterministic helpers: the same numbers on every device, so a recorded match replays exactly ----------
 // The match uses its own seeded random numbers (GR) and arithmetic-only trig (dsin, dcos, dat2, dhyp). Browsers differ in the
 // last digits of Math.sin, Math.cos, Math.atan2 and Math.hypot; those tiny differences could otherwise split a replay from the real match.
-const STEP=1/30,EVER=14,CAPT=[];let GRS=1,TK=0,REC=null;
+const STEP=1/30,EVER=15,CAPT=[];let GRS=1,TK=0,REC=null;
 function GR(){GRS=GRS+0x6D2B79F5|0;let t=Math.imul(GRS^GRS>>>15,1|GRS);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}
 function ksin(r){const z=r*r;return r*(1+z*(-1/6+z*(1/120+z*(-1/5040+z*(1/362880+z*(-1/39916800+z*(1/6227020800+z*(-1/1307674368000))))))))}
 function kcos(r){const z=r*r;return 1+z*(-1/2+z*(1/24+z*(-1/720+z*(1/40320+z*(-1/3628800+z*(1/479001600+z*(-1/87178291200+z*(1/20922789888000))))))))}
@@ -28,7 +28,7 @@ const dhyp=(x,y)=>Math.sqrt(x*x+y*y);
 const isLand=(x,y)=>ISL[gy(y)*MW+gx(x)]===1;
 // ---------- power zones: own half of a zone to unlock its power ----------
 let ZN=[],SHL=[],STR=[],ZT=0;const PROT=[0,0,0,0,0,0],HOLD=[0,0,0,0,0,0],PWC=[null,[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]];
-const ZR=3.2,PK=['cannon','fort','strike'],ZBIT={cannon:1,fort:2,strike:4,nitro:8},ZCD={cannon:3.5,fort:25,strike:22},
+const SHS=45,ZR=3.2,PK=['cannon','fort','strike'],ZBIT={cannon:1,fort:2,strike:4,nitro:8},ZCD={cannon:3.5,fort:25,strike:22},
  ZNAME={cannon:'Armory',fort:'Bastion',strike:'Missile Silo',nitro:'Nitro Station'},ZPOW={cannon:'Cannon',fort:'Fortify',strike:'Airstrike',nitro:'Nitro'};
 function placeZones(){const R=mulberry32((SEED^0x2545F491)>>>0),types=['cannon','fort','strike','nitro','cannon','fort'];ZN=[];
  for(const gap of [22,16,11])for(let k=0;k<3000&&ZN.length<types.length;k++){const ci=LANDI[(R()*LANDI.length)|0],x=(ci%MW+.5)/MC,y=(((ci/MW)|0)+.5)/MC;
@@ -41,7 +41,7 @@ function zoneTick(dt){ZT-=dt;if(ZT>0)return;ZT=.2;HOLD.fill(0);
   let o=0;for(let i=1;i<=5;i++)if(cn[i]*2>=z.c.length&&P[i]&&P[i].alive){o=i;break}
   if(o!==z.own){EV.push(['zone',zi,o,z.own]);z.own=o}if(o)HOLD[o]|=ZBIT[z.t]}}
 function POW(i,k){const p=P[i],j=PK.indexOf(k);if(!p||!p.alive||j<0||!(HOLD[i]&ZBIT[k])||PWC[i][j]>0)return false;
- if(k==='cannon'){const c=dcos(p.a),s=dsin(p.a);SHL.push({x:p.x+c*1.4,y:p.y+s*1.4,vx:c*30,vy:s*30,o:i,d:0});EV.push(['fire',i,+p.x.toFixed(1),+p.y.toFixed(1)])}
+ if(k==='cannon'){const c=dcos(p.a),s=dsin(p.a);SHL.push({x:p.x+c*1.4,y:p.y+s*1.4,vx:c*SHS,vy:s*SHS,o:i,d:0});EV.push(['fire',i,+p.x.toFixed(1),+p.y.toFixed(1)])}
  else if(k==='fort'){PROT[i]=8;EV.push(['fort',i,+p.x.toFixed(1),+p.y.toFixed(1)])}
  else{const cn=[0,0,0,0,0,0];for(let q=0;q<own.length;q++)cn[own[q]]++;let tg=0;for(let q=1;q<=5;q++)if(q!==i&&P[q].alive&&cn[q]>0&&(!tg||cn[q]>cn[tg]))tg=q;if(!tg)return false;
   const cells=[];for(let q=0;q<own.length;q++)if(own[q]===tg)cells.push(q);const pts=[];
@@ -55,8 +55,8 @@ function blast(x,y,r,o){const cx=x*MC,cy=y*MC,rc=r*MC,r2=rc*rc,hit=[];let n=0;
  if(n){MDIRTY=true;for(const v of hit){let has=false;for(let i=0;i<own.length;i++)if(own[i]===v){has=true;break}if(!has&&P[v].alive)kill(P[v],o,'blast')}}
  return n}
 function shellTick(dt){
- for(let k=SHL.length-1;k>=0;k--){const s=SHL[k];let hit=false;for(let j=0;j<4&&!hit;j++){s.x+=s.vx*dt/4;s.y+=s.vy*dt/4;s.d+=30*dt/4;
-   if(s.x<0||s.y<0||s.x>=WW||s.y>=WH||s.d>=11)hit=true;else if(s.pen!==undefined){s.pen-=30*dt/4;if(s.pen<=0)hit=true}else if(s.d>1.2){const o=ownAt(s.x,s.y);if(o&&o!==s.o)s.pen=1.5}}
+ for(let k=SHL.length-1;k>=0;k--){const s=SHL[k];let hit=false;for(let j=0;j<4&&!hit;j++){s.x+=s.vx*dt/4;s.y+=s.vy*dt/4;s.d+=SHS*dt/4;
+   if(s.x<0||s.y<0||s.x>=WW||s.y>=WH||s.d>=11)hit=true;else if(s.pen!==undefined){s.pen-=SHS*dt/4;if(s.pen<=0)hit=true}else if(s.d>1.2){const o=ownAt(s.x,s.y);if(o&&o!==s.o)s.pen=1.5}}
   if(hit){SHL.splice(k,1);blast(s.x,s.y,2.1,s.o)}}
  for(let k=STR.length-1;k>=0;k--){const s=STR[k];s.t-=dt;if(s.t<=0){STR.splice(k,1);blast(s.x,s.y,2.6,s.o)}}}
 
@@ -124,13 +124,24 @@ function pointStep(p){
   const t=p.tr,L=t.length;if(dhyp(p.x-t[L-2],p.y-t[L-1])>=TSP)t.push(p.x,p.y);
   if(!(GHO[p.id]>0))for(let i=2;i+3<L-12;i+=2)if(Math.abs(p.x-t[i])<1.5&&Math.abs(p.y-t[i+1])<1.5&&segD2(p.x,p.y,t[i],t[i+1],t[i+2],t[i+3])<.09){kill(p,0,'self');return}}
  if(!(GHO[p.id]>0))for(const q of P)if(q&&q!==p&&q.alive&&q.tr.length>=4&&!(GHO[q.id]>0)){const t=q.tr;for(let i=0;i+3<t.length;i+=2)if(Math.abs(p.x-t[i])<2&&Math.abs(p.y-t[i+1])<2&&segD2(p.x,p.y,t[i],t[i+1],t[i+2],t[i+3])<.64){kill(q,p.id,'cut');break}}}
-function stepP(p,dt,spd){
- const d=angd(p.a,p.da),m=TURN*dt;p.a+=Math.abs(d)<m?d:Math.sign(d)*m;if(p.a>Math.PI)p.a-=6.2832;else if(p.a<-Math.PI)p.a+=6.2832;
+// How a car moves. The server's step and the phone's prediction of your own car both use these two functions, so they agree exactly.
+function turnTo(s,da,dt){const d=angd(s.a,da),m=TURN*dt;s.a+=Math.abs(d)<m?d:(d<0?-m:m);if(s.a>Math.PI)s.a-=6.2832;else if(s.a<-Math.PI)s.a+=6.2832}
+function moveSub(s,c,sn,st){let nx=Math.min(WW-HR,Math.max(HR,s.x+c*st)),ny=Math.min(WH-HR,Math.max(HR,s.y+sn*st));
+ if(!isLand(nx,ny)){if(isLand(nx,s.y))ny=s.y;else if(isLand(s.x,ny))nx=s.x;else{nx=s.x;ny=s.y}}
+ s.x=nx;s.y=ny}
+function stepP(p,dt,spd){turnTo(p,p.da,dt);
  const dist=spd*dt,n=Math.max(1,Math.ceil(dist/.35)),st=dist/n,c=dcos(p.a),s=dsin(p.a);
- for(let k=0;k<n&&p.alive;k++){let nx=Math.min(WW-HR,Math.max(HR,p.x+c*st)),ny=Math.min(WH-HR,Math.max(HR,p.y+s*st));
-  if(!isLand(nx,ny)){if(isLand(nx,p.y))ny=p.y;else if(isLand(p.x,ny))nx=p.x;else{nx=p.x;ny=p.y}}
-  p.x=nx;p.y=ny;pointStep(p)}}
+ for(let k=0;k<n&&p.alive;k++){moveSub(p,c,s,st);pointStep(p)}}
 function rayOut(p,ph){let d=0;while(d<30&&ownAt(p.x+dcos(ph)*d,p.y+dsin(ph)*d)===p.id)d+=.5;return d}
+// How many of the next n ticks would the car stay on land if it steered toward heading c? (same speed and turning as the real thing, so tight shores are judged right)
+function landRun(p,c,n){let x=p.x,y=p.y,a=p.a;const m=TURN*STEP,st=SPD*.92*STEP;
+ for(let i=0;i<n;i++){const d=angd(a,c);a+=Math.abs(d)<m?d:(d<0?-m:m);x+=dcos(a)*st;y+=dsin(a)*st;if(!isLand(x,y))return i}
+ return n}
+// Keep the wanted heading if it is safe, otherwise the nearest heading that is (fanning out to the side it chose last time, so it does not dither at a shore)
+function botAvoid(p,da){const N=15;let bn=landRun(p,da,N);if(bn>=N)return da;
+ const sg0=p.avs||1;let best=da;
+ for(let k=1;k<=10;k++)for(let j=0;j<2;j++){const sg=j?-sg0:sg0,c=da+sg*k*.3,r=landRun(p,c,N);if(r>=N){p.avs=sg;return c}if(r>bn){bn=r;best=c}}
+ return best}
 function botCtl(p,dt){
  const inside=ownAt(p.x,p.y)===p.id;
  if(!p.plan&&inside){const base=dat2(WH/2-p.y,WW/2-p.x),ph=GR()<.6?base+rr(-1.3,1.3):rr(-3.14,3.14),sg=GR()<.5?1:-1,R1=rayOut(p,ph)+rr(2.5,6),R2=rr(3,7),pa=ph+sg*1.5708;
@@ -148,8 +159,13 @@ function botCtl(p,dt){
  if(p.hunt)da=dat2(p.hunt[1]-p.y,p.hunt[0]-p.x);
  const lx=p.x+dcos(p.a)*1.8,ly=p.y+dsin(p.a)*1.8;
  if(p.out)for(let i=0;i+1<p.tr.length-14;i+=2)if(dhyp(lx-p.tr[i],ly-p.tr[i+1])<1.5){da=p.a+(GR()<.5?1.3:-1.3);break}
- if(!isLand(lx,ly)||!isLand(p.x+dcos(p.a)*3.2,p.y+dsin(p.a)*3.2))da=dat2(MCY-p.y,MCX-p.x)+(GR()-.5)*.8;
- p.bc=(p.bc||0)-dt;if(p.hunt&&p.bc<=0&&dhyp(p.hunt[0]-p.x,p.hunt[1]-p.y)<5){p.bd=.28;p.bc=7;EV.push(['dash',p.id,+p.x.toFixed(1),+p.y.toFixed(1)])}
+ da=botAvoid(p,da);
+ // pinned or sliding along a shore (the car turns in place but cannot move): pivot toward the most open direction for a moment and drop the plan that led here
+ {const mv=p.qx===undefined?9:dhyp(p.x-p.qx,p.y-p.qy);p.qx=p.x;p.qy=p.y;p.pin=(mv<.25&&!(SLOW[p.id]>0))?(p.pin||0)+1:0;
+  if(p.pvt>0){p.pvt-=dt;da=p.pv}
+  else if(p.pin>=4){let bk=-99,ba=da;for(let k=0;k<24;k++){const an=-3.1416+k*.2618;let d=0;while(d<7&&isLand(p.x+dcos(an)*d,p.y+dsin(an)*d))d+=.35;const sc=d-.4*Math.abs(angd(an,da));if(sc>bk){bk=sc;ba=an}}
+   p.pv=ba;p.pvt=.7;p.pin=0;p.plan=null;da=ba}}
+ p.bc=(p.bc||0)-dt;if(p.hunt&&p.bc<=0&&dhyp(p.hunt[0]-p.x,p.hunt[1]-p.y)<5){p.bd=DSHT;p.bc=7;EV.push(['dash',p.id,+p.x.toFixed(1),+p.y.toFixed(1)])}
  p.bm=(p.bm||0)-dt;if(p.out&&p.bm<=0&&p.tr.length>50&&GR()<.02){p.bm=12;const mx=p.x-dcos(p.a)*1.5,my=p.y-dsin(p.a)*1.5;MINES.push({x:mx,y:my,o:p.id,t:14,arm:.5});EV.push(['mine',p.id,+mx.toFixed(1),+my.toFixed(1)])}
  const hb=HOLD[p.id];if(hb){const pc=PWC[p.id];
   if((hb&1)&&pc[0]<=0)for(let d=2;d<=10;d++){const o=ownAt(p.x+dcos(p.a)*d,p.y+dsin(p.a)*d);if(o&&o!==p.id&&!(PROT[o]>0)){POW(p.id,'cannon');break}}
@@ -166,7 +182,7 @@ function recallTo(p,t){p.tr=[];p.sent=0;p.rs++;p.out=false;let b=-1,bd=1e9;const
  if(b>=0){p.x=p.lx=((b%MW)+.5)/MC;p.y=p.ly=(((b/MW)|0)+.5)/MC}}
 function USE(i,s){const t=IN[i],p=P[i];if(!t||!p||!p.alive||s<1||s>2)return;const k=s-1,a=t.ab[k];if(t.cd[k]>0)return;
  const ev=n=>EV.push([n,i,+p.x.toFixed(1),+p.y.toFixed(1)]);
- if(a==='dash'){t.cd[k]=CDM.dash;t.dash=.28;ev('dash')}
+ if(a==='dash'){t.cd[k]=CDM.dash;t.dash=DSHT;ev('dash')}
  else if(a==='shield'&&!SHD[i]){t.cd[k]=CDM.shield;SHD[i]=1;t.sd=8;ev('shield')}
  else if(a==='recall'&&p.tr.length){t.cd[k]=CDM.recall;recallTo(p,t);ev('recall')}
  else if(a==='ghost'){t.cd[k]=CDM.ghost;GHO[i]=2.5;ev('ghost')}
@@ -174,7 +190,8 @@ function USE(i,s){const t=IN[i],p=P[i];if(!t||!p||!p.alive||s<1||s>2)return;cons
  else if(a==='emp'){t.cd[k]=CDM.emp;for(let j=1;j<=5;j++){const q=P[j];if(j!==i&&q.alive&&dhyp(q.x-p.x,q.y-p.y)<7)SLOW[j]=2.2}ev('emp')}
  else if(a==='grab'&&nearOwn(p)){t.cd[k]=CDM.grab;grabAt(p);ev('grab')}}
 // ---------- one fixed step, recorded inputs and checksums (used by the server, by practice matches and by replays) ----------
-function INP(i,ai,b){const t=IN[i];if(!t)return;const a=ai/50,bb=b?1:0;if(t.a===a&&t.b===bb)return;t.a=a;t.b=bb;if(REC)REC.ops.push([TK,i,0,ai,bb])}
+function INP(i,ai,b){const t=IN[i];if(!t)return;const a=ai/50,bb=b?1:0;if(t.a===a&&t.b===bb)return;t.a=a;t.b=bb;
+ if(REC){const L=REC.ops[REC.ops.length-1];if(L&&L[0]===TK&&L[1]===i&&L[2]===0){L[3]=ai;L[4]=bb}else REC.ops.push([TK,i,0,ai,bb])}}
 function ABU(i,s){USE(i,s);if(REC)REC.ops.push([TK,i,1,s])}
 function PWU(i,k){POW(i,k);if(REC)REC.ops.push([TK,i,2,PK.indexOf(k)])}
 function DRP(i){DROP(i);if(REC)REC.ops.push([TK,i,3])}
@@ -193,18 +210,44 @@ function upd(dt){tl-=dt;streakT-=dt;if(IS_SRV){FX.length=0;PO.length=0;FD.length
   for(let j=1;j<=5;j++){const q=P[j];if(j===m.o||!q.alive||q.sh>0)continue;if(dhyp(q.x-m.x,q.y-m.y)<.95){EV.push(['boom',m.o,+m.x.toFixed(1),+m.y.toFixed(1)]);kill(q,m.o,'mine');MINES.splice(k,1);break}}}
  for(let i=1;i<=5;i++){const p=P[i],t=IN[i];p.sh-=dt;
   if(!p.alive){if((p.rt-=dt)<=0){spawn(p);if(t&&p.alive)t.a=p.a}continue}
-  if(!t){if(BOTS&&i>HN){botCtl(p,dt);if(p.bd>0)p.bd-=dt;stepP(p,dt,SPD*.92*(p.bd>0?3:1)*(SLOW[i]>0?.55:1)*((HOLD[i]&8)?1.15:1))}continue}
+  if(!t){if(BOTS&&i>HN){botCtl(p,dt);if(p.bd>0)p.bd-=dt;stepP(p,dt,SPD*.92*(p.bd>0?DSHM:1)*(SLOW[i]>0?SLWM:1)*((HOLD[i]&8)?NITM:1))}continue}
   t.cd[0]=Math.max(0,t.cd[0]-dt);t.cd[1]=Math.max(0,t.cd[1]-dt);
   if(SHD[i]>0&&(t.sd-=dt)<=0)SHD[i]=0;
-  const b=t.b&&t.en>0&&t.ab.includes('boost'),slw=SLOW[i]>0?.55:1;t.en=b?Math.max(0,t.en-dt*.5):Math.min(1,t.en+dt*.2);
+  const b=t.b&&t.en>0&&t.ab.includes('boost'),slw=SLOW[i]>0?SLWM:1;t.en=b?Math.max(0,t.en-dt*.5):Math.min(1,t.en+dt*.2);
   const dsh=t.dash>0;if(dsh)t.dash-=dt;
-  p.da=t.a;stepP(p,dt,SPD*(b?1.55:1)*(dsh?3:1)*slw*((HOLD[i]&8)?1.15:1))}}
+  p.da=t.a;stepP(p,dt,SPD*(b?BSTM:1)*(dsh?DSHM:1)*slw*((HOLD[i]&8)?NITM:1))}}
 function rle(){const r=[];let c=own[0],n=0;for(let i=0;i<own.length;i++){if(own[i]===c)n++;else{r.push(c,n);c=own[i];n=1}}r.push(c,n);return r}
-function SNAP(f){
- const d=P.slice(1).map((p,i)=>{const nw=p.tr.slice(f?0:p.sent).map(v=>Math.round(v*20));if(!f)p.sent=p.tr.length;
-  return [+p.x.toFixed(2),+p.y.toFixed(2),+p.a.toFixed(2),p.alive?1:0,+Math.max(0,p.sh).toFixed(1),p.rs,nw,rdyOf(IN[i+1]),SHD[i+1],(SLOW[i+1]>0?1:0)|(GHO[i+1]>0?2:0)|(((IN[i+1]&&IN[i+1].dash>0)||p.bd>0)?4:0),HOLD[i+1],PWC[i+1].map((c,j)=>+(1-c/ZCD[PK[j]]).toFixed(2)),+Math.max(0,PROT[i+1]).toFixed(1)]});
- const o=(f||MDIRTY)?rle():undefined;if(!f)MDIRTY=false;
- return JSON.stringify({t:'s',tl:+tl.toFixed(1),p:d,o,mn:MINES.length?MINES.map(m=>[+m.x.toFixed(1),+m.y.toFixed(1),m.o,m.arm>0?0:1]):undefined,z:ZN.map(z=>z.own),sh:SHL.length?SHL.map(s=>[+s.x.toFixed(1),+s.y.toFixed(1),+s.vx.toFixed(1),+s.vy.toFixed(1),s.o]):undefined,sk:STR.length?STR.map(s=>[+s.x.toFixed(1),+s.y.toFixed(1),+s.t.toFixed(2),s.o]):undefined,f:f?1:undefined,e:(f||!EV.length)?undefined:EV.splice(0)})}
+// ---------- snapshots (server only) ----------
+// Every 1/30 s step produces one snapshot. Its first part is the same for every player (positions, trail points, land changes, events);
+// each player also gets a private part: the exact state of their own car plus the ability timers, so their phone can predict it.
+let OPREV=null,ZSENT='';
+// land that changed since the last snapshot, as [gap, length, owner, gap, length, owner, ...]
+function ODIFF(){
+ const n=own.length,w=n>>2,A=new Uint32Array(own.buffer,own.byteOffset,w),B=new Uint32Array(OPREV.buffer,OPREV.byteOffset,w),out=[];
+ let rs=0,rv=0,rl=0,end=0;
+ const flush=()=>{if(rl){out.push(rs-end,rl,rv);end=rs+rl;rl=0}},cell=j=>{const v=own[j];if(v===OPREV[j])return;if(rl&&j===rs+rl&&v===rv)rl++;else{flush();rs=j;rv=v;rl=1}};
+ for(let k=0;k<w;k++){if(A[k]===B[k])continue;const j=k<<2;cell(j);cell(j+1);cell(j+2);cell(j+3)}
+ for(let j=w<<2;j<n;j++)cell(j);
+ flush();OPREV.set(own);return out}
+function snapFlags(i,p){return(p.alive?1:0)|(SLOW[i]>0?2:0)|(GHO[i]>0?4:0)|(((IN[i]&&IN[i].dash>0)||p.bd>0)?8:0)|(SHD[i]?16:0)|(p.sh>0?32:0)|(Math.min(15,Math.ceil(Math.max(0,PROT[i])))<<6)|(HOLD[i]<<10)}
+function snapMe(i){const p=P[i],t=IN[i];return JSON.stringify([Math.round(p.x*1000),Math.round(p.y*1000),Math.round(p.a*1000),Math.round(t.en*100),Math.round(t.cd[0]*10),Math.round(t.cd[1]*10),Math.round(Math.max(0,t.dash)*100),
+ ...PWC[i].map((c,j)=>Math.round((1-c/ZCD[PK[j]])*100))])}
+// full: everything for one player who joins or resyncs (does not disturb what the others are sent). Otherwise: what changed this step.
+function snapBuild(full){
+ const first=!OPREV;let o,f;
+ if(full||first){o=rle();f=1;if(!full){OPREV=new Uint8Array(own.length);OPREV.set(own);MDIRTY=false}}
+ else if(MDIRTY){o=ODIFF();MDIRTY=false}
+ const pl=[];
+ for(let i=1;i<=5;i++){const p=P[i],tr=p.tr,nw=[];for(let k=full?0:p.sent;k<tr.length;k++)nw.push(Math.round(tr[k]*20));if(!full)p.sent=tr.length;
+  pl.push([Math.round(p.x*20),Math.round(p.y*20),Math.round(p.a*100),snapFlags(i,p),p.rs,nw])}
+ const zs=JSON.stringify(ZN.map(z=>z.own)),sendZ=full||zs!==ZSENT||TK%30===0;if(!full&&sendZ)ZSENT=zs;
+ const me=[null];for(let i=1;i<=5;i++)me.push(IN[i]?snapMe(i):null);
+ const s=JSON.stringify({t:'s',k:TK,tl:+tl.toFixed(1),p:pl,o,f,mn:MINES.length?MINES.map(m=>[+m.x.toFixed(1),+m.y.toFixed(1),m.o,m.arm>0?0:1]):undefined,z:sendZ?ZN.map(z=>z.own):undefined,
+  sh:SHL.length?SHL.map(q=>[+q.x.toFixed(1),+q.y.toFixed(1),+q.vx.toFixed(1),+q.vy.toFixed(1),q.o]):undefined,sk:STR.length?STR.map(q=>[+q.x.toFixed(1),+q.y.toFixed(1),+q.t.toFixed(2),q.o]):undefined,
+  e:(full||!EV.length)?undefined:EV.splice(0)});
+ return{s:s.slice(0,-1),m:me}}
+function SNAP(){return snapBuild(false)}
+function SNAPF(){return snapBuild(true)}
 function RESU(){hud();return JSON.stringify({cn:CN,k:KL,d:DE,N:LANDN})}
 
 function hud(nk){
