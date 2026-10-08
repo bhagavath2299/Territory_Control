@@ -167,7 +167,7 @@ function codeGen(){const A='ABCDEFGHJKMNPQRSTUVWXYZ23456789';for(;;){let c='';fo
 function mkRoom(code,pub,kind){kind=kind||'quick';const r={code,pub,kind,max:kind==='ranked'?2:5,st:'lobby',cl:[],cd:-1,sb:null,last:0,acc:0,tk:0,until:0,names:[],cos:[],mode:'pvp',h0:0,t0:0,created:Date.now(),forf:null,hum:[],eng:null,aloneAt:0};rooms.set(code,r);return r}
 function sync(p){const r=p.room;
  if(r.st!=='play')return send(p,LM(r,p));
- if(p.slot){send(p,{t:'start',W:GW,H:GH,you:p.slot,names:r.names,cos:r.cos,kind:r.kind,seed:r.seed});send(p,vm.runInContext('SNAP(1)',r.sb))}
+ if(p.slot){send(p,{t:'start',W:GW,H:GH,you:p.slot,names:r.names,cos:r.cos,kind:r.kind,seed:r.seed,land:r.land});send(p,vm.runInContext('SNAP(1)',r.sb))}
  else send(p,{t:'wait',room:r.code,left:Math.ceil(vm.runInContext('tl',r.sb))})}
 function joinRoom(p,r){
  if(r.cl.length>=r.max){send(p,{t:'full'});return}
@@ -180,6 +180,8 @@ function leaveRoom(p){const r=p.room;if(!r)return;p.room=null;r.cl=r.cl.filter(x
  if(r.st==='play'&&p.slot){if(r.kind==='ranked')r.forf=p;try{r.sb.DRP(p.slot)}catch(e){}p.slot=0;if(r.mode==='pvp'&&r.cl.filter(x=>x.slot).length<2)end(r);else if(!r.cl.some(x=>x.slot))end(r)}
  p.slot=0;
  if(!r.cl.length){if(rooms.get(r.code)===r)rooms.delete(r.code)}else if(r.st==='lobby')lobby(r)}
+// Land mask for 3D clients: run-length pairs [value,count] over the same grid as the ownership data (1 = land, 0 = water).
+function landRle(sb){const isl=vm.runInContext('ISL',sb),out=[];let c=isl[0],n=0;for(let i=0;i<isl.length;i++){if(isl[i]===c)n++;else{out.push(c,n);c=isl[i];n=1}}out.push(c,n);return out}
 function start(r,bots){
  const act=r.cl.filter(p=>p.s).slice(0,5),h=act.length,sb=mk();
  sb.AL=[null,...act.map(p=>okAb(p.row&&p.row.ab))];
@@ -191,7 +193,8 @@ function start(r,bots){
  if(bots)for(let i=h+1;i<=5;i++){r.names.push('\u{1F916} '+BOTN[i-1]);r.cos.push([['muscle','f1','sport','muscle'][(i-2)%4],['glow','neon','fire','neon'][(i-2)%4]])}
  for(const p of r.cl)p.slot=0;
  act.forEach((p,i)=>{p.slot=i+1});
- for(const p of act)send(p,{t:'start',W:GW,H:GH,you:p.slot,names:r.names,cos:r.cos,kind:r.kind,seed:r.seed});
+ r.land=landRle(sb);
+ for(const p of act)send(p,{t:'start',W:GW,H:GH,you:p.slot,names:r.names,cos:r.cos,kind:r.kind,seed:r.seed,land:r.land});
  snap(r)}
 function snap(r){const m=vm.runInContext('SNAP()',r.sb);for(const p of r.cl)if(p.slot)send(p,m)}
 function end(r){if(r.st!=='play')return;try{snap(r)}catch(e){}r.st='done';r.until=Date.now()+RES*1000;
