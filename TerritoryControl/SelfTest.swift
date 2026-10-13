@@ -67,6 +67,17 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
       });
       window.__stFrames = 0;
       (function tick() { window.__stFrames++; requestAnimationFrame(tick); })();
+      // While a screenshot is taken the page's animation frames are held back, so the picture shows
+      // exactly this step and the simulator is not busy drawing (screenshots of a busy simulator take minutes).
+      var raf = window.requestAnimationFrame.bind(window), held = [];
+      window.__stHold = false;
+      window.requestAnimationFrame = function (cb) { if (window.__stHold) { held.push(cb); return 0; } return raf(cb); };
+      window.__stRelease = function () {
+        window.__stHold = false;
+        var h = held; held = [];
+        for (var i = 0; i < h.length; i++) raf(h[i]);
+        return h.length;
+      };
     })();
     """#
 
@@ -188,13 +199,16 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
     private func mark(_ name: String, _ extra: [String: Any] = [:]) async {
         stepNumber += 1
         var entry: [String: Any] = ["step": name, "seconds": round1(Date().timeIntervalSince(started))]
+        await js("(window.__stHold=true,1)")  // freeze the picture for the screenshot
+        await sleep(0.5)
         if let page = await jsObject(Self.pageState) { entry["page"] = page }
         for (key, value) in extra { entry[key] = value }
         steps.append(entry)
         writeReport(finished: false)
         let number = stepNumber
         write("state.txt", "\(number) \(name)")
-        let answered = await waitFor(seconds: 45) { self.read("ack.txt") == "\(number)" }
+        let answered = await waitFor(seconds: 150) { self.read("ack.txt") == "\(number)" }
+        await js("window.__stRelease()")
         if !answered { note("no screenshot answer for \(name)") }
     }
 

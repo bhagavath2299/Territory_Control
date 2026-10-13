@@ -15,7 +15,7 @@ concurrency:
 jobs:
   build-and-test:
     runs-on: macos-26
-    timeout-minutes: 60
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
 
@@ -23,7 +23,7 @@ jobs:
         run: bash ci/build.sh
 
       - name: Play through it in the iPhone simulator
-        timeout-minutes: 30
+        timeout-minutes: 55
         run: bash ci/selftest.sh
 
       - name: Save the build to the ios-build branch

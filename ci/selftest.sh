@@ -33,7 +33,8 @@ limit 300 xcrun simctl boot "$UDID"
 limit 600 xcrun simctl bootstatus "$UDID" -b > /dev/null
 say "booted"
 limit 180 xcrun simctl install "$UDID" "$APP"
-say "installed"
+say "installed; letting the new simulator settle"
+sleep 60
 
 shot() {  # shot <name>: full-screen screenshot; landscape steps are turned upright for reading
   local file="$OUT/shots/$1.png" t=$SECONDS
@@ -58,7 +59,7 @@ say "app data: $DATA"
 last=""
 gone=0
 tick=0
-deadline=$((SECONDS + 900))
+deadline=$((SECONDS + 1800))
 while [ $SECONDS -lt $deadline ]; do
   tick=$((tick + 1))
   if [ -f "$ST/state.txt" ]; then
@@ -82,9 +83,9 @@ done
 cp "$ST"/report.json "$OUT/" 2>/dev/null || say "!! no report.json"
 
 # Second launch: are the settings and the replay from the first run still there?
-limit 30 xcrun simctl terminate "$UDID" "$BUNDLE" > /dev/null 2>&1
+limit 60 xcrun simctl terminate "$UDID" "$BUNDLE" > /dev/null 2>&1
 sleep 2
-limit 60 xcrun simctl launch "$UDID" "$BUNDLE" -selftest-persist > /dev/null
+limit 120 xcrun simctl launch --terminate-running-process "$UDID" "$BUNDLE" -selftest-persist > /dev/null
 say "relaunched"
 for _ in $(seq 1 360); do
   [ -f "$ST/persist.json" ] && break
