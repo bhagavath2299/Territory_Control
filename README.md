@@ -2,9 +2,15 @@
 
 This branch holds a test build only. It is not a release: `main` and the live game on Render are unchanged.
 
-- **What it is:** the new look (four places, solid territory, new cars), the clean touch HUD (joystick, buttons on the right, minimap, pause), Boost instead of Dash, portrait and landscape. Practice matches against bots; no online play.
-- **Install on iPhone:** open the address in **Safari**, tap **Share**, then **Add to Home Screen**. Open it once while online; after that it starts and plays with no connection.
+- **What it is (v19, "neon void"):** the arena is a black void with a neon floor, twice the area of before. Cars are 20% quicker, every weapon clears twice the land, and land a weapon destroys stays scorched for 15 seconds (closing a loop round it no longer refills it). New abilities for all four classes, holographic power zones, a cleaner HUD and a camera further back. Portrait and landscape. Practice matches against bots; no online play.
+- **Install on iPhone:** open the address in **Safari**, tap **Share**, then **Add to Home Screen**. Open it once while online; after that it starts and plays with no connection. (There is also a real iPhone app: branch `ios-app`.)
 - **Install on Android:** open the address in Chrome, then menu, **Install app**.
-- **Frame rate:** Settings (gear on the menu) then **Show frame rate**.
+- **Frame rate:** Settings (gear on the menu) then **Show frame rate**. Safari keeps web pages at 60 frames a second on iPhone; the iPhone app (branch `ios-app`) is set up for up to 120 on ProMotion screens.
+- **Updating an installed copy:** open it once while online, close it, and open it again.
 
-Built from the local `mobile` branch of the look-development work (prototype on v16, engine version 18). The rules differ from the live game: your own trail no longer kills you, the map has no water, and the Blade Dash and Ram abilities are switched off.
+Built from `game/` on the `ios-app` branch (engine version 19). The rules differ from the live game: your own trail does not kill you, weapons only hurt cars that are off their own land, and the class kits are new:
+
+- **Striker:** Ricochet Blades, Laser Wire; ultimate Blade Cyclone.
+- **Titan:** Fault Line, Shockwave; ultimate Juggernaut.
+- **Gunner:** Railgun, Cluster Mortar; ultimate Orbital Barrage.
+- **Sapper:** Plasma Mines, Drone Swarm; ultimate Black Hole.
