@@ -56,14 +56,23 @@ def main(folder: str) -> int:
           "| haptics bridge:", env.get("vibrateBridge"), "| service worker API:", env.get("serviceWorkerApi"))
     print("webgl:", env.get("webgl2Renderer"), "| game version:", env.get("gameVersion"), "| web build:", env.get("webSource"),
           "| cores:", env.get("cores"), "| starting tier:", env.get("startTier"))
-    print("frame rate: screen max", env.get("screenMaxFPS"), "fps | WebKit 60 fps hold setting available:", env.get("near60fpsSettingAvailable"),
-          "| now:", env.get("near60fpsSetting"))
+    print("frame rate: screen max", env.get("screenMaxFPS"), "fps | WebKit 60 fps hold:", env.get("frameRateSwitch"))
     print("boot ready after", boot.get("bootSeconds"), "s")
     for s in report.get("steps", []):
         p = s.get("page") or {}
         print(f"  {s['step']:26s} t={s.get('seconds')}s state={p.get('state')} screen={p.get('screen')} "
               f"{p.get('width')}x{p.get('height')} q={p.get('quality')} hz={p.get('refreshHz')} calls={p.get('drawCalls')} "
               + " ".join(f"{k}={v}" for k, v in s.items() if k not in ("step", "seconds", "page")))
+    last = (steps.get("99-done") or steps.get("08-results") or {}).get("page") or {}
+    if last.get("timings"):
+        print("time spent in the game's heavy functions (calls, total ms, longest ms):")
+        for name, t in sorted(last["timings"].items(), key=lambda kv: -kv[1].get("max", 0)):
+            print(f"    {name:12s} {t.get('n'):6d} {t.get('ms'):10.1f} {t.get('max'):8.1f}")
+    for s in report.get("steps", []):
+        gaps = (s.get("page") or {}).get("frameGaps") or []
+        long = [g for g in gaps if g[1] >= 500]
+        if long:
+            print(f"  long frames by {s['step']}: " + ", ".join(f"{g[1]} ms at {g[0] / 1000:.1f}s" for g in long[-6:]))
     for key in ("pageErrors", "consoleErrors", "resourceErrors", "notes"):
         items = report.get(key) or []
         if items:

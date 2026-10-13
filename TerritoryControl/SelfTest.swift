@@ -66,7 +66,15 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
         };
       });
       window.__stFrames = 0;
-      (function tick() { window.__stFrames++; requestAnimationFrame(tick); })();
+      // the longest gaps between frames (ms), to find stalls
+      window.__stGaps = [];
+      var lastT = 0;
+      (function tick(t) {
+        window.__stFrames++;
+        if (lastT && t - lastT > 120) { window.__stGaps.push([Math.round(t), Math.round(t - lastT)]); if (window.__stGaps.length > 40) window.__stGaps.shift(); }
+        lastT = t || 0;
+        requestAnimationFrame(tick);
+      })(0);
       // While a screenshot is taken the page's animation frames are held back, so the picture shows
       // exactly this step and the simulator is not busy drawing (screenshots of a busy simulator take minutes).
       var raf = window.requestAnimationFrame.bind(window), held = [];
@@ -74,6 +82,7 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
       window.requestAnimationFrame = function (cb) { if (window.__stHold) { held.push(cb); return 0; } return raf(cb); };
       window.__stRelease = function () {
         window.__stHold = false;
+        lastT = 0;  // the pause for the screenshot is not a slow frame
         var h = held; held = [];
         for (var i = 0; i < h.length; i++) raf(h[i]);
         return h.length;
@@ -102,8 +111,28 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
         quality: g(function () { return QNAME; }), scale: g(function () { return GFX.scale; }), refreshHz: g(function () { return QC.hz; }),
         drawCalls: g(function () { return GFX.stats.calls; }), frames: window.__stFrames,
         fpsText: String(el('fps').textContent || '').slice(0, 200), overlay: el('ov').className || '',
-        card: String(el('card').innerText || '').replace(/\s+/g, ' ').slice(0, 200)
+        card: String(el('card').innerText || '').replace(/\s+/g, ' ').slice(0, 200),
+        timings: window.__stT || null, frameGaps: (window.__stGaps || []).slice(-12)
       };
+    })()
+    """#
+
+    // Wraps the game's heavy functions with timers (count, total and longest call, ms), read back with each step.
+    private static let timerScript = #"""
+    (function () {
+      window.__stT = {};
+      ['localMatch', 'MPS', 'genMap', 'buildIsland', 'gwBuild', 'carBuild', 'rebuildLand', 'miniPaint', 'gwMask', 'gwScar', 'localFrame', 'frame3d', 'drawHUD', 'draw', 'STEPF', 'capture']
+        .forEach(function (n) {
+          var f = window[n]; if (typeof f !== 'function') return;
+          window[n] = function () {
+            var t = performance.now();
+            try { return f.apply(this, arguments); } finally {
+              var d = performance.now() - t, s = window.__stT[n] || (window.__stT[n] = { n: 0, ms: 0, max: 0 });
+              s.n++; s.ms = Math.round((s.ms + d) * 10) / 10; if (d > s.max) s.max = Math.round(d * 10) / 10;
+            }
+          };
+        });
+      return 1;
     })()
     """#
 
@@ -151,16 +180,13 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
         let bootReady = await waitFor(seconds: 180) { await self.bootState() == "rdy" }
         let bootSeconds = Date().timeIntervalSince(started)
         environment = (await jsObject(Self.environmentProbe)) ?? [:]
-        // whether WebKit offered the setting that lifts the 60 frames-a-second hold (see GameViewController.allowFullFrameRate)
-        if let prefs = controller?.webView.configuration.preferences {
-            let has = prefs.responds(to: Selector(("_setPreferPageRenderingUpdatesNear60FPSEnabled:")))
-            environment["near60fpsSettingAvailable"] = has
-            if has { environment["near60fpsSetting"] = prefs.value(forKey: "preferPageRenderingUpdatesNear60FPSEnabled") as? Bool }
-            environment["screenMaxFPS"] = controller?.view.window?.windowScene?.screen.maximumFramesPerSecond
-        }
+        // what became of WebKit's 60 frames-a-second hold (see GameViewController.allowFullFrameRate), and the screen's top rate
+        environment["frameRateSwitch"] = GameViewController.frameRateNote
+        environment["screenMaxFPS"] = controller?.view.window?.windowScene?.screen.maximumFramesPerSecond
         // Frame-rate read-out on (it shows in the screenshots); mark this run so the second launch can find it.
         await js("(function(){SET.fps=1;saveSet();fpsShow();localStorage.setItem('st-probe','\(Int(started.timeIntervalSince1970))');return 1})()")
         await mark("01-boot", ["bootReady": bootReady, "bootSeconds": round1(bootSeconds)])
+        await js(Self.timerScript)
 
         await tap("start")
         await sleep(3)
@@ -215,14 +241,14 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
         stepNumber += 1
         var entry: [String: Any] = ["step": name, "seconds": round1(Date().timeIntervalSince(started))]
         await js("(window.__stHold=true,1)")  // freeze the picture for the screenshot
-        await sleep(0.5)
+        await sleep(1.5)  // let the simulator finish the frames it is drawing
         if let page = await jsObject(Self.pageState) { entry["page"] = page }
         for (key, value) in extra { entry[key] = value }
         steps.append(entry)
         writeReport(finished: false)
         let number = stepNumber
         write("state.txt", "\(number) \(name)")
-        let answered = await waitFor(seconds: 300) { self.read("ack.txt") == "\(number)" }
+        let answered = await waitFor(seconds: 480) { self.read("ack.txt") == "\(number)" }
         await js("window.__stRelease()")
         if !answered { note("no screenshot answer for \(name)") }
     }

@@ -37,10 +37,13 @@ say "installed; letting the new simulator settle"
 sleep 60
 
 shot() {  # shot <name>: full-screen screenshot; landscape steps are turned upright for reading
-  local file="$OUT/shots/$1.png" t=$SECONDS
-  limit 60 xcrun simctl io "$UDID" screenshot --type=png --mask=black "$file" > /dev/null 2>&1 \
-    || limit 60 xcrun simctl io "$UDID" screenshot --type=png "$file" > /dev/null 2>&1 \
-    || say "!! screenshot $1 failed"
+  # A busy simulator can take minutes to hand over a picture: three tries, a pause between them.
+  local file="$OUT/shots/$1.png" t=$SECONDS ok=0
+  for try in 1 2 3; do
+    if limit 90 xcrun simctl io "$UDID" screenshot --type=png --mask=black "$file" > /dev/null 2>&1 && [ -s "$file" ]; then ok=1; break; fi
+    say "screenshot $1: try $try did not finish"; sleep 5
+  done
+  [ $ok = 1 ] || say "!! screenshot $1 failed"
   case "$1" in *landscape*) [ -f "$file" ] && sips -r 270 "$file" > /dev/null 2>&1 ;; esac
   say "screenshot $1 took $((SECONDS - t))s"
 }
@@ -60,7 +63,7 @@ say "app data: $DATA"
 last=""
 gone=0
 tick=0
-deadline=$((SECONDS + 1800))
+deadline=$((SECONDS + 2400))
 while [ $SECONDS -lt $deadline ]; do
   tick=$((tick + 1))
   if [ -f "$ST/state.txt" ]; then
