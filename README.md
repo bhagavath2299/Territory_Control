@@ -13,7 +13,7 @@ This branch turns the offline phone build (branch `app-test`) into a real iPhone
 - The game's Vibration setting now works: it plays iPhone haptics (iPhone browsers have no vibration).
 - Sound plays even with the side switch on silent, as the web build asks, and mixes with music from other apps.
 
-Name on the home screen: **Territory**. Bundle ID: `com.bhagavath2299.territorycontrol`. Needs iOS 16 or later.
+Name on the home screen: **Territory**. Bundle ID: `com.bhagavath2299.territorycontrol`. Needs iOS 16 or later. On iPhones with a 120 Hz screen the game can run at 120 frames a second.
 
 ## How it is built
 
@@ -36,12 +36,28 @@ The self-test code (`TerritoryControl/SelfTest.swift`) is compiled only into the
 
 With a free Apple ID the app stops opening after 7 days. Run Sideloadly again (or turn on its automatic refresh) to renew it. A paid Apple Developer account ($99 a year) gives 1-year installs and TestFlight, and is needed for the App Store.
 
-## Putting a new game build inside the app
+## The game (v19, "neon void")
 
-The game itself is `www/index.html`, a copy of the `app-test` build with the web-app-only parts taken out (manifest, home-screen icon link, service worker).
+The game's source is in `game/`, one part per file (the page was split from app-test 8861220 and grown from there):
+
+- `engine.js`: the match itself (fixed 30 steps a second, seeded, so a recorded match replays exactly). Classes and abilities (`CLS`), their numbers (`BAL`), land, scorched land, bots.
+- `gfx_core.js`, `gfx_world.js`: the 3D picture (three.js): the void arena, cars, trails, effects, camera, garage.
+- `ui.js`: HUD, buttons, menus, kill feed, sound. `main.js`: the frame loop, picture quality, loading screen.
+- `page_head.html`, `page_tail.html`: the page and its styles. `vendor/three.r180.min.js`.
 
 ```
-python3 tools/sync_web.py <folder with the new index.html> "app-test <commit>"
+python3 tools/build_game.py                         # dist/index.html: the web page (as on app-test)
+python3 tools/build_game.py --app --label="v19 ..." # also refreshes www/index.html for the app
+```
+
+v19 in short: the arena is a black void with a neon floor and twice the area; cars are 20% quicker; every weapon clears twice the land; land a weapon destroys stays scorched for 15 seconds (a loop round it does not refill it); new abilities for all four classes; holographic power zones; a cleaner HUD; the camera further back; up to 120 frames a second on ProMotion iPhones.
+
+## Putting a new game build inside the app
+
+The app's copy of the game is `www/index.html`: the built page with the web-app-only parts taken out (manifest, home-screen icon link, service worker). `build_game.py --app` makes it; for a page built elsewhere:
+
+```
+python3 tools/sync_web.py <folder with the new index.html> "<where it came from>"
 python3 tools/make_icon.py <icon-512.png>     # only if the icon changed
 ```
 
@@ -51,6 +67,7 @@ Commit and push to `ios-app`; GitHub builds and tests the new app.
 
 - `TerritoryControl/`: the app (Swift). `GameViewController.swift` shows the game; `BundleSchemeHandler.swift` serves the files; `Haptics.swift`; `SelfTest.swift` (simulator test only); `Info.plist`; `Assets.xcassets` (icon, launch colour).
 - `TerritoryControl.xcodeproj`: the Xcode project. It opens in Xcode on any Mac.
-- `www/`: the game.
-- `tools/`: copying in a new web build and making the icon.
+- `game/`: the game's source (see above). `dist/` (not kept in git): the built web page.
+- `www/`: the game as the app serves it.
+- `tools/`: building the game, copying a web build into the app, making the icon.
 - `ci/`: build, simulator test, report check, saving the build.
