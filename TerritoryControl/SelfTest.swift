@@ -91,6 +91,14 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
         paused: g(function () { return PAUSED; }), phone: g(function () { return PHONE; }),
         width: innerWidth, height: innerHeight, pixelRatio: devicePixelRatio,
         safeArea: g(function () { return SAFE; }), webgl: g(function () { return !!GFX.ok; }),
+        envSafeArea: g(function () {
+          var d = document.createElement('div');
+          d.style.cssText = 'position:fixed;visibility:hidden;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)';
+          document.documentElement.appendChild(d);
+          var s = getComputedStyle(d), r = { t: parseFloat(s.paddingTop), r: parseFloat(s.paddingRight), b: parseFloat(s.paddingBottom), l: parseFloat(s.paddingLeft) };
+          d.remove();
+          return r;
+        }),
         quality: g(function () { return QNAME; }), scale: g(function () { return GFX.scale; }),
         drawCalls: g(function () { return GFX.stats.calls; }), frames: window.__stFrames,
         fpsText: String(el('fps').textContent || '').slice(0, 200), overlay: el('ov').className || '',

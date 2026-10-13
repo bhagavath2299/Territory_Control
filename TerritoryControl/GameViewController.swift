@@ -32,6 +32,8 @@ final class GameViewController: UIViewController {
         let scripts = config.userContentController
         scripts.addUserScript(WKUserScript(source: Haptics.pageScript, injectionTime: .atDocumentStart,
                                            forMainFrameOnly: true))
+        scripts.addUserScript(WKUserScript(source: Self.safeAreaScript, injectionTime: .atDocumentStart,
+                                           forMainFrameOnly: true))
         scripts.add(haptics, name: Haptics.handlerName)
 
         #if SELFTEST
@@ -63,8 +65,7 @@ final class GameViewController: UIViewController {
         #endif
     }
 
-    // The game is started once the screen is up, when iOS has said where the notch or Dynamic Island and
-    // the home bar are. Started earlier, the game read them as zero and put its controls under them.
+    // The game is started once the screen is up and has its final size (see safeAreaScript for the safe areas).
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         guard !gameLoaded else { return }
@@ -72,15 +73,32 @@ final class GameViewController: UIViewController {
         webView.load(URLRequest(url: Self.startURL))
     }
 
-    // The game re-reads the safe areas on a resize event; send one whenever they change.
-    override func viewSafeAreaInsetsDidChange() {
-        super.viewSafeAreaInsetsDidChange()
-        tellPageLayoutChanged()
-    }
-
-    private func tellPageLayoutChanged() {
-        webView?.evaluateJavaScript("window.dispatchEvent(new Event('resize'))", completionHandler: nil)
-    }
+    /// The game reads the screen's safe areas (notch or Dynamic Island, home bar) once when it starts and again
+    /// on every resize. Inside an app, iOS can hand them to the page a moment after that first reading, which
+    /// left the minimap and joystick under the island and home bar until the phone was turned. This watches
+    /// the safe areas from inside the page and sends the game a resize as soon as they change.
+    static let safeAreaScript = #"""
+    (function () {
+      function watch() {
+        var probe = document.createElement('div');
+        probe.setAttribute('aria-hidden', 'true');
+        probe.style.cssText = 'position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;pointer-events:none;' +
+          'padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)';
+        document.documentElement.appendChild(probe);
+        var last = null;
+        function check() {
+          var s = getComputedStyle(probe);
+          var now = s.paddingTop + ' ' + s.paddingRight + ' ' + s.paddingBottom + ' ' + s.paddingLeft;
+          if (last !== null && now !== last) window.dispatchEvent(new Event('resize'));
+          last = now;
+        }
+        check();
+        try { new ResizeObserver(check).observe(probe, { box: 'border-box' }); } catch (e) {}
+        var n = 0, t = setInterval(function () { check(); if (++n >= 60) clearInterval(t); }, 1000);
+      }
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', watch); else watch();
+    })();
+    """#
 
     override var prefersStatusBarHidden: Bool { true }
     override var prefersHomeIndicatorAutoHidden: Bool { true }
@@ -112,13 +130,6 @@ extension GameViewController: WKNavigationDelegate, WKUIDelegate {
             UIApplication.shared.open(url)
         }
         return nil
-    }
-
-    // Once the page has loaded, have the game read the screen size and safe areas again (now and a moment
-    // later, whichever side of the game's own first reading this lands on).
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        tellPageLayoutChanged()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in self?.tellPageLayoutChanged() }
     }
 
     // If iOS stops the game's page while the app is in the background (to free memory), start the game
