@@ -547,7 +547,7 @@ function gfxGround(x,y){return 0}
 const colOf=c=>{if(c&&c.lc)return c.lc;return linOf(c&&c[0]==='#'?c:'#ffffff')};
 
 // ---------- trails ----------
-const TR3={pool:[],used:0,NV:5200,idx:null,ok:0};
+const TR3={pool:[],used:0,NV:5200,idx:null,ok:0,part:1};
 const TR_VS=`attribute vec2 aN;attribute vec4 aV;uniform float uHW,uSh;uniform vec3 uSunDir;varying vec4 vV;varying vec2 vN;varying vec3 vW;
 void main(){vec3 w=position;w.xz+=aN*(aV.x*aV.w*uHW);if(uSh>.5){w.xz-=uSunDir.xz/max(uSunDir.y,.3)*.14;w.y-=.012;}
  vV=aV;vN=aN;vW=w;gl_Position=projectionMatrix*viewMatrix*vec4(w,1.);}`;
@@ -622,7 +622,8 @@ function trBuild(m,tr,hx,hy,vis,HW,lift){
   const nx=-ty,ny=tx;
   if(j===0){const cx=x-tx*E*HW,cy=y-ty*E*HW;put(cx,cy,nx,ny,-E,u-E*HW,E,1);put(cx,cy,nx,ny,E,u-E*HW,E,1)}
   put(x,y,nx,ny,-E,u,0,mi);put(x,y,nx,ny,E,u,0,mi);px=x;py=y}
- g.attributes.position.needsUpdate=g.attributes.aN.needsUpdate=g.attributes.aV.needsUpdate=true;
+ // only the part of the buffers this trail uses goes to the GPU (the buffers hold 5200 points; a trail is usually a few hundred)
+ for(const [a,k] of [[g.attributes.position,3],[g.attributes.aN,2],[g.attributes.aV,4]]){if(TR3.part){a.clearUpdateRanges();a.addUpdateRange(0,n*k)}a.needsUpdate=true}
  g.setDrawRange(0,Math.max(0,(n-2)*3));m.len=u;return n}
 // the ground rectangle the camera sees (rough, for deciding what to subdivide)
 function trVis(){const c=GFX.cam,x=c.position.x,z=c.position.z,r=Math.max(30,CAM.vw*1.5);return[CAM.x-r,CAM.y-r,CAM.x+r,CAM.y+r]}
@@ -640,7 +641,7 @@ function trailsFrame(){
  for(let j=k;j<TR3.pool.length;j++)TR3.pool[j].grp.visible=false}
 
 // ---------- sparks, smoke and chips: two instanced sprite sets (glowing ones add up, smoke and chips blend normally) ----------
-const PT={ok:0,max:900,A:null,N:null};
+const PT={ok:0,max:900,A:null,N:null,part:1};
 const PT_VS=`attribute vec3 iP,iV;attribute vec4 iC,iS;varying vec4 vC;varying vec2 vUv;varying float vK;
 void main(){vec3 cp=iP;float sz=iS.x,k=iS.y;vec2 q=position.xy;vec3 off;
  if(k>.5&&k<1.5){vec3 vd=normalize(iV+vec3(1e-4));float len=sz*(.6+min(length(iV)*.14,2.6));vec3 tc=normalize(cameraPosition-cp);vec3 sd=normalize(cross(vd,tc)+vec3(1e-5));off=vd*q.x*len+sd*q.y*sz*.32;}
@@ -678,7 +679,9 @@ function particlesFrame(){
   else if(kb[1]){const br=kb[0]*(k===4?(.4+.6*t):t);fxPut(PT.A,f.x,f.h,f.y,f.vx,f.vh,f.vy,lc[0]*br+.05*br,lc[1]*br+.04*br,lc[2]*br+.04*br,Math.min(1,t*1.6),k===1?(f.s||.22):(f.s||(k===4?.2:.16+.1*t)),k,f.r)}
   else if(k===2){const gs=.55,sz=(f.s||.4)*(1.5-.8*t)*1.6;fxPut(PT.N,f.x,f.h,f.y,0,0,0,lc[0]*.35+gs*.72,lc[1]*.35+gs*.74,lc[2]*.35+gs*.8,Math.min(.8,t*1.3)*.62,sz,2,f.r)}
   else{const dk=.12;fxPut(PT.N,f.x,f.h,f.y,0,0,0,lc[0]*.5+dk,lc[1]*.5+dk,lc[2]*.5+dk,Math.min(1,t*2.2),f.s||.14,3,f.r)}}
- for(const S of [PT.A,PT.N]){const G=S.g;G.instanceCount=S.n;for(const n of ['iP','iV','iC','iS'])G.attributes[n].needsUpdate=true}}
+ // only the sprites in use go to the GPU, and nothing when none are shown
+ for(const S of [PT.A,PT.N]){const G=S.g;G.instanceCount=S.n;if(PT.part&&!S.n)continue;
+  for(const n of ['iP','iV','iC','iS']){const a=G.attributes[n];if(PT.part){a.clearUpdateRanges();a.addUpdateRange(0,S.n*a.itemSize)}a.needsUpdate=true}}}
 
 // ---------- rings, scorch marks, falling snow ----------
 const RG3={pool:[],max:22,sc:[],scMax:22};

@@ -120,10 +120,12 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
     // Wraps the game's heavy functions with timers (count, total and longest call, ms), read back with each step.
     private static let timerScript = #"""
     (function () {
-      window.__stT = {};
-      ['localMatch', 'MPS', 'genMap', 'buildIsland', 'gwBuild', 'carBuild', 'rebuildLand', 'miniPaint', 'gwMask', 'gwScar', 'localFrame', 'frame3d', 'drawHUD', 'draw', 'STEPF', 'capture']
+      window.__stT = {}; window.__stOrig = {};
+      ['localMatch', 'MPS', 'genMap', 'buildIsland', 'gwBuild', 'carBuild', 'rebuildLand', 'miniPaint', 'gwMask', 'gwScar', 'localFrame', 'frame3d', 'drawHUD', 'draw', 'STEPF', 'capture',
+       'gwFrame', 'carsFrame', 'trailsFrame', 'particlesFrame', 'gfxRender']
         .forEach(function (n) {
           var f = window[n]; if (typeof f !== 'function') return;
+          window.__stOrig[n] = f;
           window[n] = function () {
             var t = performance.now();
             try { return f.apply(this, arguments); } finally {
@@ -132,6 +134,81 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
             }
           };
         });
+      return 1;
+    })()
+    """#
+
+    // What the picture costs, measured in the paused match. First real frames per second: as it is, with the trail and
+    // spark buffers sent whole every frame, without the HUD layer, without the 3D layer. Then the game loop is stopped
+    // and the 3D picture is drawn on demand and waited for (a 1-pixel read), ms per picture, with parts left out or the
+    // floor's shader cut down. Runs in the background; the result lands in window.__stGPU.
+    private static let renderCostScript = #"""
+    (function () {
+      window.__stGPU = null;
+      var out = { fps: {}, ms: {}, notes: [] };
+      var wait = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
+      var frames = function (secs) {
+        return new Promise(function (res) {
+          var n = 0, t0 = performance.now();
+          (function f() { n++; if (performance.now() - t0 < secs * 1000) requestAnimationFrame(f); else res(Math.round(n / secs * 10) / 10); })();
+        });
+      };
+      var render = (window.__stOrig && window.__stOrig.gfxRender) || gfxRender;
+      (async function () {
+        var R = GFX.R, gl = R.getContext(), px = new Uint8Array(4), c3 = R.domElement, hud = document.getElementById('cv');
+        try {
+          out.canvas = c3.width + 'x' + c3.height; out.tier = QNAME; out.scale = GFX.scale;
+          out.trailPoints = (TR3.pool || []).reduce(function (s, m) { return s + (m && m.grp.visible ? m.g.drawRange.count / 3 + 2 : 0); }, 0);
+          out.fps.paused = await frames(3);
+          TR3.part = 0; PT.part = 0; await wait(250); out.fps.fullUploads = await frames(3); TR3.part = 1; PT.part = 1;
+          hud.style.visibility = 'hidden'; await wait(250); out.fps.noHud = await frames(3); hud.style.visibility = '';
+          c3.style.visibility = 'hidden'; await wait(250); out.fps.no3d = await frames(3); c3.style.visibility = '';
+          await wait(250);
+        } catch (e) { out.notes.push('frames: ' + e); }
+        READY = 0; await wait(300);
+        var run = function () {
+          render(GFX.S, GFX.cam); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+          var t = performance.now();
+          for (var i = 0; i < 5; i++) { render(GFX.S, GFX.cam); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); }
+          return Math.round((performance.now() - t) / 5 * 10) / 10;
+        };
+        var hide = function (list) { var keep = list.filter(function (o) { return o; }).map(function (o) { return [o, o.visible]; }); keep.forEach(function (k) { k[0].visible = false; }); return function () { keep.forEach(function (k) { k[0].visible = k[1]; }); }; };
+        var step = async function (name, f) { try { out.ms[name] = f(); } catch (e) { out.notes.push(name + ': ' + e); } await wait(60); };
+        var without = function (list) { return function () { var back = hide(list); try { return run(); } finally { back(); } }; };
+        var floorWith = function (fs, name) {
+          return function () {
+            if (fs === GW.floor.material.fragmentShader) { out.notes.push(name + ': shader text not found'); return null; }
+            var fm = GW.floor.material, m = new THREE.ShaderMaterial({ uniforms: GW.u, extensions: { derivatives: true }, vertexShader: fm.vertexShader, fragmentShader: fs });
+            GW.floor.material = m; try { return run(); } finally { GW.floor.material = fm; m.dispose(); }
+          };
+        };
+        try {
+          var src = GW.floor.material.fragmentShader;
+          var cars = (CARI || []).filter(function (c) { return c; }).map(function (c) { return c.root; });
+          var trails = (TR3.pool || []).map(function (m) { return m && m.grp; });
+          var sparks = [PT.A && PT.A.o, PT.N && PT.N.o].concat(RG3.pool || [], RG3.sc || []);
+          await step('all', run);
+          await step('noFloor', without([GW.floor]));
+          await step('floorFlat', floorWith('void main(){gl_FragColor=vec4(.003,.004,.01,1.);}', 'floorFlat'));
+          await step('floorNoLand', floorWith(src.replace('if(mB.g>.01){', 'if(false){'), 'floorNoLand'));
+          await step('floorNoDeriv', floorWith(src.replace('vec4 dxA=dFdx(mA),dyA=dFdy(mA);vec2 dB=vec2(dFdx(mB.x),dFdy(mB.x));', 'vec4 dxA=vec4(0.),dyA=vec4(0.);vec2 dB=vec2(0.);')
+            .replace('float dOwn=(c-.5)/max(length(gc),1e-5)*pxu;', 'float dOwn=(c-.5)*1.33;'), 'floorNoDeriv'));
+          await step('floorNoMath', floorWith(src.replace('float sweep=pow(.5+.5*sin((wp.x*.55+wp.y*.35)*.3-uTime*1.4),24.);', 'float sweep=0.;')
+            .replace('inner=exp(-max(dOwn,0.)*1.1)*own;', 'inner=0.;'), 'floorNoMath'));
+          await step('floorNoGrid', floorWith(src.replace('float gMaj=gridL(wp,4.,.6),gMin=gridL(wp,1.,.45)*clamp(1.5-pxu*7.,0.,1.);', 'float gMaj=0.,gMin=0.;'), 'floorNoGrid'));
+          await step('noPads', without(GW.pads));
+          await step('noCars', without(cars));
+          await step('noTrails', without(trails));
+          await step('noSparks', without(sparks));
+          await step('floorOnly', without(GFX.S.children.filter(function (o) { return o !== GW.floor; })));
+          await step('nothing', without(GFX.S.children.slice()));
+          var sc0 = GFX.scale; GFX.scale = .6; fit(); await wait(100);
+          await step('allAt60pct', run);
+          GFX.scale = sc0; fit(); await wait(100);
+        } catch (e) { out.notes.push('render: ' + e); }
+        READY = 1;
+        window.__stGPU = out;
+      })();
       return 1;
     })()
     """#
@@ -202,6 +279,13 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
         await tap("pause")
         await sleep(1.5)
         await mark("05-paused-landscape")
+        // what the picture costs, part by part (see renderCostScript), while the match is paused
+        await js(Self.renderCostScript)
+        if await waitFor(seconds: 240, { await self.jsString("window.__stGPU?'done':''") == "done" }) {
+            environment["renderCost"] = await jsObject("window.__stGPU")
+        } else {
+            note("render cost: no result after 240 s")
+        }
         await tap("resume")
 
         let f0 = await jsNumber("window.__stFrames") ?? 0

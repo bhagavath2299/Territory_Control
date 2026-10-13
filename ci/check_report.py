@@ -68,6 +68,14 @@ def main(folder: str) -> int:
         print("time spent in the game's heavy functions (calls, total ms, longest ms):")
         for name, t in sorted(last["timings"].items(), key=lambda kv: -kv[1].get("max", 0)):
             print(f"    {name:12s} {t.get('n'):6d} {t.get('ms'):10.1f} {t.get('max'):8.1f}")
+    cost = env.get("renderCost")
+    if cost:
+        print(f"what the picture costs (paused, {cost.get('canvas')} {cost.get('tier')} x{cost.get('scale')}, "
+              f"{cost.get('trailPoints')} trail points on screen):")
+        print("    frames per second:", " | ".join(f"{k} {v}" for k, v in (cost.get("fps") or {}).items()))
+        print("    ms per 3D picture:", " | ".join(f"{k} {v}" for k, v in (cost.get("ms") or {}).items()))
+        for n in cost.get("notes") or []:
+            print("    note:", n)
     for s in report.get("steps", []):
         gaps = (s.get("page") or {}).get("frameGaps") or []
         long = [g for g in gaps if g[1] >= 500]
