@@ -54,6 +54,8 @@ python3 tools/build_game.py --app --label="v19 ..." # also refreshes www/index.h
 
 v19 in short: the arena is a black void with a neon floor and twice the area; cars are 20% quicker; every weapon clears twice the land; land a weapon destroys stays scorched for 15 seconds (a loop round it does not refill it); new abilities for all four classes; holographic power zones; a cleaner HUD; the camera further back; up to 120 frames a second on ProMotion iPhones.
 
+Frame rate: the app asks iOS for the full rate (`CADisableMinimumFrameDurationOnPhone`) and switches off WebKit's 60 fps hold through WebKit's feature list (`GameViewController.allowFullFrameRate`, a private setting: fine for a sideloaded app, to be revisited before the App Store). Every shader is built behind the loading screen, in the variant the picture uses, so nothing is built during a match (`gfxWarm`, `gfxCompile`). Trails and sparks send only the part of their buffers in use. iPhones and iPads start on the middle quality tier (glow on); a device that cannot keep up shrinks the picture and drops a tier for the next match.
+
 ## Putting a new game build inside the app
 
 The app's copy of the game is `www/index.html`: the built page with the web-app-only parts taken out (manifest, home-screen icon link, service worker). `build_game.py --app` makes it; for a page built elsewhere:
