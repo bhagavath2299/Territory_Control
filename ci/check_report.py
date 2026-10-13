@@ -56,11 +56,13 @@ def main(folder: str) -> int:
           "| haptics bridge:", env.get("vibrateBridge"), "| service worker API:", env.get("serviceWorkerApi"))
     print("webgl:", env.get("webgl2Renderer"), "| game version:", env.get("gameVersion"), "| web build:", env.get("webSource"),
           "| cores:", env.get("cores"), "| starting tier:", env.get("startTier"))
+    print("frame rate: screen max", env.get("screenMaxFPS"), "fps | WebKit 60 fps hold setting available:", env.get("near60fpsSettingAvailable"),
+          "| now:", env.get("near60fpsSetting"))
     print("boot ready after", boot.get("bootSeconds"), "s")
     for s in report.get("steps", []):
         p = s.get("page") or {}
         print(f"  {s['step']:26s} t={s.get('seconds')}s state={p.get('state')} screen={p.get('screen')} "
-              f"{p.get('width')}x{p.get('height')} q={p.get('quality')} calls={p.get('drawCalls')} "
+              f"{p.get('width')}x{p.get('height')} q={p.get('quality')} hz={p.get('refreshHz')} calls={p.get('drawCalls')} "
               + " ".join(f"{k}={v}" for k, v in s.items() if k not in ("step", "seconds", "page")))
     for key in ("pageErrors", "consoleErrors", "resourceErrors", "notes"):
         items = report.get(key) or []

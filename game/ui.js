@@ -24,19 +24,17 @@ function clsGlyph(cl,x,y,s,col,g2){const g=g2||ctx;g.save();g.translate(x,y);g.f
 
 // ---------- markers in the world ----------
 // a name plate over a rival: class mark, name, share of the land. A thin bar beneath shows how long their trail is.
-function drawPlate(sx,sy,q,fs,lead,w,h){const p=P[q],nm=nmClean(NM[q]),bot=nmBot(NM[q]),pc=(CN[q]*100/LANDN).toFixed(0)+'%',g=ctx,cl=CLSI[q]||0;
- g.font=HF(800,fs);const nw=g.measureText(nm).width;g.font=HF(700,fs*.92);const pw=g.measureText(pc).width;
- const ph=fs*1.62,gl=fs*1.5,cw=lead?fs*1.15:0,bw0=0,pwid=fs*.9+gl+cw+bw0+nw+fs*.7+pw+fs*.8;
+function drawPlate(sx,sy,q,fs,lead,w,h){const p=P[q],nm=nmClean(NM[q]),pc=(CN[q]*100/LANDN).toFixed(0)+'%',g=ctx,cl=CLSI[q]||0;
+ g.font=HF(800,fs*.95);const nw=g.measureText(nm).width;g.font=HF(700,fs*.85);const pw=g.measureText(pc).width;
+ const ph=fs*1.5,gl=fs*1.25,cw=lead?fs*1.1:0,pwid=fs*.55+gl+cw+nw+fs*.5+pw+fs*.75;
  let x=sx-pwid/2,y=sy-ph/2;x=Math.max(SAFE.l+4,Math.min(w-pwid-4-SAFE.r,x));y=Math.max(4,Math.min(h-ph-4,y));
- hpanel(x,y,pwid,ph,ph*.4,.8,COLS[q]);
- let cx=x+fs*.7;
- clsGlyph(cl,cx+fs*.5,y+ph/2,fs*.52,'rgba(255,255,255,.92)');cx+=gl;
- if(lead){crownIcon(cx+fs*.45,y+ph/2,fs*.4);cx+=cw}
- 
- g.textAlign='left';g.textBaseline='middle';g.font=HF(800,fs);g.fillStyle='#ffffff';g.fillText(nm,cx,y+ph/2+.5);cx+=nw+fs*.7;
- g.font=HF(700,fs*.92);g.fillStyle=tint(COLS[q],.5);g.fillText(pc,cx,y+ph/2+.5);
- if(p&&p.out&&p.tr.length>8){const L=Math.min(1,p.tr.length/160),bw=pwid*.82;g.fillStyle='rgba(8,14,28,.6)';g.fillRect(sx-bw/2,y+ph+3,bw,4);
-  g.fillStyle=L>.6?'#ff5a4a':L>.3?'#ffb020':COLS[q];g.fillRect(sx-bw/2,y+ph+3,bw*Math.max(.08,L),4)}}
+ g.fillStyle='rgba(3,5,10,.6)';g.beginPath();g.roundRect(x,y,pwid,ph,ph/2);g.fill();g.strokeStyle=rgba(COLS[q],.5);g.lineWidth=1;g.stroke();
+ let cx=x+fs*.55;clsGlyph(cl,cx+fs*.42,y+ph/2,fs*.4,COLS[q]);cx+=gl;
+ if(lead){crownIcon(cx+fs*.4,y+ph/2,fs*.36);cx+=cw}
+ g.textAlign='left';g.textBaseline='middle';g.font=HF(800,fs*.95);g.fillStyle='#fff';g.fillText(nm,cx,y+ph/2+.5);cx+=nw+fs*.5;
+ g.font=HF(700,fs*.85);g.fillStyle=tint(COLS[q],.45);g.fillText(pc,cx,y+ph/2+.5);
+ if(p&&p.out&&p.tr.length>8){const L=Math.min(1,p.tr.length/160),bw=pwid*.7;g.fillStyle='rgba(255,255,255,.12)';g.fillRect(sx-bw/2,y+ph+3,bw,2);
+  g.fillStyle=L>.6?'#ff5a4a':L>.3?'#ffb020':COLS[q];g.fillRect(sx-bw/2,y+ph+3,bw*Math.max(.08,L),2)}}
 // a badge on the screen edge for a rival (or your land) that is off screen, turned toward it
 function drawEdge(x,y,ang,q,al,near,home){const g=ctx,R=cs*1.3,col=home?COLS[VS]:COLS[q];g.save();g.translate(x,y);g.globalAlpha=al;
  if(near){const k=.5+.5*Math.sin(clk*9);g.strokeStyle='rgba(255,70,80,'+(.25+.45*k)+')';g.lineWidth=3;g.beginPath();g.arc(0,0,R+cs*.55+k*cs*.4,0,7);g.stroke()}
@@ -60,7 +58,7 @@ function drawHUD(w,h){
  const rkAll=[1,2,3,4,5].filter(q=>NM[q]);
  const HUDON=state==='play'||state==='over'||state==='replay',[mw0,mh0]=miniSize(w,h),stripH=Math.round(cs*2.5),KO=[];
  // places the world markers keep clear of: the minimap block, the buttons, the joystick
- if(HUDON){if(MINI)KO.push([SL+2,ST+2,mw0+22,mh0+22+(state==='play'?stripH+8:0)]);
+ if(HUDON){if(MINI)KO.push([SL+2,ST+2,mw0+22,mh0+22]);if(state==='play')KO.push([w/2-cs*9,ST,cs*18,cs*7]);
   if(state==='play'){KO.push([w-SR-250,h-SB-230,250,230+SB]);KO.push([SL,h-SB-joyR()*2-60,joyR()*2+70,joyR()*2+60+SB]);KO.push([w-SR-58,ST,58,58])}}
  const fade=(bx,by,bw2,bh2,m)=>{let fa=1;for(const r of KO){const dx=Math.max(r[0]-(bx+bw2),bx-(r[0]+r[2]),0),dy=Math.max(r[1]-(by+bh2),by-(r[1]+r[3]),0);fa=Math.min(fa,Math.hypot(dx,dy)/m)}return fa};
  // markers: plates over the rivals, pointers to the ones that are off screen
@@ -81,28 +79,38 @@ function drawHUD(w,h){
  ctx.textAlign='center';
  for(const q of PO){const [px,py]=S(q.x,q.y,2.2),k=Math.min(1,(q.l0-q.l)*7),sc=.7+.3*Math.min(1,k*1.4);ctx.globalAlpha=Math.min(1,q.l*1.6);ctx.font=HF('900 italic',Math.round(cs*1.7*sc));const hw2=ctx.measureText(q.t).width/2+8,tx=Math.min(w-hw2,Math.max(hw2,px)),ty=Math.max(cs*3,py);stext(q.t,tx,ty,q.c,'rgba(6,12,28,.92)',cs*.45)}
  ctx.globalAlpha=1;
- // minimap, and under it the clock and your share of the land
- if(MINI&&HUDON){const mw=mw0,mh=mh0,mx=SL+12,my=ST+12;hpanel(mx-5,my-5,mw+10,mh+10,12,.8);
-  ctx.save();cutPath(ctx,mx,my,mw,mh,7);ctx.clip();ctx.drawImage(MINI,mx,my,mw,mh);
-  for(let q=1;q<=5;q++){const p=P[q];if(!p||!p.tr||p.tr.length<4)continue;ctx.strokeStyle=COLS[q];ctx.lineWidth=q===VS?1.7:1.2;ctx.lineJoin='round';ctx.beginPath();const t=(q===VS&&MP)?ncTrail(p):p.tr;for(let i=0;i<t.length;i+=4)i?ctx.lineTo(mx+t[i]/WW*mw,my+t[i+1]/WH*mh):ctx.moveTo(mx+t[i]/WW*mw,my+t[i+1]/WH*mh);if(p.alive)ctx.lineTo(mx+p.rx/WW*mw,my+p.ry/WH*mh);ctx.stroke()}
-  for(let zi=0;zi<ZN.length;zi++){const zz=ZN[zi],o=ZOWN[zi]||0,zx=mx+zz.x/WW*mw,zy=my+zz.y/WH*mh;ctx.fillStyle=o?COLS[o]:'#ffffff';ctx.strokeStyle='#10162a';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(zx,zy-3.4);ctx.lineTo(zx+3.4,zy);ctx.lineTo(zx,zy+3.4);ctx.lineTo(zx-3.4,zy);ctx.closePath();ctx.fill();ctx.stroke()}
-  {const tl2=s2w(0,0,0),tr2=s2w(w,0,0),bl2=s2w(0,h,0),br2=s2w(w,h,0),pts=[tl2,tr2,br2,bl2];ctx.strokeStyle='rgba(255,255,255,.8)';ctx.lineWidth=1;ctx.beginPath();pts.forEach((v,i)=>{const X=mx+Math.max(-2,Math.min(WW+2,v[0]))/WW*mw,Y=my+Math.max(-2,Math.min(WH+2,v[1]))/WH*mh;i?ctx.lineTo(X,Y):ctx.moveTo(X,Y)});ctx.closePath();ctx.stroke()}
-  for(let q=1;q<=5;q++){const p=P[q];if(!p||!p.alive)continue;const px=mx+p.rx/WW*mw,py=my+p.ry/WH*mh,me2=q===VS,s=me2?4.4:3.2;
-   if(me2){const k=.5+.5*Math.sin(clk*5);ctx.fillStyle='rgba(255,255,255,'+(.25+.25*k)+')';ctx.beginPath();ctx.arc(px,py,s+2.2+k*2,0,7);ctx.fill()}
-   ctx.save();ctx.translate(px,py);ctx.rotate(p.ra||0);ctx.fillStyle=COLS[q];ctx.strokeStyle=me2?'#ffffff':'rgba(10,14,26,.9)';ctx.lineWidth=me2?1.5:1;ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(s*1.25,0);ctx.lineTo(-s*.85,-s*.85);ctx.lineTo(-s*.4,0);ctx.lineTo(-s*.85,s*.85);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore()}
+ // minimap in a thin glass frame (top left)
+ if(MINI&&HUDON){const mw=mw0,mh=mh0,mx=SL+12,my=ST+12;
+  ctx.fillStyle='rgba(3,5,10,.5)';ctx.beginPath();ctx.roundRect(mx-4,my-4,mw+8,mh+8,10);ctx.fill();ctx.strokeStyle='rgba(140,210,255,.16)';ctx.lineWidth=1;ctx.stroke();
+  ctx.save();ctx.beginPath();ctx.roundRect(mx,my,mw,mh,7);ctx.clip();ctx.drawImage(MINI,mx,my,mw,mh);
+  for(let q=1;q<=5;q++){const p=P[q];if(!p||!p.tr||p.tr.length<4)continue;ctx.strokeStyle=COLS[q];ctx.lineWidth=q===VS?1.6:1.1;ctx.lineJoin='round';ctx.beginPath();const t=(q===VS&&MP)?ncTrail(p):p.tr;for(let i=0;i<t.length;i+=4)i?ctx.lineTo(mx+t[i]/WW*mw,my+t[i+1]/WH*mh):ctx.moveTo(mx+t[i]/WW*mw,my+t[i+1]/WH*mh);if(p.alive)ctx.lineTo(mx+p.rx/WW*mw,my+p.ry/WH*mh);ctx.stroke()}
+  for(let zi=0;zi<ZN.length;zi++){const zz=ZN[zi],o=ZOWN[zi]||0,zx=mx+zz.x/WW*mw,zy=my+zz.y/WH*mh;ctx.fillStyle=o?COLS[o]:'rgba(255,255,255,.75)';ctx.beginPath();ctx.moveTo(zx,zy-2.8);ctx.lineTo(zx+2.8,zy);ctx.lineTo(zx,zy+2.8);ctx.lineTo(zx-2.8,zy);ctx.closePath();ctx.fill()}
+  {const tl2=s2w(0,0,0),tr2=s2w(w,0,0),bl2=s2w(0,h,0),br2=s2w(w,h,0),pts=[tl2,tr2,br2,bl2];ctx.strokeStyle='rgba(255,255,255,.55)';ctx.lineWidth=1;ctx.beginPath();pts.forEach((v,i)=>{const X=mx+Math.max(-2,Math.min(WW+2,v[0]))/WW*mw,Y=my+Math.max(-2,Math.min(WH+2,v[1]))/WH*mh;i?ctx.lineTo(X,Y):ctx.moveTo(X,Y)});ctx.closePath();ctx.stroke()}
+  for(let q=1;q<=5;q++){const p=P[q];if(!p||!p.alive)continue;const px=mx+p.rx/WW*mw,py=my+p.ry/WH*mh,me2=q===VS,s=me2?4:3;
+   if(me2){const k=.5+.5*Math.sin(clk*5);ctx.fillStyle='rgba(255,255,255,'+(.18+.22*k)+')';ctx.beginPath();ctx.arc(px,py,s+2+k*2,0,7);ctx.fill()}
+   ctx.save();ctx.translate(px,py);ctx.rotate(p.ra||0);ctx.fillStyle=COLS[q];ctx.strokeStyle=me2?'#ffffff':'rgba(3,5,10,.9)';ctx.lineWidth=me2?1.4:1;ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(s*1.25,0);ctx.lineTo(-s*.85,-s*.85);ctx.lineTo(-s*.4,0);ctx.lineTo(-s*.85,s*.85);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore()}
   ctx.restore();
-  if(state==='play'){const y=my+mh+9,pw=mw+10,ph=stripH,t=Math.max(0,Math.ceil(tl)),ts=(t/60|0)+':'+String(t%60).padStart(2,'0'),low=t<=10;
-   hpanel(mx-5,y,pw,ph,ph*.4,.84);
-   const bw=(pw-10)*Math.max(0,Math.min(1,tl/TL));ctx.fillStyle=low?'rgba(255,90,110,.9)':'rgba(255,255,255,.55)';ctx.fillRect(mx,y+ph-3,bw,1.5);
-   ctx.textAlign='left';ctx.font=HF('900 italic',Math.round(cs*1.45));ctx.fillStyle=low?'rgba(255,90,110,'+(.65+.35*Math.sin(fr/3))+')':'#ffffff';ctx.fillText(ts,mx+1,y+ph/2);
-   ctx.textAlign='right';ctx.font=HF('800 italic',Math.round(cs*1.2));ctx.fillStyle=tint(COLS[VS],.45);ctx.fillText((CN[VS]*100/LANDN).toFixed(1)+'%',mx+mw,y+ph/2);
-   // small pills under it: the ping (online) and the nitro bonus
-   let cy=y+ph+6;const chip=(tx,dotc,fill,ink)=>{ctx.font=HF(800,Math.round(cs*.95));const cw=Math.min(pw,ctx.measureText(tx).width+cs*(dotc?2.4:1.6)),chh=cs*1.7,cx0=mx-5;
-    if(fill){ctx.fillStyle=fill;ctx.beginPath();ctx.roundRect(cx0,cy,cw,chh,chh/2);ctx.fill()}else hpanel(cx0,cy,cw,chh,chh*.4,.74);
-    let tx0=cx0+cs*.8;if(dotc){ctx.fillStyle=dotc;ctx.beginPath();ctx.arc(cx0+cs*.85,cy+chh/2,cs*.3,0,7);ctx.fill();tx0=cx0+cs*1.5}
+  // small pills under it: the ping (online) and the nitro bonus
+  if(state==='play'){let cy=my+mh+10;const chip=(tx,dotc,fill,ink)=>{ctx.font=HF(800,Math.round(cs*.9));const cw=ctx.measureText(tx).width+cs*(dotc?2.3:1.6),chh=cs*1.6,cx0=mx-4;
+    ctx.fillStyle=fill||'rgba(3,5,10,.55)';ctx.beginPath();ctx.roundRect(cx0,cy,cw,chh,chh/2);ctx.fill();
+    let tx0=cx0+cs*.8;if(dotc){ctx.fillStyle=dotc;ctx.beginPath();ctx.arc(cx0+cs*.8,cy+chh/2,cs*.28,0,7);ctx.fill();tx0=cx0+cs*1.4}
     ctx.fillStyle=ink||'#ffffff';ctx.textAlign='left';ctx.fillText(tx,tx0,cy+chh/2+.5);cy+=chh+cs*.35};
    if(MP&&NC.hasSnap&&(NC.ping>0||NC.rtt>0)){const pg=Math.round(NC.ping>0?NC.ping:NC.rtt),pc2=pg<90?'#46d37a':pg<160?'#ffd24a':pg<260?'#ff9a3d':'#ff5a6e';chip(pg+' ms',pc2)}
-   if(MYHOLD&8)chip('Nitro +15%',null,'rgba(255,176,32,.96)','#1b1206')}}
+   if(MYHOLD&8)chip('Nitro +15%',null,'rgba(255,176,32,.92)','#1b1206')}}
+ // the clock and your share of the land: a pill at the top in the middle; under it, what just happened to you
+ if(state==='play'){const t=Math.max(0,Math.ceil(tl)),ts=(t/60|0)+':'+String(t%60).padStart(2,'0'),low=t<=10,pc=(CN[VS]*100/LANDN).toFixed(1)+'%',f1=Math.round(cs*1.45),f2=Math.round(cs*1.15);
+  ctx.font=HF('900 italic',f1);const tw=ctx.measureText(ts).width;ctx.font=HF('800 italic',f2);const pw2=ctx.measureText(pc).width;
+  const ph=Math.round(cs*2.3),W2=tw+pw2+cs*3.6,x0=w/2-W2/2,y0=ST+10;
+  ctx.fillStyle='rgba(3,5,10,.55)';ctx.beginPath();ctx.roundRect(x0,y0,W2,ph,ph/2);ctx.fill();ctx.strokeStyle=low?'rgba(255,80,100,'+(.45+.3*Math.sin(fr/3))+')':'rgba(140,210,255,.16)';ctx.lineWidth=1;ctx.stroke();
+  {const k=Math.max(0,Math.min(1,tl/TL)),bw=(W2-ph)*k;ctx.fillStyle=low?'rgba(255,90,110,.9)':'rgba(255,255,255,.35)';ctx.fillRect(x0+ph/2,y0+ph-2.5,bw,1.5)}
+  ctx.textAlign='left';ctx.font=HF('900 italic',f1);ctx.fillStyle=low?'rgba(255,90,110,'+(.65+.35*Math.sin(fr/3))+')':'#ffffff';ctx.fillText(ts,x0+cs*1.1,y0+ph/2+1);
+  ctx.fillStyle=COLS[VS];ctx.beginPath();ctx.arc(x0+cs*1.1+tw+cs*.7,y0+ph/2,cs*.2,0,7);ctx.fill();
+  ctx.font=HF('800 italic',f2);ctx.fillStyle=tint(COLS[VS],.45);ctx.fillText(pc,x0+cs*1.1+tw+cs*1.4,y0+ph/2+1);
+  let fy=y0+ph+cs*.55;ctx.textAlign='center';
+  for(const d of FD){if(!d.me)continue;const age=clk-(d.t0===undefined?clk:d.t0),a=Math.min(1,age*7)*Math.min(1,d.l/.6);if(a<=.01)continue;
+   ctx.globalAlpha=a;ctx.font=HF(800,Math.round(cs*.98));const tw3=ctx.measureText(d.t).width,fh=cs*1.85,fx=w/2-tw3/2-cs*1,sl=(1-Math.min(1,age*7))*-8;
+   ctx.fillStyle='rgba(3,5,10,.62)';ctx.beginPath();ctx.roundRect(fx,fy+sl,tw3+cs*2,fh,fh/2);ctx.fill();ctx.fillStyle=d.c;ctx.beginPath();ctx.arc(fx+cs*.75,fy+sl+fh/2,cs*.22,0,7);ctx.fill();
+   ctx.fillStyle='#ffffff';ctx.fillText(d.t,w/2+cs*.25,fy+sl+fh/2+1);fy+=fh+cs*.3;ctx.globalAlpha=1}}
  ctx.textAlign='center';
  if(state==='play'&&tl<=30&&tl>0){const a=.07+.05*Math.sin(fr/5)+(tl<=10?.07:0),g2=ctx.createRadialGradient(w/2,h/2,Math.min(w,h)*.34,w/2,h/2,Math.max(w,h)*.75);g2.addColorStop(0,'rgba(255,40,80,0)');g2.addColorStop(1,'rgba(255,40,80,'+a+')');ctx.fillStyle=g2;ctx.fillRect(0,0,w,h);
   if(tl>27){ctx.globalAlpha=Math.min(1,tl-27);ctx.font=HF('900 italic',Math.round(cs*3));stext('FINAL RUSH',w/2,h*.3,'#ffffff','rgba(255,36,72,.95)',cs*.65)}
@@ -151,9 +159,11 @@ addEventListener('keydown',e=>{if(e.repeat||(e.target&&e.target.tagName==='INPUT
 addEventListener('keyup',e=>{if(e.code==='Space'||e.key==='Shift')abUp(4)});
 addEventListener('resize',()=>{if(P){readSafe();fit()}});
 function abDown(s){if(state!=='play'||RPL)return;
- if(s===4){setBoost(1);return}
- if(MP){if(!ncUse(s))snd('deny');return}
- if(IN[1]){if(!ABU(1,s))snd('deny')}}
+ if(s===4){setBoost(1);abFlash(4);return}
+ if(MP){if(!ncUse(s))snd('deny');else abFlash(s);return}
+ if(IN[1]){if(!ABU(1,s))snd('deny');else abFlash(s)}}
+// a quick pop of the button that fired
+function abFlash(s){const b=ABB[s-1];if(!b)return;b.classList.remove('fire');void b.offsetWidth;b.classList.add('fire');clearTimeout(b._ft);b._ft=setTimeout(()=>b.classList.remove('fire'),340)}
 function abUp(s){if(s===4)setBoost(0)}
 function firePow(k){if(state!=='play'||!me||!me.alive||RPL)return;if(MP)tx({t:'pw',k});else PWU(1,k)}
 function aim(){if(!me)return;const hx=me.rx,hy=me.ry;
@@ -167,7 +177,7 @@ function snapPrev(){for(let i=1;i<=5;i++){const p=P[i];p.ox=p.x;p.oy=p.y;p.oa=p.
 function interp(a){for(let i=1;i<=5;i++){const p=P[i];if(p.ox===undefined||!p.alive){p.rx=p.x;p.ry=p.y;p.ra=p.a;continue}
  const dx=p.x-p.ox,dy=p.y-p.oy;if(dx*dx+dy*dy>6.25){p.rx=p.x;p.ry=p.y;p.ra=p.a}else{p.rx=p.ox+dx*a;p.ry=p.oy+dy*a;p.ra=p.oa+angd(p.oa,p.a)*a}}}
 function humanInput(){const t=IN[1];if(!t||!me)return;aim();if(me.alive&&!wasAlive)tg.a=me.a;wasAlive=me.alive;INP(1,Math.round(Math.max(-7,Math.min(7,tg.a))*50),boost?1:0)}
-function drainEV(){while(EV.length){const e=EV.shift();if(e[0]==='ko')koMsg(e[1],e[2],e[3]);else if(e[0]==='zone')zoneEv(e[1],e[2],e[3]);else if(e[0]==='seize')seizeEv(e[1],e[2],e[3]);else if(e[0]==='strike'||e[0]==='orbital')strikeEv(e[0],e[1],e[2]);else evFx(e[0],e[1],e[2],e[3])}}
+function drainEV(){while(EV.length){const e=EV.shift();if(e[0]==='ko')koMsg(e[1],e[2],e[3],e[4]);else if(e[0]==='rail'){railFx(e[1],e[2],e[3],e[4],e[5]);evFx('rail',e[1],e[4],e[5])}else if(e[0]==='zone')zoneEv(e[1],e[2],e[3]);else if(e[0]==='seize')seizeEv(e[1],e[2],e[3]);else if(e[0]==='strike'||e[0]==='orbital')strikeEv(e[0],e[1],e[2]);else evFx(e[0],e[1],e[2],e[3])}}
 function syncVisual(){
  for(let i=1;i<=5;i++){const p=P[i];visFlags(p,snapFlags(i,p));PRV[i]=PROT[i];HOLDV[i]=HOLD[i]}
  MNV=MINES.map(m=>[m.x,m.y,m.o,m.arm>0?0:1,m.k]);ZOWN=ZN.map(z=>z.own);
@@ -233,7 +243,7 @@ function rpSeek(frac){if(!RPL)return;const t=Math.max(0,Math.min(RPL.rec.ticks-1
 function seekStep(){const r=RPL;let n=0;
  while(TK<r.seek&&n<400){n++;snapPrev();const o=r.rec.ops;while(r.oi<o.length&&o[r.oi][0]<=TK)APPLY(o[r.oi++]);STEPF();EV.length=0}
  if(TK>=r.seek){FF=0;r.seek=null;r.paused=r.wasPaused;FX=[];PO=[];FD=[];SCORCH=[];RINGS=[];ACC=0;snapPrev();interp(0);syncVisual();CAM.x=me.x;CAM.y=me.y;rpUpd()}else interp(0)}
-function rpView(s){if(!RPL||s<1||s>5||!P[s])return;VS=s;me=P[s];PREV=null;MDIRTY=true;CAM.x=me.rx;CAM.y=me.ry;rpBar(false);syncVisual()}
+function rpView(s){if(!RPL||s<1||s>5||!P[s])return;VS=s;me=P[s];LANDV=-1;MINID=1;MDIRTY=true;CAM.x=me.rx;CAM.y=me.ry;rpBar(false);syncVisual()}
 function rpClose(){RPL=null;FF=0;rpBar(null);backToMenu()}
 function rpSpeed(){if(!RPL)return;RPL.speed=RPL.speed===1?2:RPL.speed===2?4:1;rpUpd()}
 function rpEnded(){rpUpd();const fin=RPL.rec.fin,N=fin.N||LANDN,rk=[1,2,3,4,5].filter(i=>(RPL.rec.names||[])[i]).sort((a,b)=>fin.cn[b]-fin.cn[a]);
@@ -273,6 +283,11 @@ const IC={
  orbital:I('<path fill-rule="evenodd" d="M12 9.500a5.800 5.800 0 1 0 0 11.600 5.800 5.800 0 0 0 0-11.600zm0 2.200a3.600 3.600 0 1 1 0 7.200 3.600 3.600 0 0 1 0-7.200z"/><path d="M11 1h2v9h-2zM11.100 13.300h1.800v1.800h-1.800z"/>'),
  mine:I('<path d="M12 6a6 6 0 1 0 0 12 6 6 0 0 0 0-12zM11 1h2v3h-2zM11 20h2v3h-2zM1 11h3v2H1zm19 0h3v2h-3zM4.200 4.200l1.400-1.400 2.100 2.100-1.400 1.400zM16.300 16.300l1.400-1.400 2.100 2.100-1.400 1.400zM4.200 19.800l2.100-2.100 1.400 1.400-2.100 2.100zM16.300 7.700l2.100-2.100 1.400 1.400-2.100 2.100z"/>'),
  drone:I('<path d="M21 3c-6 .2-9.500 3-11.500 7.500l4 4C18.500 12.500 20.800 9 21 3z"/><path d="M8 11.500 3.500 12.800l-1.500 4 4.500-1zM12.500 16 11.200 20.500l-4 1.500 1-4.500z"/>'),
+ rico:I('<path d="M8.500 2.500l1.700 4.300 4.300 1.700-4.300 1.700-1.700 4.300-1.700-4.300L2.500 8.500l4.300-1.700z"/><path d="M14 21.500l3.200-6.800 1.300 3.100 3-1.200-3.200 6.800-1.300-3.100z" opacity=".85"/><path d="M12.500 13.600l1.400-1.400 3.200 3.200-1.400 1.400z"/>'),
+ wire:I('<path d="M3 7h3v14H3zM18 7h3v14h-3z"/><circle cx="4.500" cy="5" r="2.200"/><circle cx="19.500" cy="5" r="2.200"/><path d="M6 11.300l2.400-1.300 2.400 2.600 2.400-2.600 2.400 2.600L18 11.300v2.200l-2.400 1.300-2.400-2.600-2.400 2.600-2.400-2.600L6 13.500z"/>'),
+ fault:I('<path d="M14.500 1.500 9 9.500l4.200 1.800L7.500 22.500 17 11.200l-4.300-1.900L17.500 1.500z"/><path d="M1.500 20.500h5v2h-5zM17.500 20.500h5v2h-5z"/>'),
+ rail:I('<path d="M2 10h12.500v4.500H2z"/><path d="M14.500 8.800h3v7h-3z"/><path d="M17.500 11.400H23v1.700h-5.500z"/><path d="M4.500 14.500h3.200V19H4.500z"/><path d="M3 7.200h8v1.600H3z" opacity=".7"/>'),
+ hole:I('<path fill-rule="evenodd" d="M12 2.500a9.500 9.500 0 1 0 9.500 9.500h-2.600A6.900 6.900 0 1 1 12 5.100zm0 4.300a5.200 5.200 0 1 0 5.200 5.200h-2.500a2.700 2.700 0 1 1-2.700-2.700z"/><circle cx="12" cy="12" r="1.300"/>'),
  field:I('<circle cx="12" cy="12" r="2.600"/><circle cx="12" cy="4.200" r="1.800"/><circle cx="17.500" cy="6.500" r="1.800"/><circle cx="19.800" cy="12" r="1.800"/><circle cx="17.500" cy="17.500" r="1.800"/><circle cx="12" cy="19.800" r="1.800"/><circle cx="6.500" cy="17.500" r="1.800"/><circle cx="4.200" cy="12" r="1.800"/><circle cx="6.500" cy="6.500" r="1.800"/>'),
  cannon:I('<path d="M3 15a3 3 0 1 0 6 0 3 3 0 0 0-6 0zm4-4.500 9-5 2 3.500-9 5zM19 6l2-1 1 2-2 1z"/>'),
  fort:I('<path d="M12 2 4 5v6c0 5 3.400 9.200 8 11 4.600-1.800 8-6 8-11V5zm0 4 4 1.500V11c0 2.600-1.600 5-4 6.200C9.600 16 8 13.600 8 11V7.500z"/>'),
@@ -288,9 +303,9 @@ const isMe=q=>q===VS&&!RPL;
 const ZPOW_ICON={cannon:'cannon',fort:'fort',strike:'orbital'};
 // ability buttons: icon, name and a ring that fills as the ability recharges
 let ABK='',ABV=[-1,-1,-1,-1],ABT=['','','',''];
-const ABSHORT={blade:'Dash',fan:'Fan',storm:'Storm',ram:'Ram',shock:'Shock',fort:'Fortress',cannon:'Cannon',mortar:'Mortar',orbital:'Orbital',mine:'Mines',drone:'Drone',field:'Field'};
+const ABSHORT={rico:'Blades',wire:'Wire',storm:'Cyclone',fault:'Fault',shock:'Shock',fort:'Juggernaut',rail:'Railgun',mortar:'Mortar',orbital:'Orbital',mine:'Mines',drone:'Swarm',hole:'Black hole'};
 function setAbLabels(){const cl=CLSI[VS]||0,C=CLS[cl],ids=[C.ab[0].id,C.ab[1].id,C.ab[2].id,'sprint'],nm=[ABSHORT[C.ab[0].id]||C.ab[0].n,ABSHORT[C.ab[1].id]||C.ab[1].n,ABSHORT[C.ab[2].id]||C.ab[2].n,'Boost'],kb=['Q','E','R','Space'];
- ABB.forEach((b,j)=>{b.innerHTML=(IC[ids[j]]||'')+'<span>'+nm[j]+'</span><b class="cd"></b><em class="kb">'+kb[j]+'</em>';b.style.setProperty('--pc',j===3?'#ffb020':j===2?'#ffe08a':C.col);b.dataset.cl=cl});
+ ABB.forEach((b,j)=>{b.innerHTML=(IC[ids[j]]||'')+'<b class="cd"></b><span>'+nm[j]+'</span><em class="kb">'+kb[j]+'</em>';b.style.setProperty('--pc',j===3?'#ffb020':j===2?'#ffe08a':C.col);b.dataset.cl=cl});
  ABV=[-1,-1,-1,-1];ABT=['','','','']}
 function abHud(){
  const pl=state==='play'&&!RPL,key=pl?(CLSI[VS]||0)+'|'+VS:'off';
@@ -314,44 +329,55 @@ function evFx(ty,id,x,y){
  switch(ty){
   case 'blade':burst(x,y,c,22,16);burst(x,y,'#ffffff',10,12);RINGS.push({x,y,t0:clk,c,r:3.4,dur:.45});snd('blade');if(mine){buzz(25);shake=Math.max(shake,3)}break;
   case 'ram':burst(x,y,'#ffb020',26,13);burst(x,y,'#ffffff',10,10);RINGS.push({x,y,t0:clk,c:'#ffb020',r:4.4,dur:.5});snd('ram');if(mine){buzz(35);shake=Math.max(shake,5)}break;
-  case 'fan':burst(x,y,c,14,11);snd('fan');if(mine)buzz(15);break;
+  case 'fan':burst(x,y,c,14,11);RINGS.push({x,y,t0:clk,c,r:2,dur:.3});snd('fan');if(mine)buzz(15);break;
   case 'storm':RINGS.push({x,y,t0:clk,c,r:7.5,dur:.7});RINGS.push({x,y,t0:clk+.08,c:'#ffffff',r:5,dur:.5});burst(x,y,c,40,13);burst(x,y,'#ffffff',16,10);snd('storm');if(mine){buzz(70);shake=Math.max(shake,6)}break;
   case 'shock':RINGS.push({x,y,t0:clk,c:'#ffb020',r:BAL.shockR*1.05,dur:.7});RINGS.push({x,y,t0:clk+.07,c:'#ffffff',r:BAL.shockR*.65,dur:.55});burst(x,y,'#e8f4ff',54,16,.2);burst(x,y,'#ffb020',24,12);snd('shock');shakeAt(x,y,11,22);if(mine)buzz(90);break;
   case 'fortress':RINGS.push({x,y,t0:clk,c:'#5ee1ff',r:6,dur:.65});burst(x,y,'#5ee1ff',30,10);snd('fortress');if(mine){buzz(60);shake=Math.max(shake,4)}break;
   case 'fpulse':RINGS.push({x,y,t0:clk,c:'#5ee1ff',r:BAL.fortR*2.1,dur:.5});snd('fpulse');shakeAt(x,y,3,12);break;
   case 'fire':burst(x,y,'#ffd27a',14,10);FX.push({x,y,h:.8,vh:0,vx:0,vy:0,l:.16,l0:.16,c:'#fff0cc',k:5,s:1.5,r:0,vr:0});snd('fire');if(mine){shake=Math.max(shake,4);buzz(20)}break;
-  case 'mortar':burst(x,y,'#ffd27a',16,9);snd('mortar');if(mine)buzz(25);break;
-  case 'mine':burst(x,y,'#8fe9b9',10,4);snd('mine');break;
+  case 'mortar':burst(x,y,'#ffd27a',16,9);RINGS.push({x,y,t0:clk,c:'#ffd27a',r:2,dur:.3});snd('mortar');if(mine)buzz(25);break;
+  case 'mine':burst(x,y,c,10,4);snd('mine');break;
   case 'boom':explode(x,y,2.4,'#ffb020');snd('boom');shakeAt(x,y,12,22);if(mine||(me&&Math.hypot(me.rx-x,me.ry-y)<5))buzz(120);break;
   case 'boom2':{explode(x,y,2.1,'#ffb020');const dd=shakeAt(x,y,9,16);if(dd<14)snd('boom2');else if(dd<32)snd('boom2far');break}
   case 'bhit':burst(x,y,c,18,13);burst(x,y,'#ffffff',8,10);snd('bhit');break;
-  case 'drone':burst(x,y,'#8fe9b9',10,6);snd('drone');if(mine)buzz(20);break;
+  case 'drone':burst(x,y,c,16,8);RINGS.push({x,y,t0:clk,c,r:2.4,dur:.35});snd('drone');if(mine)buzz(20);break;
   case 'fizz':burst(x,y,'#9aa4b6',10,4);break;
-  case 'field':RINGS.push({x,y,t0:clk,c:'#8fe9b9',r:BAL.shockR,dur:.6});burst(x,y,'#8fe9b9',24,9);snd('field');if(mine){buzz(50);shake=Math.max(shake,3)}break;
+  case 'rbounce':burst(x,y,c,10,10,.6);burst(x,y,'#ffffff',5,8,.6);RINGS.push({x,y,t0:clk,c,r:1.4,dur:.25});snd('rbounce');break;
+  case 'rail':snd('rail');if(mine){buzz(35);shake=Math.max(shake,5)}else shakeAt(x,y,4,14);break;
+  case 'wire':burst(x,y,c,12,6,.6);snd('wire');if(mine)buzz(20);break;
+  case 'wcut':burst(x,y,'#ffffff',14,12,.6);burst(x,y,c,14,9,.6);RINGS.push({x,y,t0:clk,c,r:2.2,dur:.3});snd('wcut');break;
+  case 'fault':RINGS.push({x,y,t0:clk,c,r:3,dur:.4});burst(x,y,'#ffd27a',18,10,.2);snd('fault');shakeAt(x,y,mine?9:6,20);if(mine)buzz(60);break;
+  case 'fend':burst(x,y,'#ffb050',14,8,.2);snd('fend');break;
+  case 'hole':RINGS.push({x,y,t0:clk,c,r:6,dur:.5});RINGS.push({x,y,t0:clk+.1,c:'#ffffff',r:3,dur:.4});burst(x,y,'#ffffff',20,4,.4);snd('hole');shakeAt(x,y,6,24);if(mine)buzz(80);break;
+  case 'hcrush':RINGS.push({x,y,t0:clk,c:'#ffffff',r:2.6,dur:.3});burst(x,y,c,24,12,.5);snd('hcrush');break;
   case 'pop':burst(x,y,'#5ee1ff',40,12);RINGS.push({x,y,t0:clk,c:'#5ee1ff',r:4,dur:.5});snd('pop');if(mine){shake=10;buzz(60)}break;
   case 'plate':RINGS.push({x,y,t0:clk,c:'#5ee1ff',r:3,dur:.5});snd('plate');break;
   case 'fort':RINGS.push({x,y,t0:clk,c:'#5ee1ff',r:5,dur:.6});burst(x,y,'#5ee1ff',20,7);snd('fortify');break;
  }}
-function koMsg(v,b,why){if(!v)return;const vn=NM[v]||'Player',bn=NM[b]||'',mine=isMe(v),kb=isMe(b);
- const by=b?(kb?'You':bn):'';
+const KOW={rail:'a railgun',blade:'a blade',fault:'a fault line',hole:'a black hole',storm:'the blade cyclone',wire:'a laser wire',bomb:'a blast',shell:'a shell',missile:'a drone'};
+function koMsg(v,b,why,tr){if(!v)return;const vn=NM[v]||'Player',bn=NM[b]||'',mine=isMe(v),kb=isMe(b);
+ const by=b?(kb?'You':bn):'',bys=b?(kb?'Your':bn+"'s"):'';
+ if(tr&&b&&KOW[why]){const t=by+(mine?' cut your trail':' cut '+vn+"'s trail")+' with '+KOW[why];FD.push({t,c:COLS[b],l:4,t0:clk,me:mine||kb});if(FD.length>3)FD.shift();if(mine)DEATH=t;return}
  const T={self:mine?'You crossed your own trail':vn+' crossed their own trail',
   noland:b?(by+(mine?' took all your land':' took all of '+vn+"'s land")):(mine?'You lost all your land':vn+' lost all their land'),
   enclosed:by+(mine?' trapped your trail':' trapped '+vn),blast:by+(mine?' blew up all your land':' blew up all of '+vn+"'s land"),
   mine:b?(kb?'Your':bn+"'s")+' mine got '+(mine?'you':vn):'',cut:by+(mine?' cut your trail':' cut '+vn),
   shell:by+' shelled '+(mine?'you':vn),blade:by+' sliced '+(mine?'you':vn),ram:by+' crushed '+(mine?'you':vn),
-  missile:(kb?'Your':bn+"'s")+' drone hit '+(mine?'you':vn),bomb:by+(mine?' blasted you':' blasted '+vn)};
+  missile:bys+' drone hit '+(mine?'you':vn),bomb:by+(mine?' blasted you':' blasted '+vn),
+  rail:by+' railgunned '+(mine?'you':vn),wire:bys+' laser wire cut down '+(mine?'you':vn),fault:by+' split the ground under '+(mine?'you':vn),
+  hole:bys+' black hole swallowed '+(mine?'you':vn),storm:bys+' blade cyclone shredded '+(mine?'you':vn)};
  let t=T[why];if(!t||(why!=='self'&&why!=='noland'&&!b))t=b?by+(mine?' eliminated you':' eliminated '+vn):(mine?'You were eliminated':vn+' was eliminated');
- FD.push({t,c:COLS[b||v],l:4});if(FD.length>3)FD.shift();if(mine)DEATH=t}
+ FD.push({t,c:COLS[b||v],l:4,t0:clk,me:mine||kb});if(FD.length>3)FD.shift();if(mine)DEATH=t}
 function zoneEv(zi,o,old){const z=ZN[zi];if(!z)return;const nm=ZNAME[z.t];
- if(isMe(o)){FD.push({t:'You took the '+nm+': '+ZPOW[z.t]+' ready',c:COLS[VS],l:4});if(me)pop(me.rx,me.ry-3.2,ZPOW[z.t].toUpperCase()+' ONLINE','#ffb020',1.6);snd('zone');buzz(30)}
- else if(isMe(old))FD.push({t:'You lost the '+nm,c:COLS[o]||'#c8d1e6',l:4});
+ if(isMe(o)){FD.push({t:'You took the '+nm+': '+ZPOW[z.t]+' ready',c:COLS[VS],l:4,t0:clk,me:1});if(me)pop(me.rx,me.ry-3.2,ZPOW[z.t].toUpperCase()+' ONLINE','#ffb020',1.6);snd('zone');buzz(30)}
+ else if(isMe(old))FD.push({t:'You lost the '+nm,c:COLS[o]||'#c8d1e6',l:4,t0:clk,me:1});
  else if(o&&NM[o])FD.push({t:NM[o]+' took the '+nm,c:COLS[o],l:4});
  if(FD.length>3)FD.shift();RINGS.push({x:z.x,y:z.y,t0:clk,c:COLS[o]||'#ffffff'})}
 function seizeEv(h,v,n){const pc=(n*100/LANDN).toFixed(1);
  if(isMe(h)&&me){pop(me.rx,me.ry-2.5,'+'+pc+'% seized','#ffd54a',1.5);snd('seize')}
- if(h&&v&&NM[h]&&NM[v]){FD.push({t:(isMe(h)?'You':NM[h])+' seized '+(isMe(v)?'your':NM[v]+"'s")+' land',c:COLS[h],l:4});if(FD.length>3)FD.shift()}}
-function strikeEv(kind,i,t){if(!i||!t||!NM[i]||!NM[t])return;const what=kind==='orbital'?'an orbital strike':'an airstrike';
- FD.push({t:(isMe(i)?'You':NM[i])+' called '+what+' on '+(isMe(t)?'you!':NM[t]),c:'#ff3b5e',l:4});if(FD.length>3)FD.shift();snd(kind==='orbital'?'orbital':'strike');if(isMe(t)){buzz(120);pop(me.rx,me.ry-3,'INCOMING','#ff3b5e',1.4)}}
+ if(h&&v&&NM[h]&&NM[v]){FD.push({t:(isMe(h)?'You':NM[h])+' seized '+(isMe(v)?'your':NM[v]+"'s")+' land',c:COLS[h],l:4,t0:clk,me:isMe(h)||isMe(v)});if(FD.length>3)FD.shift()}}
+function strikeEv(kind,i,t){if(!i||!t||!NM[i]||!NM[t])return;const what=kind==='orbital'?'an orbital barrage':'an airstrike';
+ FD.push({t:(isMe(i)?'You':NM[i])+' called '+what+' on '+(isMe(t)?'you!':NM[t]),c:'#ff3b5e',l:4,t0:clk,me:isMe(i)||isMe(t)});if(FD.length>3)FD.shift();snd(kind==='orbital'?'orbital':'strike');if(isMe(t)){buzz(120);pop(me.rx,me.ry-3,'INCOMING','#ff3b5e',1.4)}}
 function rush(){if(state!=='play'){lastSec=99;return}const s=Math.ceil(tl);if(s!==lastSec){if(s<=10&&s>0){snd('tick',10-s);buzz(12)}else if(s===30){snd('rush');buzz(60)}lastSec=s}}
 (function(){const d=[[IC.cannon,'Fire'],[IC.fort,'Fortify'],[IC.orbital,'Strike']];PWB.forEach((b,j)=>{b.innerHTML=d[j][0]+'<span>'+d[j][1]+'</span>'})})();
 function updatePowDock(pl){const hb=pl&&me&&me.alive?MYHOLD:0,key=hb+'|'+(PRV[VS]>0?Math.ceil(PRV[VS]):0);
@@ -448,7 +474,6 @@ function menu(){const m=ME,nm=esc(myName||m.name||'Player');
  +'<div class="row">'+(on?'<button class="btn" data-a="bots">'+IC.bots+'<span class="tx">Practice<small>vs bots</small></span></button>':'')
  +'<button class="btn vio'+(on?'':' off')+'" data-a="friends">'+IC.friends+'<span class="tx">Friends<small>'+(on?'Private room':'Needs server')+'</small></span></button></div>'
  +(FEAT.ranked?'<button class="btn alt" data-a="ranked">'+IC.trophy+'<span class="tx">Ranked 1v1</span></button>':'')
- +'<button class="btn alt c" data-a="lab">'+IC.garage+'<span class="tx">Look lab<small>Try the new places, sizes and land styles</small></span></button>'
  +'<div class="tri"><button class="tile" data-a="replays">'+(cnt?'<i>'+cnt+'</i>':'')+IC.replay+'Replays</button><button class="tile" data-a="garage">'+IC.garage+'Garage</button><button class="tile" data-a="how">'+IC.how+'How to play</button></div>'
  +'<div class="mm-foot" id="nst">'+netLine()+'</div></div>','menu','mm')}
 function friendsUI(){show(hdr('Play with friends')+'<button class="btn gr" data-a="create">'+IC.friends+'Create a room</button><p class="hint">or enter a room code</p><input id="cd" class="inp code" maxlength="8" placeholder="ROOM CODE" autocomplete="off" autocapitalize="characters"><button class="btn" data-a="joincode">Join room</button>','friends')}
@@ -466,9 +491,10 @@ function howUI(){const r=(n,t)=>'<div class="rw" style="align-items:flex-start">
  +r(3,'If a rival touches your trail you are out. Cut theirs first.')
  +r(4,'Take a rival out and <b>all of their land becomes yours</b>.')
  +r(5,'Pick a <b>class</b>: Striker, Titan, Gunner or Sapper. Each has two quick abilities and an <b>Ultimate</b> that charges as you capture land and take rivals out.')
- +r(6,'<b>Exposed</b>: shots, blades and rams only hurt cars that are <u>outside</u> their own land. Home is safe, but your trail is not.')
- +r(7,'Hold <b>Boost</b> to go faster. It drains the bar, and recharges when you let go.')
- +r(8,'Own half of a <b>power zone</b> to unlock a power: Cannon, Fortify, Airstrike or Nitro.')
+ +r(6,'<b>Exposed</b>: weapons only hurt cars that are <u>outside</u> their own land. Home is safe, but your trail is not.')
+ +r(7,'Weapons <b>blow land apart</b>. Destroyed land stays <b>scorched</b> for 15 seconds: closing a loop round it will not fill it, only driving over it wins it back.')
+ +r(8,'Hold <b>Boost</b> to go faster. It drains the bar, and recharges when you let go.')
+ +r(9,'Own half of a <b>power zone</b> to unlock a power: Cannon, Fortify, Airstrike or Nitro.')
  +'<p class="hint">Keyboard: mouse to steer, Q / E abilities, R ultimate, Space boost, Z X C zone powers.<br>Matches last 2 minutes. The most land wins.</p>','how')}
 // ---------- class select: four classes, each with its own weapons ----------
 function classTabs(cl,act){return CLS.map((c,i)=>'<button class="ctab'+(i===cl?' on':'')+'" data-a="'+act+'" data-v="'+i+'" style="--cc:'+c.col+'"><span class="gl">'+IC[CLSIC[i]]+'</span>'+c.n+'</button>').join('')}
@@ -584,7 +610,7 @@ function resultReplay(){const e=$('rpslot');if(!e)return;
  if(!LASTREP){e.innerHTML=MP?'<p class="hint" style="margin:0">Saving the replay...</p>':'';return}
  e.innerHTML='<button class="btn vio" data-a="watchlast">'+IC.replay+'<span class="tx">Watch replay<small>Saved for '+(LASTREP.days||7)+' days</small></span></button>'}
 // the server keeps sending lobby updates to a player who is still in a room; they may only take over the screen when the player is waiting
-const NOTAKE={result:1,replay:1,rpend:1,load:1,replays:1,garage:1,cls:1,settings:1,lab:1,rewards:1,stats:1,war:1,how:1,gone:1};
+const NOTAKE={result:1,replay:1,rpend:1,load:1,replays:1,garage:1,cls:1,settings:1,rewards:1,stats:1,war:1,how:1,gone:1};
 function lobbyOK(){return state!=='play'&&state!=='replay'&&!RPL&&!NOTAKE[scr]}
 // pause: a practice match stops while the menu is up; an online match carries on (the server does not wait), so it is only a menu there
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&state==='play'&&!MP&&!RPL)pauseSet(1)});
@@ -629,8 +655,6 @@ function act(a,v,el){
   case 'garage':garageUI();break;
   case 'cls':classUI();break;
   case 'settings':settingsUI();break;
-  case 'lab':labUI();break;
-  case 'labset':labSet(v);break;
   case 'replays':replaysUI();break;
   case 'how':howUI();break;
   case 'rewards':rewardsUI();break;
@@ -665,56 +689,6 @@ document.addEventListener('input',e=>{const t=e.target;if(t&&t.id==='mvol'){SET.
 document.addEventListener('change',e=>{const t=e.target;if(!t)return;
  if(t.id==='nm'){myName=String(t.value).trim().slice(0,12);lsSet('ct-name',myName);tx({t:'name',name:myName})}
  else if(t.id==='city')tx({t:'city',city:t.value})});
-// ---------- look lab (prototype only): try the looks, the size of things on screen, how captured land is drawn and the marker under your car ----------
-// The choices are kept on the phone. While a match is on, four small buttons on the left edge switch them live, so the same moment can be compared.
-const LAB={look:-1,ter:0,zoom:1.35,mark:1};
-const LABZ=[1,1.35,1.7],LABZN=['As before','Bigger','Biggest'],LABT=['Painted','Flat','Raised'],LABM=['Ring + arrows','Thin ring','No ring'];
-let LABEL=null;
-function labLoad(){
- try{const o=JSON.parse(lsGet('tc-lab','null'));if(o)for(const k in LAB)if(typeof o[k]==='number')LAB[k]=o[k]}catch(e){}
- try{const qs=new URLSearchParams(location.search);for(const k of ['look','ter','zoom','mark'])if(qs.get(k)!==null&&qs.get(k)!==''&&isFinite(+qs.get(k)))LAB[k]=+qs.get(k)}catch(e){}
- if(!(LAB.look>=-1&&LAB.look<GTH.length))LAB.look=-1;if(!TERSTY[LAB.ter])LAB.ter=0;if(!(LAB.zoom>=.8&&LAB.zoom<=2.2))LAB.zoom=1.35;if(!(LAB.mark>=0&&LAB.mark<=2))LAB.mark=1;
- labApply(0)}
-// what: 'look' rebuilds the ground, 'ter' only repaints the land, the others need nothing
-function labApply(what){LOOKSEL=LAB.look|0;TERSEL=LAB.ter|0;CAMK=LAB.zoom;MARKSEL=LAB.mark|0;lsSet('tc-lab',JSON.stringify(LAB));
- if(what==='look'&&GFX.ok&&GW.built){buildIsland();MDIRTY=true}
- else if(what==='ter'&&GFX.ok&&GW.built)gwLook(GFX.theme);
- labPills()}
-function labName(){return LAB.look<0?'Auto ('+(GFX.theme?GFX.theme.n:'')+')':GTH[LAB.look].n}
-function labNext(k){
- if(k==='look'){LAB.look=LAB.look+1>=GTH.length?-1:LAB.look+1;labApply('look')}
- else if(k==='ter'){LAB.ter=(LAB.ter+1)%TERSTY.length;labApply('ter')}
- else if(k==='zoom'){const i=LABZ.findIndex(z=>Math.abs(z-LAB.zoom)<.01);LAB.zoom=LABZ[(i+1)%LABZ.length];labApply('')}
- else{LAB.mark=(LAB.mark+1)%3;labApply('')}}
-// the four small buttons on the left edge during a match. The small LAB button above them folds them away (so a thumb cannot hit them by accident) and brings them back
-let LABOPEN=1;
-function labPills(){
- if(!LABEL){const d=document.createElement('div');d.id='lab';d.style.cssText='position:fixed;left:8px;top:38%;display:none;flex-direction:column;gap:7px;z-index:4;align-items:flex-start';
-  const mk=(k,css)=>{const b=document.createElement('button');b.dataset.k=k;b.style.cssText='border-radius:11px;background:#0a101cb8;box-shadow:inset 0 0 0 1px #a0c8ff2a;font:800 10.5px/1.15 system-ui,-apple-system,sans-serif;letter-spacing:.05em;color:#fff;text-align:left;touch-action:none;max-width:112px;'+css;
-   b.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();if(k==='fold'){LABOPEN=LABOPEN?0:1;try{lsSet('tc-lab-open',String(LABOPEN))}catch(e2){}labPills()}else labNext(k)});d.appendChild(b);return b};
-  mk('fold','padding:5px 9px;opacity:.9');for(const k of ['look','zoom','ter','mark'])mk(k,'padding:7px 10px');
-  try{if(lsGet('tc-lab-open','1')==='0')LABOPEN=0}catch(e){}
-  document.body.appendChild(d);LABEL=d}
- const t={look:['LOOK',LAB.look<0?'Auto':GTH[LAB.look].n],zoom:['SIZE',LABZN[Math.max(0,LABZ.findIndex(z=>Math.abs(z-LAB.zoom)<.01))]],ter:['LAND',LABT[LAB.ter]],mark:['MARKER',LABM[LAB.mark]]};
- for(const b of LABEL.children){if(b.dataset.k==='fold'){b.textContent=LABOPEN?'LAB \u2715':'LAB \u25B8';continue}
-  b.style.display=LABOPEN?'':'none';const v=t[b.dataset.k];b.innerHTML='<span style="opacity:.6">'+v[0]+'</span><br>'+v[1]}}
-// the look switches stay in the Look lab screen; the match screen is kept clean (LABHUD=1 brings the in-match buttons back)
-let LABHUD=0;
-function labTick(){if(!LABEL)return;const on=LABHUD&&(state==='play'||state==='replay')&&scr!=='result';if(on!==LABEL._on){LABEL._on=on;LABEL.style.display=on?'flex':'none'}}
-// the full list, from the main menu
-function labUI(keep){
- const seg=(k,names,cur)=>'<span class="seg" style="width:100%">'+names.map((n,i)=>'<button style="flex:1" class="'+(i===cur?'on':'')+'" data-a="labset" data-v="'+k+':'+i+'">'+n+'</button>').join('')+'</span>';
- const sw=['#e9eff9','#7f9a52','#c98a5c','#d9c193'];
- const row=(i,n,d)=>'<button class="abl" data-a="labset" data-v="look:'+i+'" style="'+(LAB.look===i?'box-shadow:inset 0 0 0 2px #7fe3ff':'')+'"><span class="ic" style="background:'+(i<0?'conic-gradient(#e9eff9 0 25%,#7f9a52 0 50%,#c98a5c 0 75%,#d9c193 0)':sw[i])+'"></span><span><b>'+n+'</b><small>'+d+'</small></span></button>';
- show(hdr('Look lab')+'<p class="hint" style="text-align:left;margin-top:0">A prototype of the new look. Nothing here is final: pick what you like and tell me.</p>'
-  +'<div class="sec">Place</div>'+row(-1,'Auto','A different place every match')+row(0,'Glacier Plateau','Snow, bare rock, a frozen country below')+row(1,'Highland Meadow','Grass and dirt above the clouds')+row(2,'Red Mesa','Cracked red rock over a sand plain')+row(3,'Dune Sea','Rippled sand and rows of dunes')
-  +'<div class="sec">Size on screen</div>'+seg('zoom',LABZN,Math.max(0,LABZ.findIndex(z=>Math.abs(z-LAB.zoom)<.01)))
-  +'<div class="sec">Captured land</div>'+seg('ter',LABT,LAB.ter)
-  +'<div class="sec">Marker under your car</div>'+seg('mark',LABM,LAB.mark)
-  +'<button class="btn play" style="font-size:20px;padding:15px" data-a="bots">'+IC.play+'<span class="tx">Try it<small>Practice match against bots</small></span></button>','lab',undefined,keep)}
-function labSet(v){const [k,i]=String(v).split(':'),n=+i;
- if(k==='look'){LAB.look=n;labApply('look')}else if(k==='ter'){LAB.ter=n;labApply('ter')}else if(k==='zoom'){LAB.zoom=LABZ[n]||1.35;labApply('')}else if(k==='mark'){LAB.mark=n;labApply('')}
- if(scr==='lab')labUI(1)}
 // ---------- sound: a small synthesiser, the sound effects and the adaptive music (nothing is downloaded) ----------
 // Everything is built from oscillators and noise, so the whole soundtrack costs zero bytes of audio files.
 // makeAudio(ctx) works on a live AudioContext and on an OfflineAudioContext (used by the tests to render and measure the music).
@@ -749,10 +723,10 @@ function mlev(sc,i,d,r,res){
   return{bpm:Math.round((rp?106:118)+12*i+(r?10:0)),pad:.9-.3*x,bass:.45+.4*x,kick:.6+.4*x,snare:x>.22?.35+.5*x:0,hat:Math.min(1,.3+.6*x+(r?.2:0)+d*.15),arp:.3+.7*x,lead:x>.3?Math.min(.9,(x-.3)*1.3):0,sp:rp?.3:0,lv:1,cut:900+1700*x}}
  return{bpm:96,pad:1,bass:.4,kick:.38,snare:0,hat:.3,arp:.4,lead:.9,sp:.55,lv:0,cut:1300}}
 const SFXDB={ui:5.6,logo:-1.9,start:1.9,boost:13,dash:11,shield:-4.9,pop:2.9,recall:6.7,ghost:7.2,mine:4.2,boom:0,boom2:0,boom2far:1.1,emp:7.6,grab:4,fire:.9,fort:-.5,zone:5.3,seize:5.9,strike:9.9,tick:7.4,rush:1.1,kill:7.4,die:1.3,ko:4.4,capture:2.6,win:3.8,lose:2.3,
- blade:8,ram:3,fan:8,storm:6,shock:2,fortress:1,fpulse:4,mortar:3,bhit:7,drone:8,field:6,plate:6,fortify:-.5,orbital:9,deny:6},SFXG={};for(const k in SFXDB)SFXG[k]=Math.pow(10,SFXDB[k]/20);
+ blade:8,ram:3,fan:8,storm:6,shock:2,fortress:1,fpulse:4,mortar:3,bhit:7,drone:8,field:6,plate:6,fortify:-.5,orbital:9,deny:6,rail:6,wire:5,fault:3,hole:4,rbounce:4,wcut:6,hcrush:3,fend:4},SFXG={};for(const k in SFXDB)SFXG[k]=Math.pow(10,SFXDB[k]/20);
 const SFXCD={ui:.03,ko:.1,kill:.05,capture:.07,tick:0,pop:.06,boom:.08,boom2:.1,boom2far:.1,die:.3,win:1,lose:1,start:.5,boost:.12,dash:.1,fire:.08,
- blade:.1,ram:.1,fan:.1,storm:.3,shock:.2,fortress:.3,fpulse:.35,mortar:.1,bhit:.05,drone:.15,field:.3,plate:.15,fortify:.3,orbital:.5,deny:.15};
-const SFXDUCK={boom:.3,boom2:.5,boom2far:.12,die:.5,win:.55,lose:.5,rush:.3,strike:.12,capture:.1,kill:.12,shock:.35,fortress:.2,orbital:.15,ram:.15};
+ blade:.1,ram:.1,fan:.1,storm:.3,shock:.2,fortress:.3,fpulse:.35,mortar:.1,bhit:.05,drone:.15,field:.3,plate:.15,fortify:.3,orbital:.5,deny:.15,rail:.1,wire:.2,fault:.2,hole:.4,rbounce:.06,wcut:.08,hcrush:.15,fend:.15};
+const SFXDUCK={rail:.2,fault:.25,hole:.3,boom:.3,boom2:.5,boom2far:.12,die:.5,win:.55,lose:.5,rush:.3,strike:.12,capture:.1,kill:.12,shock:.35,fortress:.2,orbital:.15,ram:.15};
 
 function makeAudio(ctx,opt){opt=opt||{};const A={ctx,live:!!opt.live},rnd0=mulberry32(0x5EED5EED),SR=ctx.sampleRate;
  // ---- the mixing desk ----
@@ -847,7 +821,16 @@ function makeAudio(ctx,opt){opt=opt||{};const A={ctx,live:!!opt.live},rnd0=mulbe
   plate(t){osc('square',1700,1200,t,.07,.05,OUT,{at:.001,lp:5000});bell(MIDI(91),t,.5,.05,OUT);nz(t,.05,.12,OUT,{ty:'highpass',f0:4500,at:.001})},
   fortify(t){[0,7,12].forEach(n=>pluck(MIDI(48+n),t,.7,.11,OUT,1800));bell(MIDI(72),t,1,.06,OUT);nz(t,.2,.1,OUT,{ty:'bandpass',f0:2500,q:3,at:.001})},
   orbital(t){osc('sine',3000,300,t,1.2,.06,OUT,{at:.03});osc('sine',3010,303,t,1.2,.05,OUT,{at:.03});osc('sine',1500,150,t+.1,1.2,.04,OUT,{at:.03});nz(t+.5,1,.2,OUT,{ty:'lowpass',f0:500,f1:70,q:.7,at:.35});osc('sine',60,30,t+.9,1,.3,OUT,{at:.1})},
-  deny(t){osc('square',150,105,t,.13,.06,OUT,{at:.002,lp:900});osc('square',96,80,t+.06,.1,.05,OUT,{at:.002,lp:800})}};
+  deny(t){osc('square',150,105,t,.13,.06,OUT,{at:.002,lp:900});osc('square',96,80,t+.06,.1,.05,OUT,{at:.002,lp:800})},
+  // ---- v19 abilities ----
+  rail(t){osc('sawtooth',2600,180,t,.35,.07,OUT,{at:.002,lp:6000,fd:.6});nz(t,.5,.22,OUT,{ty:'bandpass',f0:6000,f1:800,q:1.5,at:.001,fd:.8});osc('sine',90,40,t,.4,.3,OUT,{at:.002,fd:.5});bell(MIDI(98),t,.5,.05,OUT)},
+  wire(t){osc('square',880,880,t,.25,.04,OUT,{at:.005,lp:2400});osc('sine',1760,1600,t,.3,.05,OUT,{at:.01});nz(t,.3,.05,OUT,{ty:'highpass',f0:5000,at:.01})},
+  fault(t){osc('sine',70,30,t,.8,.45,OUT,{at:.003,fd:.5});nz(t,.9,.35,OUT,{ty:'lowpass',f0:1800,f1:90,q:.8,at:.005,fd:.8});nz(t+.05,.5,.12,OUT,{ty:'bandpass',f0:2500,f1:600,q:1.5,at:.02})},
+  hole(t){osc('sine',600,40,t,1.4,.3,OUT,{at:.05,fd:.7});osc('sawtooth',300,30,t,1.2,.06,OUT,{at:.1,lp:800});nz(t,1.5,.25,OUT,{ty:'bandpass',f0:3000,f1:150,q:2,at:.3,fd:.7})},
+  rbounce(t){bell(MIDI(100),t,.25,.05,OUT);osc('triangle',3200,2000,t,.08,.04,OUT,{at:.001})},
+  wcut(t){osc('square',2400,300,t,.12,.06,OUT,{at:.001,lp:5000});nz(t,.1,.15,OUT,{ty:'highpass',f0:3000,at:.001})},
+  hcrush(t){osc('sine',140,30,t,.5,.4,OUT,{at:.002,fd:.5});nz(t,.4,.2,OUT,{ty:'lowpass',f0:1200,f1:80,q:.7,at:.002})},
+  fend(t){nz(t,.35,.18,OUT,{ty:'lowpass',f0:1500,f1:200,q:.7,at:.002});osc('sine',110,50,t,.3,.2,OUT,{at:.002,fd:.5})}};
  const cool={};
  A.sfxAt=(name,t,a,b)=>{const f=X[name];if(!f)return;const g=ctx.createGain();g.gain.value=SFXG[name]==null?1:SFXG[name];g.connect(SD);OUT=g;try{f(t,a,b)}finally{OUT=SD}const dk=SFXDUCK[name];if(dk)duck(dk,name==='win'||name==='lose'?1.6:.35,t)};
  A.sfx=(name,a,b)=>{try{if(!X[name])return;const now=ctx.currentTime;if(A.live&&ctx.state!=='running')return;const cd=SFXCD[name]==null?.04:SFXCD[name];if(cool[name]!=null&&now-cool[name]<cd)return;cool[name]=now;A.sfxAt(name,now+.005,a,b)}catch(e){}};

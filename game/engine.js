@@ -34,7 +34,7 @@ const CLS=[
       {id:'hole',n:'Black Hole',ut:0,d:'Open a black hole ahead of you for 4 seconds. It drags exposed rivals in, swallows enemy land and destroys anything outside its own land at its core.'}]}];
 // numbers that decide how strong the abilities are. v19: every blast clears twice the land of v18 (radius x1.42), the cannon flies 50% further, the airstrike drops 6 bombs
 // instead of 3, and land destroyed by any weapon stays scorched for scarT seconds (see SCAR).
-const BAL={ucs:1.35,ucLand:1.2,ucKill:24,shellV:60,shellR:30,shellBlast:3.0,bladeV:52,bladeR:28,missV:36,missT:3.8,missTurn:5.5,missBlast:2.7,
+const BAL={ucs:1.6,ucLand:1.2,ucKill:24,shellV:60,shellR:30,shellBlast:3.0,bladeV:52,bladeR:28,missV:36,missT:3.8,missTurn:5.5,missBlast:2.7,
  stormR:4.2,stormCarve:2.4,shockR:9.3,shockBlast:4.8,shockKill:3.7,fortR:3.7,fortPulse:1,plateRegen:20,
  mortarR:3.25,mortarN:6,orbitalR:4.5,orbitalN:12,mineMax:6,mineBlast:2.4,strikeR:3.7,strikeN:6,
  railL:32,railW:.8,railCarve:.85,wireL:9,wireT:6,faultL:14,faultV:45,faultW:.9,holeD:7.5,holeT:4,holeR:5.2,holePull:10,holeCore:1.7,scarT:15};
@@ -45,12 +45,12 @@ let CAM={x:WW/2,y:WH/2,z:15,vz:26,oy:0},vw=400,vh=700,MINI=null,PREV=null,FLASH=
 
 // ---------- settings and picture quality (saved on the phone) ----------
 const SET={music:1,sfx:1,vib:1,q:'auto',mvol:.8,svol:.9,fps:0};
-// post: HDR picture, glow and finishing pass. msaa: edge smoothing samples. shadow: shadow map size (0 = off). pr: highest pixel ratio. fx: how many sparks and smoke puffs. tex: size of the ground textures.
-// mesh: spacing of the ground mesh in map units (the lighting comes from a baked picture, so a coarser mesh mostly changes the outline of the cliffs).
-// Phones start on med (no glow pass, cheaper shadows); weak phones start on low. Auto then moves between tiers only between matches.
-const QLV={high:{fx:1,post:1,glow:1,msaa:4,shadow:2048,pr:2.25,hi:1,tex:1024,mesh:.5},
- med:{fx:.7,post:1,glow:0,msaa:0,shadow:1024,pr:1.6,hi:1,tex:512,mesh:.5},
- low:{fx:.4,post:0,glow:0,msaa:0,shadow:0,pr:1.1,hi:0,tex:512,mesh:1}};
+// post: HDR picture, glow and finishing pass. glow: the bloom that makes the neon shine. msaa: edge smoothing samples. shadow: shadow map size for the garage
+// (the arena itself has no shadows). pr: highest pixel ratio. fx: how many sparks and smoke puffs.
+// Phones start on med (bloom on, no edge smoothing); weak phones start on low. Auto then moves between tiers only between matches.
+const QLV={high:{fx:1,post:1,glow:1,msaa:4,shadow:2048,pr:2.25,hi:1},
+ med:{fx:.75,post:1,glow:1,msaa:0,shadow:1024,pr:1.6,hi:1},
+ low:{fx:.45,post:0,glow:0,msaa:0,shadow:0,pr:1.1,hi:0}};
 const PHONE=(()=>{try{return matchMedia('(pointer:coarse)').matches&&Math.max(screen.width,screen.height)<1100}catch(e){return false}})();
 let QL=QLV.high,QNAME='high';
 function lsGet(k,d){try{const v=localStorage.getItem(k);return v==null?d:v}catch(e){return d}}
@@ -101,7 +101,7 @@ let ISL=new Uint8Array(MW*MH).fill(1),LANDN=MW*MH,LANDI=null,SEED=1,MCX=WW/2,MCY
 // scorched land (v19): a cell destroyed by a weapon keeps the tick until which it stays scorched. Scorched land cannot be taken by closing a loop
 // round it (that used to refill a crater at once); only driving over it wins it back. LH / LHT: who last destroyed each player's land, and when
 // (a player left with no land is credited to them).
-const SCAR=new Int32Array(MW*MH),SCO=new Uint8Array(MW*MH),LH=[0,0,0,0,0,0],LHT=[0,0,0,0,0,0];
+const SCAR=new Int32Array(MW*MH),SCO=new Uint8Array(MW*MH),LH=[0,0,0,0,0,0],LHT=[0,0,0,0,0,0];let SCARMAX=0;
 // v19 hazards that stay on the arena for a while: laser wires, fault lines racing across the ground, black holes
 let WIRES=[],FAULTS=[],HOLES=[];
 function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
@@ -179,7 +179,7 @@ function meleeHit(p){const r2=p.mr*p.mr;
 const SCART=Math.round(BAL.scarT/STEP);
 function wreck(x,y,r,o,hit){const cx=x*MC,cy=y*MC,rc=r*MC,r2=rc*rc;let n=0;
  for(let Y=Math.max(0,Math.floor(cy-rc));Y<=Math.min(MH-1,Math.ceil(cy+rc));Y++)for(let X=Math.max(0,Math.floor(cx-rc));X<=Math.min(MW-1,Math.ceil(cx+rc));X++){const i=Y*MW+X,dx=X+.5-cx,dy=Y+.5-cy,v=own[i];
-  if(v&&v!==o&&dx*dx+dy*dy<=r2&&!(PROT[v]>0)&&!(P[v].sh>0)){own[i]=0;CNI[v]--;SCAR[i]=TK+SCART;SCO[i]=v;n++;LH[v]=o;LHT[v]=TK;if(hit&&!hit.includes(v))hit.push(v)}}
+  if(v&&v!==o&&dx*dx+dy*dy<=r2&&!(PROT[v]>0)&&!(P[v].sh>0)){own[i]=0;CNI[v]--;SCAR[i]=TK+SCART;SCO[i]=v;SCARMAX=TK+SCART;n++;LH[v]=o;LHT[v]=TK;if(hit&&!hit.includes(v))hit.push(v)}}
  if(n)MDIRTY=true;return n}
 // the same without a blast: blades, the railgun, a fault line, the cyclone and a black hole slice or swallow land. A player left with no land is
 // taken out by the next land count (see hud), credited to whoever destroyed their land last.
@@ -239,7 +239,7 @@ function hazTick(dt){
     if(segSegD2(ax,ay,bx,by,w.x1,w.y1,w.x2,w.y2)<.25){if(kill(q,w.o,'wire',1))EV.push(['wcut',w.o,+ax.toFixed(1),+ay.toFixed(1)]);break}}}}
  // a fault line races ahead, splitting land and taking out exposed rivals on its path
  for(let k=FAULTS.length-1;k>=0;k--){const f=FAULTS[k],d0=f.d;f.d=Math.min(BAL.faultL,f.d+BAL.faultV*dt);
-  for(let d=d0;d<=f.d;d+=.45){const x=f.x+f.c*d,y=f.y+f.s*d;if(x<.5||y<.5||x>=WW-.5||y>=WH-.5||!isLand(x,y)){f.d=BAL.faultL;break}
+  for(let d=d0;d<=f.d;d+=.45){const x=f.x+f.c*d,y=f.y+f.s*d;if(x<.5||y<.5||x>=WW-.5||y>=WH-.5||!isLand(x,y)){f.e=d;f.d=BAL.faultL;break}
    carve(x,y,BAL.faultW,f.o);carHit(x,y,BAL.faultW+.2,f.o,'fault',false);trailHit(x,y,.6,f.o,'fault')}
   if(f.d>=BAL.faultL){FAULTS.splice(k,1);EV.push(['fend',f.o,+(f.x+f.c*f.d).toFixed(1),+(f.y+f.s*f.d).toFixed(1)])}}
  // a black hole grows for a moment, drags exposed rivals toward its core, swallows enemy land and cuts trails near it, then collapses with a blast
@@ -321,7 +321,7 @@ function capture(p){const id=p.id,t=p.tr;LOSTM=0;
  if(g>0)ucAdd(id,g/LANDN*100*BAL.ucLand);
  for(const q of P)if(q&&q!==p&&q.alive){const t=q.tr;let hit=false;for(let i=2;i+1<t.length;i+=2)if(FL[gy(t[i+1])*MW+gx(t[i])]===2){hit=true;break}
   if(hit)kill(q,id,'enclosed');else if(!CNI[q.id])kill(q,id,'noland')}
- if(p===me&&g>8&&!IS_SRV){score+=Math.round(g*.6);if(!FF){burst(p.x,p.y,COLS[p.id],22,9);burst(p.x,p.y,'#ffffff',10,7);pop(p.x,p.y-1.5,'+'+Math.round(g*1000/LANDN)/10+'%',COLS[p.id]);shake=Math.max(shake,Math.min(10,g/70));snd('capture',g);buzz(25);CAPT.push([clk,g])}}
+ if(p===me&&g>8&&!IS_SRV){score+=Math.round(g*.6);if(!FF){burst(p.x,p.y,COLS[p.id],22,9);burst(p.x,p.y,'#ffffff',10,7);if(g*1000/LANDN>=3)pop(p.x,p.y-1.5,'+'+Math.round(g*1000/LANDN)/10+'%',COLS[p.id]);shake=Math.max(shake,Math.min(10,g/70));snd('capture',g);buzz(25);CAPT.push([clk,g])}}
  return g}
 function segD2(px,py,x0,y0,x1,y1){const dx=x1-x0,dy=y1-y0,l=dx*dx+dy*dy;let t=l?((px-x0)*dx+(py-y0)*dy)/l:0;t=t<0?0:t>1?1:t;const ex=x0+dx*t-px,ey=y0+dy*t-py;return ex*ex+ey*ey}
 // squared distance between the segments a-b and c-d (0 when they cross)
@@ -446,7 +446,7 @@ function assignClasses(n,fc){const R=mulberry32((SEED^0xC1A55)>>>0),perm=[0,1,2,
  for(let i=1;i<=5;i++){const v=CLSI[i];CLSI[i]=(fc&&fc[i]>=0&&fc[i]<=3)?fc[i]:(i<=n&&v>=0&&v<=3&&v===(v|0))?v:perm[i&3]}}
 function newIN(i){return{a:P[i].a,b:0,en:1,cd:[0,0],uc:0,mv:0,mk:0,ut:0,pt:0}}
 let NBOT;
-function MPS(n,bots,nb,seed,fc){NBOT=nb;genMap(seed===undefined?(Math.random()*1e9|0):seed);GRS=(SEED^0x9E3779B9)|0;TK=0;REC=null;MINES.length=0;SLOW.fill(0);SHL.length=0;STR.length=0;BLD.length=0;MSL.length=0;WIRES.length=0;FAULTS.length=0;HOLES.length=0;SCAR.fill(0);SCO.fill(0);LH.fill(0);LHT.fill(0);PROT.fill(0);HOLD.fill(0);INV.fill(0);PLT.fill(0);PLR.fill(0);for(let i=1;i<=5;i++)PWC[i]=[0,0,0];ZT=0;
+function MPS(n,bots,nb,seed,fc){NBOT=nb;genMap(seed===undefined?(Math.random()*1e9|0):seed);GRS=(SEED^0x9E3779B9)|0;TK=0;REC=null;MINES.length=0;SLOW.fill(0);SHL.length=0;STR.length=0;BLD.length=0;MSL.length=0;WIRES.length=0;FAULTS.length=0;HOLES.length=0;SCAR.fill(0);SCO.fill(0);SCARMAX=0;LH.fill(0);LHT.fill(0);PROT.fill(0);HOLD.fill(0);INV.fill(0);PLT.fill(0);PLR.fill(0);for(let i=1;i<=5;i++)PWC[i]=[0,0,0];ZT=0;
  IN.length=0;assignClasses(n,fc);newGame();state='play';tl=TL;HN=n;BOTS=!!bots;KL.fill(0);DE.fill(0);EV.length=0;
  for(let i=n+1;i<=5;i++){const p=P[i];if(bots&&i<=n+(nb===undefined?5:nb))continue;landMove(i,0);p.alive=false;p.rt=1e9;p.tr=[]}
  MDIRTY=true;
@@ -471,7 +471,7 @@ function USE(i,s){const t=IN[i],p=P[i];if(!t||!p||!p.alive||s<1||s>3)return fals
   case 'cannon':SHL.push({x:X+c*1.5,y:Y+sn*1.5,vx:c*BAL.shellV,vy:sn*BAL.shellV,o:i,d:0});ev('fire');break;
   case 'rail':{const st=.4;let L=0;while(L<BAL.railL){const nx=X+c*(L+1.2+st),ny=Y+sn*(L+1.2+st);if(nx<.5||ny<.5||nx>=WW-.5||ny>=WH-.5||!isLand(nx,ny))break;L+=st}
    for(let d=1.2,n=0;d<=L+1.2;d+=st,n++){const x=X+c*d,y=Y+sn*d;carHit(x,y,BAL.railW,i,'rail',false);trailHit(x,y,.55,i,'rail');if(n%2===0)carve(x,y,BAL.railCarve,i)}
-   EV.push(['rail',i,+(X+c*(L+1.2)).toFixed(1),+(Y+sn*(L+1.2)).toFixed(1)]);break}
+   EV.push(['rail',i,+X.toFixed(1),+Y.toFixed(1),+(X+c*(L+1.2)).toFixed(1),+(Y+sn*(L+1.2)).toFixed(1)]);break}
   case 'mortar':for(let k=0;k<BAL.mortarN;k++){const d=7+(k>>1)*4.6,lat=(k&1?1:-1)*rr(1,2.6);STR.push({x:clampX(X+c*d-sn*lat),y:clampY(Y+sn*d+c*lat),t:.8+k*.16,o:i,r:BAL.mortarR})}ev('mortar');break;
   case 'orbital':{const tg=bigRival(i);if(!tg)return false;const pts=landSpots(tg,BAL.orbitalN,4.4);if(!pts.length)return false;
    pts.forEach((v,k)=>STR.push({x:v[0],y:v[1],t:.9+k*.22,o:i,r:BAL.orbitalR}));EV.push(['orbital',i,tg,0]);break}

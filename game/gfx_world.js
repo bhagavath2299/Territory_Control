@@ -1,169 +1,7 @@
-// ---------- 3D renderer, part 2b: what makes the island a place ----------
-// A research station on a flat islet (modules on legs, a radome, fuel tanks, containers, a mast, a helipad with a helicopter, a wind turbine),
-// an icebreaker sailing round the island with its wake, penguins on the islets, and a cargo plane that crosses the sky now and then.
-// None of it stands on the land you drive on, so the game itself never sees any of it.
-const PR={grp:null,mats:null,rot:[],blink:[],ship:null,path:null,plen:0,ps:0,wake:null,peng:null,pengD:[],plane:null,pl:null,planeNext:14,padTex:null};
-
-function prMats(){if(PR.mats)return PR.mats;
- const S=(c,r,m,o)=>new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:r,metalness:m,envMapIntensity:.7},o||{}));
- PR.mats={white:S(0xe6ebf2,.55,.05),orange:S(0xd8482a,.5,.15),red:S(0xae2528,.45,.2),dark:S(0x272d39,.55,.6),steel:S(0x9aa3b2,.38,.85),yellow:S(0xf0bd2c,.45,.2),blue:S(0x2f63c8,.5,.2),
-  black:S(0x14171d,.5,.2),deck:S(0x59606d,.8,.3,{side:THREE.DoubleSide}),glass:S(0x16212e,.15,.3,{emissive:new THREE.Color(1,.78,.45),emissiveIntensity:0}),
-  lamp:new THREE.MeshBasicMaterial({color:new THREE.Color(3,.25,.2),toneMapped:false}),lampG:new THREE.MeshBasicMaterial({color:new THREE.Color(.2,2.6,.6),toneMapped:false}),lampW:new THREE.MeshBasicMaterial({color:new THREE.Color(3,3,3),toneMapped:false})};
- PR.mats.hull=PR.mats.red.clone();PR.mats.hull.side=THREE.DoubleSide;
- return PR.mats}
-// parts that share a material become one mesh
-function prMesh(list,mat,cast){const m=new THREE.Mesh(gMerge(list),mat);m.castShadow=cast!==false;m.receiveShadow=true;return m}
-function prLamp(par,mat,x,y,z,r,blink){const m=new THREE.Mesh(new THREE.SphereGeometry(r||.1,10,8),mat);m.position.set(x,y,z);m.layers.enable(GLOW);par.add(m);if(blink)PR.blink.push({o:m,ph:blink});return m}
-// a helipad: dark disc, white circle and the letter H
-function prPadTex(){if(PR.padTex)return PR.padTex;const N=256,c=mkc(N,N),g=c.getContext('2d');g.fillStyle='#363c48';g.fillRect(0,0,N,N);
- g.strokeStyle='#f0f2f6';g.lineWidth=12;g.beginPath();g.arc(N/2,N/2,N*.4,0,7);g.stroke();g.strokeStyle='#f2c230';g.lineWidth=6;g.beginPath();g.arc(N/2,N/2,N*.47,0,7);g.stroke();
- g.fillStyle='#f0f2f6';g.fillRect(N*.33,N*.3,N*.08,N*.4);g.fillRect(N*.59,N*.3,N*.08,N*.4);g.fillRect(N*.33,N*.46,N*.34,N*.08);
- const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;return PR.padTex=t}
-function prHelipad(r){const M=prMats();const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r*1.04,.14,40),[M.dark,new THREE.MeshStandardMaterial({map:prPadTex(),roughness:.7,metalness:.1}),M.dark]);m.receiveShadow=true;m.castShadow=true;return m}
-
-// ---------- the research station ----------
-function prStation(){
- const M=prMats(),g=new THREE.Group(),W=[],O=[],D=[],ST=[],GL=[],Y=[],B=[];
- // main module on short legs: orange walls, white roof, a band of windows
- O.push(gP(box(3.8,1.3,1.9,.06),0,1.15,0));W.push(gP(box(3.96,.14,2.06,.04),0,1.86,0));
- GL.push(gP(box(3.3,.3,.05),0,1.32,.96),gP(box(3.3,.3,.05),0,1.32,-.96),gP(box(.05,.3,1.2),1.91,1.32,0));
- for(const sx of [-1.6,0,1.6])for(const sz of [-.75,.75])D.push(gP(cyl(.09,.09,.55,6),sx,.27,sz));
- ST.push(gP(box(.6,.28,.55,.03),-1.1,2.07,.35),gP(box(.6,.28,.55,.03),-.3,2.07,.35),gP(cyl(.2,.2,.32,12),1.1,2.08,-.45));
- D.push(gP(box(.55,.08,1.0),2.3,.5,.45,0,0,-.55));
- // second module, white with a blue band, joined by a short corridor
- W.push(gP(box(2.4,1.1,1.5,.06),.7,1.0,2.45));B.push(gP(box(2.46,.22,1.56,.02),.7,1.2,2.45));GL.push(gP(box(1.8,.24,.05),.7,.98,3.21));
- W.push(gP(box(.7,.7,.7,.04),.7,1.0,1.35));
- for(const sx of [-.3,1.7])for(const sz of [1.9,3.0])D.push(gP(cyl(.08,.08,.5,6),sx,.25,sz));
- // radome on a round tower
- W.push(gP(new THREE.SphereGeometry(.85,20,14),-2.7,2.25,2.2),gP(cyl(.55,.62,1.4,16),-2.7,.7,2.2));
- // fuel tanks on cradles
- Y.push(gP(cyl(.4,.4,1.9,16),2.7,.55,-1.7,0,0,Math.PI/2),gP(cyl(.4,.4,1.9,16),2.7,.55,-2.65,0,0,Math.PI/2));
- D.push(gP(box(.2,.3,2.0),1.95,.15,-2.17),gP(box(.2,.3,2.0),3.45,.15,-2.17));
- // stacked containers
- B.push(gP(box(1.5,.62,.66,.02),-2.4,.31,-1.4));O.push(gP(box(1.5,.62,.66,.02),-2.3,.93,-1.4,0,.08,0));Y.push(gP(box(1.5,.62,.66,.02),-2.4,.31,-2.15));
- // antenna mast with cross arms and a dish
- ST.push(gP(cyl(.05,.08,3.8,6),-.9,3.75,-.35),gP(box(.9,.04,.04),-.9,4.6,-.35),gP(box(.04,.04,.7),-.9,5.1,-.35),gP(cyl(.24,.24,.04,14),-.9,4.2,-.1,1.2,0,0));
- g.add(prMesh(W,M.white),prMesh(O,M.orange),prMesh(D,M.dark),prMesh(ST,M.steel),prMesh(GL,M.glass,false),prMesh(Y,M.yellow),prMesh(B,M.blue));
- prLamp(g,M.lamp,-.9,5.72,-.35,.11,1);
- // helipad with a parked helicopter, rotor idling
- const hp=prHelipad(1.4);hp.position.set(3.7,.07,2.4);g.add(hp);
- const hc=new THREE.Group(),HB=[],HD=[];
- HB.push(gP(new THREE.SphereGeometry(.42,16,12),0,.52,0,0,0,0,1.3,.85,.85),gP(box(1.4,.14,.14),-.95,.62,0),gP(box(.32,.42,.06),-1.6,.78,0));
- HD.push(gP(box(1.2,.05,.07),0,.05,.32),gP(box(1.2,.05,.07),0,.05,-.32),gP(box(.05,.3,.05),.3,.2,.3),gP(box(.05,.3,.05),-.3,.2,.3),gP(box(.05,.3,.05),.3,.2,-.3),gP(box(.05,.3,.05),-.3,.2,-.3));
- hc.add(prMesh(HB,M.red),prMesh(HD,M.dark));
- const rot=new THREE.Mesh(gMerge([gP(box(2.7,.025,.13),0,0,0),gP(box(2.7,.025,.13),0,0,0,0,Math.PI/2,0)]),M.dark);rot.position.set(0,1.0,0);rot.castShadow=true;hc.add(rot);
- hc.position.set(3.7,.14,2.4);hc.rotation.y=.6;g.add(hc);PR.rot.push({o:rot,ax:'y',sp:1.4});
- // wind turbine
- const wt=new THREE.Group();wt.add(prMesh([gP(cyl(.1,.17,4.6,10),0,2.3,0)],M.white),prMesh([gP(box(.75,.34,.34,.06),0,4.7,0)],M.white));
- const hub=new THREE.Group();hub.position.set(.42,4.7,0);const bl=[];
- for(let k=0;k<3;k++){const b0=box(.05,1.95,.2);b0.translate(0,1.02,0);bl.push(gP(b0,0,0,0,k*2.0944,0,0))}bl.push(new THREE.SphereGeometry(.14,10,8));
- const rr=prMesh(bl,M.white);hub.add(rr);wt.add(hub);PR.rot.push({o:rr,ax:'x',sp:2.1});
- wt.position.set(-3.8,0,-2.9);wt.rotation.y=.5;g.add(wt);
- // a flag
- const fl=new THREE.Group();fl.add(prMesh([gP(cyl(.03,.03,2.4,6),0,1.2,0)],M.steel));const fm=new THREE.Mesh(new THREE.PlaneGeometry(.9,.55,6,1),new THREE.MeshStandardMaterial({color:0x2f63c8,roughness:.8,side:THREE.DoubleSide}));fm.position.set(.45,2.1,0);fm.castShadow=true;fl.add(fm);
- fl.position.set(2.3,0,-.6);g.add(fl);PR.flag=fm;
- return g}
-
-// ---------- the icebreaker ----------
-function prWakeTex(){const W=256,H=128,c=mkc(W,H),g=c.getContext('2d'),im=g.createImageData(W,H),d=im.data;
- for(let y=0;y<H;y++)for(let x=0;x<W;x++){const u=x/W,v=y/H-.5,i=(y*W+x)*4,sp=(1-u)*.42+.05,l1=Math.exp(-Math.pow((Math.abs(v)-sp)/(.025+.04*(1-u)),2)),wash=Math.exp(-v*v/(.004+.03*(1-u)))*(.35+.65*u),
-  n=.6+.4*Math.sin(x*.9+Math.sin(y*.7)*3)*Math.sin(y*1.3+x*.2),a=Math.min(1,(l1*.9+wash*.8)*n)*Math.pow(u,1.4);d[i]=d[i+1]=d[i+2]=255;d[i+3]=Math.round(a*230)}
- g.putImageData(im,0,0);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return t}
-function prShip(){
- const M=prMats(),g=new THREE.Group();
- // hull: smooth sections, keel down (the water hides what is below the waterline)
- let st=spStations([{x:-8,w:1.35,y0:-.6,y1:1.0,k:5},{x:-6.6,w:1.7,y0:-.9,y1:1.0,k:5.5},{x:2,w:1.75,y0:-.9,y1:1.0,k:5.5},{x:5,w:1.45,y0:-.8,y1:1.1,k:4.5},{x:7,w:.8,y0:-.5,y1:1.25,k:3.4},{x:8.3,w:.1,y0:.1,y1:1.35,k:2.4}],40);
- st=st.map(s=>({x:s.x,w:s.w,y0:s.y1,y1:s.y0,k:s.k}));
- const hull=new THREE.Mesh(loft(st,18,0),M.hull);hull.castShadow=true;hull.receiveShadow=true;g.add(hull);
- // deck: the outline of the hull at deck height
- const sh=new THREE.Shape();st.forEach((s,i)=>i?sh.lineTo(s.x,s.w*.97):sh.moveTo(s.x,s.w*.97));for(let i=st.length-1;i>=0;i--)sh.lineTo(st[i].x,-st[i].w*.97);sh.closePath();
- const dg=new THREE.ShapeGeometry(sh);dg.rotateX(-Math.PI/2);const dk=new THREE.Mesh(dg,M.deck);dk.position.y=1.0;dk.receiveShadow=true;g.add(dk);
- const W=[],R=[],D=[],ST=[],GL=[],Y=[],B=[],O=[];
- // superstructure, bridge, wings, funnel, mast, crane, containers, lifeboats
- W.push(gP(box(3.4,1.4,2.8,.05),-2.2,1.7,0),gP(box(2.6,1.0,2.4,.05),-2.0,2.9,0),gP(box(.9,.12,3.8,.02),-1.2,3.42,0));
- GL.push(gP(box(.05,.34,2.2),-.69,3.0,0),gP(box(2.2,.3,.05),-2.0,3.0,1.21),gP(box(2.2,.3,.05),-2.0,3.0,-1.21),gP(box(3,.24,.05),-2.2,1.85,1.41),gP(box(3,.24,.05),-2.2,1.85,-1.41));
- Y.push(gP(cyl(.48,.56,1.8,18),-3.7,2.75,0));R.push(gP(cyl(.5,.5,.32,18),-3.7,3.35,0));D.push(gP(cyl(.4,.4,.06,18),-3.7,3.66,0));
- ST.push(gP(cyl(.05,.07,2.6,6),-1.6,4.6,0),gP(box(.08,.06,1.2),-1.6,5.3,0),gP(cyl(.14,.17,1.4,10),3.6,1.7,.95),gP(box(3.3,.13,.13),4.9,2.55,.95,0,0,-.45));
- B.push(gP(box(1.7,.72,.72,.02),2.4,1.36,-.62));O.push(gP(box(1.7,.72,.72,.02),2.4,1.36,.18));Y.push(gP(box(1.7,.72,.72,.02),2.4,2.08,-.25));
- O.push(gP(new THREE.CapsuleGeometry(.24,.9,3,10),-2.4,2.0,1.62,0,0,Math.PI/2),gP(new THREE.CapsuleGeometry(.24,.9,3,10),-2.4,2.0,-1.62,0,0,Math.PI/2));
- g.add(prMesh(W,M.white),prMesh(R,M.red),prMesh(D,M.dark),prMesh(ST,M.steel),prMesh(GL,M.glass,false),prMesh(Y,M.yellow),prMesh(B,M.blue),prMesh(O,M.orange));
- const hp=prHelipad(1.25);hp.position.set(-6.6,1.07,0);g.add(hp);
- prLamp(g,M.lamp,-1.6,5.95,0,.1,2);prLamp(g,M.lamp,-1.2,3.5,-1.9,.08);prLamp(g,M.lampG,-1.2,3.5,1.9,.08);prLamp(g,M.lampW,8.1,1.6,0,.08);
- // wake behind and foam at the bow
- const wk=new THREE.Mesh(new THREE.PlaneGeometry(18,6.5),new THREE.MeshBasicMaterial({map:prWakeTex(),transparent:true,depthWrite:false,opacity:.85,toneMapped:false,color:new THREE.Color(1,1,1)}));
- wk.rotation.x=-Math.PI/2;wk.position.set(-17,.03,0);wk.renderOrder=1;g.add(wk);
- const bw=new THREE.Mesh(new THREE.PlaneGeometry(2.6,4.2),new THREE.MeshBasicMaterial({map:spotTex(),transparent:true,depthWrite:false,opacity:.7,toneMapped:false}));bw.rotation.x=-Math.PI/2;bw.position.set(7.4,.04,0);bw.renderOrder=1;g.add(bw);
- return g}
-// a loop round the island in open water: on rays from the middle, the first point past the last land where the sea is deep enough; smoothed
-function prShipPath(){const S=GW.SD;if(!S)return null;let cx=0,cy=0,n=0;for(let y=0;y<MH;y+=3)for(let x=0;x<MW;x+=3)if(ISL[y*MW+x]){cx+=x;cy+=y;n++}if(!n)return null;cx=cx/n/MC;cy=cy/n/MC;
- const N=96,pts=[];for(let i=0;i<N;i++){const a=i/N*6.2832,ca=Math.cos(a),sa=Math.sin(a);let last=0;for(let t=0;t<260;t+=.5){if(gfxSD(cx+ca*t,cy+sa*t)>-.5)last=t}
-  let t=last;while(t<last+60&&gfxSD(cx+ca*t,cy+sa*t)>-10.5)t+=.5;pts.push([cx+ca*t,cy+sa*t])}
- for(let k=0;k<4;k++){const q=pts.map(p=>p.slice());for(let i=0;i<N;i++){const a=q[(i+N-1)%N],b=q[i],c=q[(i+1)%N];pts[i]=[(a[0]+b[0]*2+c[0])/4,(a[1]+b[1]*2+c[1])/4]}}
- const L=[0];for(let i=1;i<=N;i++){const a=pts[i-1],b=pts[i%N];L.push(L[i-1]+Math.hypot(b[0]-a[0],b[1]-a[1]))}
- return{pts,L,len:L[N]}}
-function prPathAt(P,s){const N=P.pts.length;s=((s%P.len)+P.len)%P.len;let lo=0,hi=N;while(hi-lo>1){const m=(lo+hi)>>1;if(P.L[m]<=s)lo=m;else hi=m}
- const a=P.pts[lo],b=P.pts[(lo+1)%N],t=(s-P.L[lo])/Math.max(1e-6,P.L[lo+1]-P.L[lo]);return[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,Math.atan2(b[1]-a[1],b[0]-a[0])]}
-
-// ---------- penguins ----------
-function prPengGeo(){const parts=[[new THREE.SphereGeometry(.2,10,8),[0,.33,0],[1,1.55,.9],'#15181f'],[new THREE.SphereGeometry(.17,10,8),[.075,.3,0],[.8,1.35,.8],'#f2f1ea'],[new THREE.SphereGeometry(.13,10,8),[.02,.67,0],[1,1,1],'#15181f'],
-  [new THREE.ConeGeometry(.045,.15,6),[.16,.66,0],[1,1,1],'#f0a020',[0,0,-Math.PI/2]],[new THREE.SphereGeometry(.06,6,4),[.06,.03,.08],[1.5,.5,1],'#f0a020'],[new THREE.SphereGeometry(.06,6,4),[.06,.03,-.08],[1.5,.5,1],'#f0a020'],
-  [new THREE.SphereGeometry(.07,8,6),[.11,.5,.11],[1,1,.6],'#f6c64a'],[new THREE.SphereGeometry(.07,8,6),[.11,.5,-.11],[1,1,.6],'#f6c64a']];
- const list=parts.map(([g0,p,s,c,r])=>{const g=gP(g0,p[0],p[1],p[2],r?r[0]:0,r?r[1]:0,r?r[2]:0,s[0],s[1],s[2]);g.deleteAttribute('uv');const n=g.attributes.position.count,col=new Float32Array(n*3),l=linOf(c);for(let i=0;i<n;i++){col[i*3]=l[0];col[i*3+1]=l[1];col[i*3+2]=l[2]}g.setAttribute('color',new THREE.BufferAttribute(col,3));return g});
- const m=THREE.mergeGeometries(list,false);for(const g of list)g.dispose();return m}
-
-// ---------- the cargo plane ----------
-function prPlane(){const M=prMats(),g=new THREE.Group(),W=[],R=[],D=[];
- W.push(gP(cyl(.62,.62,8.2,16),0,0,0,0,0,Math.PI/2),gP(new THREE.SphereGeometry(.62,16,10),4.1,0,0,0,0,0,1.6,1,1),gP(new THREE.ConeGeometry(.62,2.4,16),-5.3,.12,0,0,0,Math.PI/2,1,1,.85),gP(box(1.8,.14,12.6,.05),.4,.18,0));
- R.push(gP(box(1.1,.1,4.2,.03),-5.6,.42,0),gP(box(1.5,1.8,.14,.03),-5.75,1.15,0),gP(box(2.2,.16,12.62,.02),.4,.2,0,0,0,0,.3,1,1));
- for(const z of [-2.3,-4.1,2.3,4.1])D.push(gP(cyl(.24,.24,1.15,10),.95,-.12,z,0,0,Math.PI/2));
- g.add(prMesh(W,M.white),prMesh(R,M.red),prMesh(D,M.dark));
- prLamp(g,M.lamp,.4,.2,-6.35,.12);prLamp(g,M.lampG,.4,.2,6.35,.12);PR.strobe=prLamp(g,M.lampW,-5.9,2.1,0,.12);
- g.visible=false;return g}
-
-// ---------- build / tick / dispose ----------
-function gwProps(){
- gwPropsDispose();if(!GFX.ok)return;const R=mulberry32((SEED^0x7A11)>>>0);
- PR.grp=new THREE.Group();GFX.S.add(PR.grp);
- const si=GW.islets.find(o=>o.st);
- if(si){const st=prStation();st.position.set(si.x,si.h*.98,si.y);st.rotation.y=R()*6.28;st.scale.setScalar(1.3);PR.grp.add(st)}
- // the ship and its loop
- PR.path=null;PR.ships=[];if(PR.path&&PR.path.len>40){PR.ps=R()*PR.path.len;for(let k=0;k<(PR.path.len>500?2:1);k++){const sh=prShip();sh.userData.off=k*PR.path.len/2;PR.ships.push(sh);PR.grp.add(sh)}PR.ship=PR.ships[0]}
- // penguins: a small colony on the shore of each islet
- const spots=[];for(const o of GW.islets){const n=o.st?9:4+((R()*4)|0),a0=R()*6.28;for(let k=0;k<n;k++){const a=a0+(R()-.5)*1.4,rr=o.r*(o.st?.86:.55+R()*.25),x=o.x+Math.cos(a)*rr+(R()-.5)*.8,y=o.y+Math.sin(a)*rr+(R()-.5)*.8,h=gfxH(x,y);if(h<.15)continue;spots.push({x,y,h,yaw:a+Math.PI+(R()-.5)*.8,ph:R()*6.28,s:.85+R()*.3})}}
- if(spots.length){const im=new THREE.InstancedMesh(prPengGeo(),new THREE.MeshStandardMaterial({vertexColors:true,roughness:.6,metalness:0,envMapIntensity:.5}),spots.length);im.castShadow=true;im.receiveShadow=false;im.frustumCulled=false;PR.peng=im;PR.pengD=spots;PR.grp.add(im)}
- PR.plane=prPlane();PR.grp.add(PR.plane);PR.pl=null;PR.planeNext=clk+10+R()*12;
- prTick(0)}
-function gwPropsDispose(){if(!PR.grp)return;GFX.S.remove(PR.grp);
- PR.grp.traverse(o=>{if(o.isMesh){o.geometry.dispose();const ms=Array.isArray(o.material)?o.material:[o.material];for(const m of ms){if(!Object.values(PR.mats||{}).includes(m)){if(m.map&&m.map!==PR.padTex&&m.map!==_spotTex)m.map.dispose()}}}});
- PR.grp=null;PR.rot=[];PR.blink=[];PR.ship=null;PR.ships=[];PR.peng=null;PR.pengD=[];PR.plane=null;PR.pl=null;PR.flag=null;PR.strobe=null}
-const _rm=new THREE.Matrix4(),_rq=new THREE.Quaternion(),_re=new THREE.Euler(),_rv=new THREE.Vector3(),_rs=new THREE.Vector3();
-function prTick(dt){
- if(!PR.grp)return;const t=GFX.time,th=GFX.theme||{night:0},M=PR.mats;
- M.glass.emissiveIntensity=th.night*1.9+(th.night>.1?.2:0);
- for(const r of PR.rot)r.o.rotation[r.ax]+=r.sp*dt;
- for(const b of PR.blink)b.o.visible=((t*1.1+b.ph*.37)%1)<.32;
- if(PR.flag)PR.flag.rotation.y=Math.sin(t*2.3)*.25;
- // the ship sails round the island
- if(PR.ships&&PR.path){PR.ps+=dt*2.4;for(const sh of PR.ships){const s0=PR.ps+sh.userData.off,[x,y]=prPathAt(PR.path,s0),[x2,y2]=prPathAt(PR.path,s0+3),ha=Math.atan2(y2-y,x2-x);
-  sh.position.set(x,Math.sin(t*.9+sh.userData.off)*.05,y);sh.rotation.set(Math.sin(t*.7)*.015,-ha,Math.sin(t*.9)*.02)}}
- // penguins shuffle
- if(PR.peng){const im=PR.peng,D=PR.pengD;for(let i=0;i<D.length;i++){const p=D[i],w=Math.sin(t*2.2+p.ph);_re.set(0,-(p.yaw+w*.22),w*.06);_rq.setFromEuler(_re);_rv.set(p.x,p.h-.02+Math.max(0,Math.sin(t*4.4+p.ph))*.03,p.y);_rs.setScalar(p.s);_rm.compose(_rv,_rq,_rs);im.setMatrixAt(i,_rm)}im.instanceMatrix.needsUpdate=true}
- // a cargo plane crosses the view now and then (in matches and in the menu showreel)
- if(PR.plane){const P=PR.plane;
-  if(PR.planeNext-t>150)PR.planeNext=t+12;
-  if(!PR.pl&&t>PR.planeNext&&(state==='play'||state==='menu')){const a=Math.random()*6.28,off=(Math.random()-.5)*14,cx=CAM.x-Math.sin(a)*off,cy=CAM.y+Math.cos(a)*off;PR.pl={a,x0:cx-Math.cos(a)*80,y0:cy-Math.sin(a)*80,t0:t,dur:160/24}}
-  if(PR.pl){const p=PR.pl,u=(t-p.t0)/p.dur;if(u>=1||u<0){PR.pl=null;P.visible=false;PR.planeNext=t+38+Math.random()*30}
-   else{P.visible=true;const d=u*160;P.position.set(p.x0+Math.cos(p.a)*d,22,p.y0+Math.sin(p.a)*d);P.rotation.set(Math.sin(t*.8)*.04,-p.a,0);if(PR.strobe)PR.strobe.visible=(t%1)<.1}}}}
-// ---------- 3D renderer, part 2: the plateau (ground with real hills), its cliffs, the mist below, rocks and the power pads ----------
-// The land is a height field built from the match seed (same on every phone). It only decides how things look; the game itself runs on the flat map.
-// There is no water anywhere: the playable land is the top of a plateau, and beyond its rim the ground falls away down cliffs into a valley of mist.
-const GPAD=26;   // the ground is drawn this far beyond the map on every side (the cliffs and what lies below them)
-const HRES=4;
-const GW={built:0,HW:(WW+2*GPAD)*HRES+1,HH:(WH+2*GPAD)*HRES+1,H:null,SD:null,chunks:[],u:null,flash:[],rocks:[],pads:[],islets:[],texOwn:null,texTN:null,texShore:null};
-// ---- small noise helpers (value noise from integer hashes) ----
-function hash2(ix,iy,s){let h=(Math.imul(ix,374761393)+Math.imul(iy,668265263)+Math.imul(s,1274126177))|0;h=Math.imul(h^(h>>>13),1274126177);return((h^(h>>>16))>>>0)/4294967295}
-function vnoise(x,y,s){const ix=Math.floor(x),iy=Math.floor(y),fx=x-ix,fy=y-iy,sx=fx*fx*(3-2*fx),sy=fy*fy*(3-2*fy),a=hash2(ix,iy,s),b=hash2(ix+1,iy,s),c=hash2(ix,iy+1,s),d=hash2(ix+1,iy+1,s);return a+(b-a)*sx+(c-a+(a-b-c+d)*sx)*sy}
-function fbm2(x,y,s,oct){let a=.5,f=1,t=0,n=0;for(let i=0;i<oct;i++){t+=vnoise(x*f,y*f,s+i*17)*a;n+=a;a*=.5;f*=2.03}return t/n}
+// ---------- 3D renderer, part 2: the arena. A black void with a neon floor: a faint grid, a glowing rim, land in the owners' colours, scorched land, power pads ----------
+// The game runs on a flat map. The floor is one flat sheet drawn by one shader from small pictures of the map: where the arena ends (texEdge),
+// who owns what (texOwn, turned into smooth coverage on the GPU), and which land is scorched (texScar).
+const GW={built:0,u:null,pads:[],floor:null,floorMat:null,texOwn:null,texEdge:null,texScar:null,scData:null,scT:-9,scOn:0,scDirty:0};
 const sm01=t=>t<=0?0:t>=1?1:t*t*(3-2*t);
 // ---- exact distance to the nearest set cell (Felzenszwalb), in cells ----
 function edt1(f,n,d,v,z){let k=0;v[0]=0;z[0]=-1e20;z[1]=1e20;
@@ -179,191 +17,69 @@ function blurSep(a,w,h,sig){const R=Math.ceil(sig*2.5),k=new Float32Array(R*2+1)
  for(let y=0;y<h;y++)for(let x=0;x<w;x++){let c=0;for(let i=-R;i<=R;i++){const xx=Math.min(w-1,Math.max(0,x+i));c+=a[y*w+xx]*k[i+R]}t[y*w+x]=c}
  for(let y=0;y<h;y++)for(let x=0;x<w;x++){let c=0;for(let i=-R;i<=R;i++){const yy=Math.min(h-1,Math.max(0,y+i));c+=t[yy*w+x]*k[i+R]}a[y*w+x]=c}
  return a}
-// the same blur for wide radii, three running-sum box passes per direction (cost does not grow with the radius; looks the same for soft shading)
-function boxPass(src,dst,w,h,r,horiz){const n=2*r+1;
- if(horiz){for(let y=0;y<h;y++){const o=y*w;let acc=0;for(let i=-r;i<=r;i++)acc+=src[o+(i<0?0:i>w-1?w-1:i)];for(let x=0;x<w;x++){dst[o+x]=acc/n;const xa=x+r+1,xb=x-r;acc+=src[o+(xa>w-1?w-1:xa)]-src[o+(xb<0?0:xb)]}}}
- else{for(let x=0;x<w;x++){let acc=0;for(let i=-r;i<=r;i++)acc+=src[(i<0?0:i>h-1?h-1:i)*w+x];for(let y=0;y<h;y++){dst[y*w+x]=acc/n;const ya=y+r+1,yb=y-r;acc+=src[(ya>h-1?h-1:ya)*w+x]-src[(yb<0?0:yb)*w+x]}}}}
-function blurFast(a,w,h,sig){if(sig<3)return blurSep(a,w,h,sig);const r=Math.max(1,Math.round((Math.sqrt(4*sig*sig+1)-1)/2)),t=new Float32Array(a.length);
- for(let p=0;p<3;p++){boxPass(a,t,w,h,r,true);boxPass(t,a,w,h,r,false)}return a}
-// a field on the padded grid (4 samples per unit, starting GPAD units before the map), read at a world point
-function gridAt(F,x,y){let fx=(x+GPAD)*HRES,fy=(y+GPAD)*HRES;fx=fx<0?0:fx>GW.HW-1.001?GW.HW-1.001:fx;fy=fy<0?0:fy>GW.HH-1.001?GW.HH-1.001:fy;
- const ix=fx|0,iy=fy|0,tx=fx-ix,ty=fy-iy,i=iy*GW.HW+ix,a=F[i],b=F[i+1],c=F[i+GW.HW],d=F[i+GW.HW+1];return a+(b-a)*tx+(c-a+(a-b-c+d)*tx)*ty}
-// the height of the ground at a world point, and how far that point is inside the rim of the plateau (units; negative beyond it)
-function gfxH(x,y){return GW.H?gridAt(GW.H,x,y):0}
-function gfxSD(x,y){return GW.SD?gridAt(GW.SD,x,y):0}
-function interpH(H,x,y){return gridAt(H,x,y)}
+// the floor is flat: everything stands at height 0
+function gfxH(x,y){return 0}
 
-// ---- the height field ----
-function gwHeights(){
- const HW=GW.HW,HH=GW.HH,H=new Float32Array(HW*HH),SD=new Float32Array(HW*HH),S=SEED|0,RL=(GFX.theme&&GFX.theme.rel)||{};
- const aBig=RL.big===undefined?4.6:RL.big,aRid=RL.rid===undefined?1.2:RL.rid,aDn=RL.dn===undefined?.6:RL.dn,cD=RL.cliff===undefined?11:RL.cliff,fq=RL.fq||1,dF=RL.df||.072,dW=RL.dw===undefined?3.6:RL.dw,dS=RL.ds||.74,dK=RL.dk||0,rollK=RL.roll===undefined?.6:RL.roll;GW.low=-(cD+3);
- // distance from the rim of the playable land, smoothed so the rim is round instead of stepped
- const sdc=new Float32Array(MW*MH),inW=new Uint8Array(MW*MH);for(let i=0;i<inW.length;i++)inW[i]=ISL[i]?0:1;
- const dIn=edt2(inW,MW,MH),dOut=edt2(ISL,MW,MH);
- for(let i=0;i<sdc.length;i++)sdc[i]=(ISL[i]?dIn[i]-.5:-(dOut[i]-.5))/MC;
- blurSep(sdc,MW,MH,1.5);
- // beyond the map itself the distance carries on outward from the map's edge
- const sdAt=(x,y)=>{const cx=x<0?0:x>WW?WW:x,cy=y<0?0:y>WH?WH:y,ox=x-cx,oy=y-cy;let fx=cx*MC-.5,fy=cy*MC-.5;fx=fx<0?0:fx>MW-1.001?MW-1.001:fx;fy=fy<0?0:fy>MH-1.001?MH-1.001:fy;
-  const ix=fx|0,iy=fy|0,tx=fx-ix,ty=fy-iy,i=iy*MW+ix,a=sdc[i],b=sdc[i+1],c=sdc[i+MW],d=sdc[i+MW+1],v=a+(b-a)*tx+(c-a+(a-b-c+d)*tx)*ty;return(ox||oy)?Math.min(v,0)-Math.sqrt(ox*ox+oy*oy):v};
- for(let j=0;j<HH;j++)for(let i=0;i<HW;i++){const x=i/HRES-GPAD,y=j/HRES-GPAD,d=sdAt(x,y);let h;
-  if(d>0){ // on the plateau: level at the rim, then broad hills that stand on plains
-   // (terms that come out as zero are not computed: this loop runs over half a million points at the start of every match)
-   const m=sm01((d-1.2)/8),t=fbm2(x*.024*fq,y*.024*fq,S,3),hl=sm01((t-.46)/.42),rid=hl>0&&aRid>0?1-Math.abs(fbm2(x*.07*fq+9,y*.07*fq+4,S+5,3)*2-1):0,roll=rollK?(fbm2(x*.06,y*.06,S+3,2)-.5)*rollK:0;
-   // drifts / dunes: rows across the wind, a long gentle side to the west and a short steep one to the east.
-   // dk=0 gives rounded drifts (snow); dk=1 gives a dune: the windward side still climbing at the crest, a straight slip face with a curved foot
-   let dn=0;if(aDn>0){const dm=sm01((fbm2(x*.03+3,y*.016,S+19,2)-.3)/.34);if(dm>0){const u=x*dF+(fbm2(x*.021,y*.021,S+7,2)-.5)*dW,ph=u-Math.floor(u),tw=ph/dS,tl=(ph-dS)/(1-dS),prS=ph<dS?sm01(tw):1-sm01(tl),prC=ph<dS?tw*tw*(2-tw):Math.pow(1-tl,1.7),pr=prS+(prC-prS)*dK;dn=pr*aDn*dm}}
-   h=.22*sm01(d/1.5)+(hl*aBig+rid*rid*aRid*hl+roll+dn)*m}
-  else{ // beyond the rim: a cliff with ledges and gullies, a slope of fallen rock, then the low country, which levels out toward the edge of what is drawn
-   // (past 14.5 units every term that uses the cliff noise has settled, so it is only computed nearer the rim; same heights as before)
-   const e=-d,g=e<14.5?fbm2(x*.31,y*.31,S+21,3):.5,w=1.6+2.8*g,c=sm01(e/w),c4=c*(1-c)*4,far=1-sm01((Math.max(-x,x-WW,-y,y-WH)-(GPAD-8))/6.5),g2=c4>0?fbm2(x*.95,y*.95,S+33,2):.5,fk=sm01((e-w-2)/8)*far;
-   h=-cD*.74*c-(cD*.26+3)*sm01((e-w)/10)+Math.sin(c*11+g*7)*.3*c4+(g2-.5)*1.1*c4+(fk>0?((fbm2(x*.055,y*.055,S+41,3)-.5)*3.4+(fbm2(x*.21,y*.21,S+47,2)-.5)*.7)*fk:0)}
-  H[j*HW+i]=h;SD[j*HW+i]=d}
- // level ground under the power pads so the platforms sit flat
- for(const z of ZN){let c=0,n=0;for(let a=0;a<8;a++){c+=gridAt(H,z.x+Math.cos(a)*1.2,z.y+Math.sin(a)*1.2);n++}c/=n;z.gh=c;
-  const r1=ZR+3.2,x0=Math.max(0,Math.floor((z.x-r1+GPAD)*HRES)),x1=Math.min(HW-1,Math.ceil((z.x+r1+GPAD)*HRES)),y0=Math.max(0,Math.floor((z.y-r1+GPAD)*HRES)),y1=Math.min(HH-1,Math.ceil((z.y+r1+GPAD)*HRES));
-  for(let j=y0;j<=y1;j++)for(let i=x0;i<=x1;i++){const dd=Math.hypot(i/HRES-GPAD-z.x,j/HRES-GPAD-z.y),w=1-sm01((dd-(ZR+.2))/3);if(w>0)H[j*HW+i]+=(c-H[j*HW+i])*w}}
- GW.H=H;GW.SD=SD}
-// baked light: normals, how hollow each spot is, and where the sun reaches (hills and the rim shade what lies behind them)
-function gwBake(th){
- const HW=GW.HW,HH=GW.HH,H=GW.H,SD=GW.SD,px=new Uint8Array(HW*HH*4),sun=sunVec(th.az,th.el),hl=Math.hypot(sun.x,sun.z)||1,lx=sun.x/hl,lz=sun.z/hl,tanE=sun.y/hl;
- const bl=Float32Array.from(H);blurFast(bl,HW,HH,5);const b2=Float32Array.from(H);blurFast(b2,HW,HH,18);
- const STEPS=22,SL=.75;let Hmax=-1e9;for(let k=0;k<H.length;k++)if(H[k]>Hmax)Hmax=H[k];
- for(let j=0;j<HH;j++)for(let i=0;i<HW;i++){const k=j*HW+i,x=i/HRES-GPAD,y=j/HRES-GPAD,h=H[k];
-  const hx0=H[j*HW+Math.max(0,i-1)],hx1=H[j*HW+Math.min(HW-1,i+1)],hy0=H[Math.max(0,j-1)*HW+i],hy1=H[Math.min(HH-1,j+1)*HW+i],dx=(hx1-hx0)*HRES/((i>0&&i<HW-1)?2:1),dz=(hy1-hy0)*HRES/((j>0&&j<HH-1)?2:1),l=1/Math.sqrt(dx*dx+dz*dz+1);
-  const nx=-dx*l,nz=-dz*l;
-  // march toward the sun; stop once the ray is above every hill, or the point is already fully in shade
-  let ex=0;if(SD[k]>-14)for(let s=1;s<=STEPS;s++){const t=s*SL,rh=h+t*tanE;if(rh>Hmax)break;const e=gridAt(H,x+lx*t,y+lz*t)-rh;if(e>ex){ex=e;if(ex>=.55)break}}
-  const vis=1-sm01(ex/.55),ao=Math.max(0,Math.min(1,.72+(h-bl[k])*.55+(h-b2[k])*.07));
-  px[k*4]=Math.round((nx*.5+.5)*255);px[k*4+1]=Math.round((nz*.5+.5)*255);px[k*4+2]=Math.round(ao*255);px[k*4+3]=Math.round(vis*255)}
- if(GW.texTN)GW.texTN.dispose();
- GW.texTN=dtex(px,HW,HH,THREE.RGBAFormat,THREE.UnsignedByteType,{clamp:1});GW.u.uTN.value=GW.texTN}
-
-// ---- materials ----
+// ---- the floor ----
 function gwUniforms(){
- const U=GFX.U,T=GFX.tex,V4=()=>new THREE.Vector4(),a4=()=>[V4(),V4(),V4(),V4()];
- GW.u={uOwn:{value:null},uTN:{value:null},uShore:{value:null},uNoise:{value:T.noise},uLA:{value:LAY.arrA},uLN:{value:LAY.arrN},
-  uOwnSize:{value:new THREE.Vector2(MW,MH)},uWorld:{value:new THREE.Vector2(WW,WH)},uWorldP:{value:new THREE.Vector2(WW+2*GPAD,WH+2*GPAD)},uPad:{value:GPAD},
-  uCol:{value:COLLIN.map(c=>new THREE.Vector3(c[0],c[1],c[2]))},
-  uLS:{value:a4()},uLT:{value:a4()},uMa:{value:a4()},uMb:{value:a4()},uMc:{value:a4()},uLI:{value:[0,0,0,0]},
-  uMacro:{value:.2},uCavK:{value:.26},uSpark:{value:0},uWrap:{value:0},uCloudK:{value:.2},uBnc:{value:new THREE.Vector3(0,0,0)},
-  uTS:{value:V4()},uTS2:{value:V4()},uTrkC:{value:new THREE.Vector3(.8,.8,.8)},uTrkK:{value:new THREE.Vector2(.3,1)},
-  uMist:{value:new THREE.Color(1,1,1)},uMistS:{value:new THREE.Color(.6,.7,.9)},uMistY:{value:-9},uMistD:{value:6},uMistK:{value:1},uMistN:{value:2.4},uRelK:{value:1.4},uTSn:{value:.5},uQ:{value:1},
-  uTime:U.time,uMA:{value:null},uMB:{value:null},uTrk:{value:null},uTrkPx:{value:new THREE.Vector2(.001,.001)},
-  uFlash:{value:[0,1,2,3].map(()=>new THREE.Vector4(0,0,1,0))},uSunDir:U.sunDir,uSunCol:U.sunCol,uCam:U.camPos}}
-// the billows of the mist: the ground fades into exactly this picture as it drops, and the flat sheet below draws the same one
-const MIST_FN=`vec3 mistCol(vec2 q){float a=textureLod(uNoise,q*.012+vec2(uTime*.0030,uTime*.0012),0.).r,b=textureLod(uNoise,q*.037+vec2(-uTime*.004,uTime*.0026),0.).g,c=textureLod(uNoise,q*.11+vec2(uTime*.006,0.),0.).b;
-  return mix(uMistS,uMist,smoothstep(.2,.8,a*.5+b*.32+c*.18));}`;
-function gwTerrainMat(){
- const m=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.8,metalness:0,envMapIntensity:.45});
- m.onBeforeCompile=sh=>{Object.assign(sh.uniforms,GW.u);
-  sh.vertexShader=sh.vertexShader.replace('#include <common>',`#include <common>
-   varying vec3 vWP;`)
-   .replace('#include <begin_vertex>',`#include <begin_vertex>
-   vWP=transformed;`);
-  sh.fragmentShader=sh.fragmentShader.replace('#include <common>',`#include <common>
-   precision highp sampler2DArray;
-   uniform sampler2DArray uLA,uLN;uniform sampler2D uTrk,uMA,uMB,uTN,uShore,uNoise;
-   uniform vec2 uOwnSize,uWorld,uWorldP,uTrkPx,uTrkK;uniform vec3 uBnc;uniform float uPad,uTime,uMacro,uCavK,uSpark,uWrap,uCloudK,uMistY,uMistD,uMistK,uMistN,uRelK,uTSn,uQ;
-   uniform vec3 uCol[6];uniform vec3 uSunDir,uSunCol,uTrkC,uMist,uMistS;
-   uniform vec4 uLS[4],uLT[4],uMa[4],uMb[4],uMc[4];uniform float uLI[4];uniform vec4 uTS,uTS2;uniform vec4 uFlash[4];
-   varying vec3 vWP;
-   float h21(vec2 p){p=fract(p*vec2(.1031,.1030));p+=dot(p,p.yx+33.33);return fract((p.x+p.y)*p.x);}
-   vec2 rot2(vec2 v){return vec2(v.x*.8+v.y*.6,-v.x*.6+v.y*.8);}
-   ${MIST_FN}
-   // one ground material at a world point: colour, height and fine normal. A second, larger and turned copy is mixed in by a noise, so the pattern does not visibly repeat
-   void lay(int i,vec2 wp,vec2 dx,vec2 dy,float nz,out vec3 al,out float ht,out vec3 nc){
-    vec4 S=uLS[i];float li=uLI[i];
-    vec4 a=textureGrad(uLA,vec3(wp*S.x,li),dx*S.x,dy*S.x);
-    float k=0.;al=a.rgb;ht=a.a;
-    if(uQ>.5){vec4 b=textureGrad(uLA,vec3(rot2(wp)*S.y+vec2(.37,.71),li),rot2(dx)*S.y,rot2(dy)*S.y);k=smoothstep(.3,.7,nz)*S.z;al=mix(a.rgb,b.rgb,k);ht=mix(a.a,b.a,k);}
-    vec4 n=textureGrad(uLN,vec3(wp*S.x,li),dx*S.x,dy*S.x);nc=vec3((n.xy*2.-1.)*S.w*(1.-k*.6),n.z);}`)
-  .replace('#include <color_fragment>',`#include <color_fragment>
-   vec2 wp=vWP.xz,suv=(wp+uPad)/uWorldP,ouv=wp/uWorld;
-   vec4 tn=texture2D(uTN,suv);vec2 nxz=tn.rg*2.-1.;float sl0=1.-sqrt(max(0.,1.-dot(nxz,nxz)));
-   nxz*=uRelK;float nl=length(nxz);if(nl>.97)nxz*=.97/nl;vec3 N0=vec3(nxz.x,sqrt(max(0.,1.-dot(nxz,nxz))),nxz.y);
-   float sdv=texture2D(uShore,suv).r*12.-6.;
-   vec4 nA=texture2D(uNoise,wp*.0137),nB=texture2D(uNoise,wp*.047+vec2(.37,.11)),nC=texture2D(uNoise,wp*.19+vec2(.11,.53));
-   // what decides where each material lies: slope, height, three sizes of patch, hollows, the rim of the plateau and the cliff below it
-   vec4 mi0=vec4(clamp(sl0*3.,0.,1.),clamp(vWP.y*.16+.5,0.,1.),nA.r,nB.g);
-   vec4 mi1=vec4(nC.b,1.-tn.b,smoothstep(2.2,0.,sdv)*step(0.,sdv),smoothstep(.15,-.9,sdv));
-   vec2 gdx=dFdx(wp),gdy=dFdy(wp);float gyx=dFdx(vWP.y),gyy=dFdy(vWP.y);
-   vec3 alb,nc;float ht;lay(0,wp,gdx,gdy,nB.r,alb,ht,nc);
-   alb*=uLT[0].rgb;float rgh=uLT[0].a;vec2 nd=nc.xy;float cav=nc.z,w0=1.;
-   for(int i=1;i<3;i++){
-    float v=dot(uMa[i],mi0)+dot(uMb[i],mi1)+uMc[i].x,mk=smoothstep(uMc[i].y,uMc[i].z,v);
-    if(mk>.004){vec3 a2,n2;float h2;lay(i,wp,gdx,gdy,i==1?nB.a:nA.b,a2,h2,n2);
-     float e=abs(uMc[i].w),hs=uMc[i].w<0.?1.-ht:h2,mm=mk*(1.+2.*e)-e,w=smoothstep(1.-mm-e,1.-mm+e,hs);
-     alb=mix(alb,a2*uLT[i].rgb,w);ht=mix(ht,h2,w);nd=mix(nd,n2.xy,w);cav=mix(cav,n2.z,w);rgh=mix(rgh,uLT[i].a,w);w0*=1.-w;}}
-   // the cliff rock is laid on from the sides as well as from above, so its beds stay level whichever way a face looks
-   {float v=dot(uMa[3],mi0)+dot(uMb[3],mi1)+uMc[3].x,mk=smoothstep(uMc[3].y,uMc[3].z,v);
-    if(mk>.004){vec4 S=uLS[3];float li=uLI[3];
-     vec3 bw=vec3(abs(N0.x),N0.y*.75,abs(N0.z));bw=bw*bw*bw;bw/=bw.x+bw.y+bw.z+1e-5;
-     vec4 cx=textureGrad(uLA,vec3(vec2(wp.y,vWP.y)*S.x,li),vec2(gdx.y,gyx)*S.x,vec2(gdy.y,gyy)*S.x);
-     vec4 cz=textureGrad(uLA,vec3(vec2(wp.x,vWP.y)*S.x,li),vec2(gdx.x,gyx)*S.x,vec2(gdy.x,gyy)*S.x);
-     vec4 ct=textureGrad(uLA,vec3(wp*S.x,li),gdx*S.x,gdy*S.x);
-     vec4 c3=cx*bw.x+ct*bw.y+cz*bw.z;
-     float e=abs(uMc[3].w),mm=mk*(1.+2.*e)-e,w=smoothstep(1.-mm-e,1.-mm+e,c3.a);
-     alb=mix(alb,c3.rgb*uLT[3].rgb,w);ht=mix(ht,c3.a,w);nd*=1.-w;cav=mix(cav,.3+c3.a*.4,w);rgh=mix(rgh,uLT[3].a,w);w0*=1.-w;}}
-   alb*=1.+(nA.g-.5)*uMacro*1.3+(nB.b-.5)*uMacro*.7;
-   alb*=mix(1.-uCavK,1.,smoothstep(.15,.6,cav));
-   vec3 Nw=N0;Nw.xz+=nd;
-   // tyre tracks: a picture the cars draw into as they drive, read back as pressed, darker ground
-   float trk=texture2D(uTrk,ouv).r;
-   if(trk>.003){vec2 tgr=vec2(texture2D(uTrk,ouv+vec2(uTrkPx.x,0.)).r-texture2D(uTrk,ouv-vec2(uTrkPx.x,0.)).r,texture2D(uTrk,ouv+vec2(0.,uTrkPx.y)).r-texture2D(uTrk,ouv-vec2(0.,uTrkPx.y)).r);
-    alb=mix(alb,alb*uTrkC,trk*uTrkK.x);Nw.xz+=tgr*uTrkK.y;}
-   // territory: smooth coverage fields of the five players (made on the GPU from the game's land map), so borders are round and clean at any zoom.
-   // Land that belongs to somebody is SOLID colour: paint over the ground, optionally a raised slab with a wall on the near side and a shadow.
-   vec4 mA=texture2D(uMA,ouv),mB=texture2D(uMB,ouv);float mt=mB.g,own=0.,dW=-9.,wall=0.,slabSh=0.;vec3 oc=vec3(0.);vec2 grd=vec2(0.);
-   float aaW=max(length(fwidth(wp)),.012);
-   if(mt>.004){
-    int cid=1;float mxo=mA.x;if(mA.y>mxo){mxo=mA.y;cid=2;}if(mA.z>mxo){mxo=mA.z;cid=3;}if(mA.w>mxo){mxo=mA.w;cid=4;}if(mB.x>mxo){mxo=mB.x;cid=5;}
-    oc=uCol[cid];
-    vec2 e1=vec2(1./uOwnSize.x,0.),e2=vec2(0.,1./uOwnSize.y);
-    grd=vec2(texture2D(uMB,ouv+e1).g-texture2D(uMB,ouv-e1).g,texture2D(uMB,ouv+e2).g-texture2D(uMB,ouv-e2).g)*.5;
-    dW=(mt-.5)/max(length(grd),.03)/(uOwnSize.x/uWorld.x);
-    own=smoothstep(-aaW,aaW,dW);}
-   if(uTS.z>0.){
-    // the camera looks down from the south, so a slab shows its southern wall: ground just south of owned land is covered by that wall
-    vec2 ouN=ouv-vec2(0.,uTS.z*.445/uWorld.y);vec4 mA2=texture2D(uMA,ouN),mB2=texture2D(uMB,ouN);
-    wall=smoothstep(.42,.58,mB2.g)*(1.-own);
-    if(wall>.003){int c2=1;float mx2=mA2.x;if(mA2.y>mx2){mx2=mA2.y;c2=2;}if(mA2.z>mx2){mx2=mA2.z;c2=3;}if(mA2.w>mx2){mx2=mA2.w;c2=4;}if(mB2.x>mx2){mx2=mB2.x;c2=5;}
-     alb=mix(alb,uCol[c2]*uTS.x*.46,wall);rgh=mix(rgh,.7,wall);Nw=mix(Nw,vec3(0.,.4,.92),wall);}
-    vec2 so=uSunDir.xz/max(uSunDir.y,.3)*uTS.z;
-    slabSh=smoothstep(.35,.65,texture2D(uMB,(wp+so)/uWorld).g)*(1.-own)*(1.-wall);}
-   if(own>0.){
-    vec3 paint=oc*uTS.x*(1.+(ht-.5)*uTS.y);
-    paint*=1.-smoothstep(.2,0.,dW)*uTS.w;
-    alb=mix(alb,paint,own);rgh=mix(rgh,uTS2.y,own);
-    Nw.xz=mix(Nw.xz,N0.xz*uTSn+nd*uTS2.z,own);}
-   Nw.xz-=grd*uTS2.w;Nw=normalize(Nw);
-   diffuseColor.rgb=alb;`)
-  .replace('#include <roughnessmap_fragment>',`#include <roughnessmap_fragment>
-   roughnessFactor=rgh;`)
-  .replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
-   normal=normalize((viewMatrix*vec4(Nw,0.)).xyz);`)
-  .replace('#include <emissivemap_fragment>',`#include <emissivemap_fragment>
-   totalEmissiveRadiance+=oc*own*uTS2.x;
-   for(int fi=0;fi<4;fi++){vec4 fl=uFlash[fi];if(fl.z<1.){float dd=length(vWP.xz-fl.xy),rr=fl.z*30.;float bd=exp(-pow((dd-rr)/1.5,2.))*(1.-fl.z);totalEmissiveRadiance+=uCol[int(fl.w+.5)]*bd*1.1*own;}}
-   if(uSpark>0.){vec3 Vv=normalize(cameraPosition-vWP);vec2 cell=floor(wp*6.5);vec3 rv=vec3(h21(cell),h21(cell+17.3),h21(cell+41.9))*2.-1.;vec3 Ng=normalize(Nw+rv*.55);
-    float gl=pow(max(dot(reflect(-Vv,Ng),uSunDir),0.),520.);totalEmissiveRadiance+=uSunCol*gl*uSpark*w0*(1.-own)*tn.a*.9*(1.-trk*.8);}`)
-  .replace('#include <lights_fragment_end>',`#include <lights_fragment_end>
-   {float clv=texture2D(uNoise,wp*.009+vec2(uTime*.004,uTime*.002)).a;float vis=mix(tn.a,mix(1.,tn.a,uTSn),own)*mix(1.,smoothstep(.3,.7,clv),uCloudK)*(1.-slabSh*.72);
-    reflectedLight.directDiffuse*=vis;reflectedLight.directSpecular*=vis;
-    // shade is never black out here: the bright ground all round throws light back into it
-    {float lit=vis*clamp(dot(N0,uSunDir)/max(uSunDir.y,.2),0.,1.);reflectedLight.indirectDiffuse+=diffuseColor.rgb*uBnc*(1.-lit);}
-    float aoK=mix(.5,1.,mix(tn.b,mix(1.,tn.b,uTSn),own))*(1.-slabSh*.25);reflectedLight.indirectDiffuse*=aoK;reflectedLight.indirectSpecular*=aoK*aoK;
-    if(uWrap>0.){float ndl=dot(Nw,uSunDir);float wr=clamp((ndl+.4)/1.4,0.,1.);
-     reflectedLight.indirectDiffuse+=diffuseColor.rgb*uSunCol*wr*wr*w0*(1.-own)*.075*uWrap*vis*vec3(.72,.95,1.2);}}`)
-  .replace('#include <opaque_fragment>',`#include <opaque_fragment>
-   {float mh=smoothstep(uMistY+uMistD,uMistY,vWP.y+(nB.a-.5)*uMistN)*uMistK;if(mh>0.)gl_FragColor.rgb=mix(gl_FragColor.rgb,mistCol(wp),mh);}`)};
- m.customProgramCacheKey=()=>'terrain6';return m}
-// the mist that fills the valley round the plateau
-function gwMistMat(){
- return new THREE.ShaderMaterial({uniforms:{uNoise:GW.u.uNoise,uTime:GW.u.uTime,uMist:GW.u.uMist,uMistS:GW.u.uMistS},
+ const U=GFX.U,th=GTH[0];
+ GW.u={uMA:{value:null},uMB:{value:null},uEdge:{value:null},uScar:{value:null},
+  uOwnSize:{value:new THREE.Vector2(MW,MH)},uWorld:{value:new THREE.Vector2(WW,WH)},
+  uCol:{value:COLLIN.map(c=>new THREE.Vector3(c[0],c[1],c[2]))},uFlash:{value:[0,1,2,3].map(()=>new THREE.Vector4(0,0,1,0))},
+  uEdgeC:{value:new THREE.Vector3(...linOf(th.edge))},uGridC:{value:new THREE.Vector3(...linOf(th.grid))},
+  uTime:U.time,uGlowPass:U.glowPass,uFogN:U.fogNear,uFogF:U.fogFar,uQ:{value:1}}}
+function gwVoidMat(){
+ return new THREE.ShaderMaterial({uniforms:GW.u,extensions:{derivatives:true},
   vertexShader:'varying vec3 vWP;void main(){vec4 w=modelMatrix*vec4(position,1.);vWP=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}',
-  fragmentShader:`uniform sampler2D uNoise;uniform float uTime;uniform vec3 uMist,uMistS;varying vec3 vWP;
-  ${MIST_FN}
-  void main(){gl_FragColor=vec4(mistCol(vWP.xz),1.);
+  fragmentShader:`uniform sampler2D uMA,uMB,uEdge,uScar;uniform vec2 uOwnSize,uWorld;uniform vec3 uCol[6],uEdgeC,uGridC;uniform vec4 uFlash[4];
+  uniform float uTime,uGlowPass,uFogN,uFogF;varying vec3 vWP;
+  float h21(vec2 p){p=fract(p*vec2(.1031,.1030));p+=dot(p,p.yx+33.33);return fract((p.x+p.y)*p.x);}
+  float vn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h21(i),h21(i+vec2(1.,0.)),f.x),mix(h21(i+vec2(0.,1.)),h21(i+vec2(1.,1.)),f.x),f.y);}
+  // 1 on the lines of a grid with cells of size s (w: half the line width in pixels)
+  float gridL(vec2 p,float s,float w){vec2 q=p/s,d=abs(fract(q-.5)-.5)/max(fwidth(q),vec2(1e-4));return 1.-smoothstep(w-.5,w+.5,min(d.x,d.y));}
+  void main(){
+   vec2 wp=vWP.xz,ouv=wp/uWorld,px=fwidth(wp);float pxu=max(max(px.x,px.y),1e-4);
+   // where the arena ends: distance in units (+ inside), carried on outward beyond the map
+   float sd=(texture2D(uEdge,clamp(ouv,0.,1.)).r-.5)*12.;vec2 ob=max(max(-wp,wp-uWorld),0.);float outD=length(ob);if(outD>0.)sd=min(sd,0.)-outD;
+   float inA=smoothstep(-pxu,pxu,sd);
+   vec3 base=vec3(.003,.0045,.01)*inA,emis=vec3(0.);
+   // the grid: 4-unit cells, and 1-unit cells that fade away as the camera pulls back; it carries on faintly a little way past the rim
+   float gMaj=gridL(wp,4.,.6),gMin=gridL(wp,1.,.45)*clamp(1.5-pxu*7.,0.,1.);
+   vec2 cr=abs(fract(wp/4.-.5)-.5)*4.;float dot0=(1.-smoothstep(.06,.06+pxu*1.5,length(cr)))*inA;
+   float gk=inA+(1.-inA)*.35*smoothstep(-8.,0.,sd);
+   vec3 grid=uGridC*(gMaj*.085+gMin*.026)*gk+uGridC*dot0*.35;
+   // land: coverage of the five players (smooth), the owner is the one with the most
+   vec4 mA=texture2D(uMA,ouv),mB=texture2D(uMB,ouv);
+   vec4 dxA=dFdx(mA),dyA=dFdy(mA);vec2 dB=vec2(dFdx(mB.x),dFdy(mB.x));
+   float own=0.;
+   if(mB.g>.01){
+    float c=mA.x;vec2 gc=vec2(dxA.x,dyA.x);int cid=1;
+    if(mA.y>c){c=mA.y;gc=vec2(dxA.y,dyA.y);cid=2;}if(mA.z>c){c=mA.z;gc=vec2(dxA.z,dyA.z);cid=3;}if(mA.w>c){c=mA.w;gc=vec2(dxA.w,dyA.w);cid=4;}if(mB.x>c){c=mB.x;gc=dB;cid=5;}
+    vec3 oc=uCol[cid];
+    float dOwn=(c-.5)/max(length(gc),1e-5)*pxu;   // units to the edge of this owner's land (+ inside)
+    own=smoothstep(-pxu*.8,pxu*.8,dOwn);
+    float rimW=max(.17,pxu*1.3),rim=(1.-smoothstep(rimW-pxu,rimW+pxu,dOwn))*own,inner=exp(-max(dOwn,0.)*1.1)*own;
+    // inside: a deep tint of the colour with the grid lit in it, a fine weave and a slow sweep of light
+    float weave=smoothstep(.86,.9,fract((wp.x-wp.y)*.9))*.5;
+    float sweep=pow(.5+.5*sin((wp.x*.55+wp.y*.35)*.3-uTime*1.4),24.);
+    base=mix(base,oc*(.06+weave*.025),own);
+    grid=mix(grid,oc*(gMaj*.5+gMin*.12+dot0*.8),own);
+    emis+=oc*(rim*2.1+inner*.3+sweep*.1*own);
+    // a capture: a wave of light runs out from where the loop closed
+    for(int fi=0;fi<4;fi++){vec4 fl=uFlash[fi];if(fl.z<1.){float dd=length(wp-fl.xy),rr=fl.z*32.;emis+=uCol[int(fl.w+.5)]*exp(-pow((dd-rr)/1.6,2.))*(1.-fl.z)*1.1*own;}}
+   }
+   // scorched land: embers and glowing cracks that cool as the scar wears off
+   float sc=texture2D(uScar,ouv).r*(1.-own);
+   if(sc>.004){float n1=vn(wp*1.7+vec2(uTime*.25,0.)),n2=vn(wp*5.3-vec2(0.,uTime*.55)),n3=vn(wp*.6);
+    float crack=1.-smoothstep(.04,.12,abs(n1-.5)),heat=sc*(.5+.5*n2);
+    vec3 ember=mix(vec3(.45,.04,.0),vec3(1.9,.55,.08),heat);
+    emis+=ember*(crack*.95+.12+n3*.08)*sc;base+=vec3(.03,.005,.0)*sc;}
+   // the rim of the arena: a bright line with a soft glow on both sides
+   float ae=abs(sd);
+   emis+=uEdgeC*((1.-smoothstep(.05,.05+pxu*1.5,ae))*1.7+exp(-ae*.9)*.12+exp(-ae*3.4)*.24)*(.86+.14*sin(uTime*1.8+(wp.x-wp.y)*.12))*(1.-own*.5);
+   float fog=smoothstep(uFogN,uFogF,length(vWP-cameraPosition));
+   vec3 col=(uGlowPass>.5?emis:base+grid+emis)*(1.-fog);
+   gl_FragColor=vec4(col,1.);
    #include <tonemapping_fragment>
    #include <colorspace_fragment>
   }`})}
@@ -391,209 +107,113 @@ function gwMask(){
  GW.mm.uniforms.uSet.value=0;R.setRenderTarget(GW.rtA);R.render(GW.mScene,GW.mCam);
  GW.mm.uniforms.uSet.value=1;R.setRenderTarget(GW.rtB);R.render(GW.mScene,GW.mCam);
  R.setRenderTarget(old)}
+// ---- scorched land: how much of its 15 seconds each scorched cell has left (0..255), redrawn a few times a second while any is cooling ----
+function gwScar(){
+ if(!GW.texScar)return;const live=typeof SCARMAX!=='undefined'&&SCARMAX>TK;
+ if(!live&&!GW.scOn)return;if(clk-GW.scT<(GW.scDirty?.05:.2))return;GW.scT=clk;GW.scDirty=0;
+ const d=GW.scData,K=255/Math.max(1,SCART);let on=0;
+ for(let i=0;i<d.length;i++){const r=SCAR[i]-TK;let v=0;if(r>0&&!own[i]){v=(r*K)|0;if(v>255)v=255;on=1}d[i]=v}
+ GW.texScar.needsUpdate=true;GW.scOn=on}
 
-// ---- tyre tracks: the rear wheels draw soft grooves into a picture of the whole island (10 pixels per unit); the terrain reads it back ----
-const TRK={rt:null,S:null,cam:null,geo:null,last:[],N:96,clear:1};
-function trkInit(){
- if(TRK.rt||!QL.hi||!GFX.ok)return;const W=Math.round(WW*10),H=Math.round(WH*10);
- TRK.rt=new THREE.WebGLRenderTarget(W,H,{format:THREE.RedFormat,type:THREE.UnsignedByteType,minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter,depthBuffer:false,stencilBuffer:false,generateMipmaps:false});
- TRK.cam=new THREE.OrthographicCamera(0,WW,WH,0,-10,10);TRK.cam.position.z=5;TRK.cam.updateProjectionMatrix();TRK.cam.updateMatrixWorld();
- const g=TRK.geo=new THREE.BufferGeometry(),N=TRK.N*6;g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(N*3),3).setUsage(THREE.DynamicDrawUsage));
- g.setAttribute('aV',new THREE.BufferAttribute(new Float32Array(N),1).setUsage(THREE.DynamicDrawUsage));g.setAttribute('aI',new THREE.BufferAttribute(new Float32Array(N),1).setUsage(THREE.DynamicDrawUsage));g.setDrawRange(0,0);
- const m=new THREE.Mesh(g,new THREE.ShaderMaterial({depthTest:false,depthWrite:false,side:THREE.DoubleSide,blending:THREE.CustomBlending,blendEquation:THREE.MaxEquation,blendSrc:THREE.OneFactor,blendDst:THREE.OneFactor,
-  vertexShader:'attribute float aV,aI;varying float vV,vI;void main(){vV=aV;vI=aI;gl_Position=projectionMatrix*viewMatrix*vec4(position,1.);}',
-  fragmentShader:'varying float vV,vI;void main(){float a=(1.-vV*vV)*vI;gl_FragColor=vec4(a,a,a,1.);}'}));m.frustumCulled=false;
- TRK.S=new THREE.Scene();TRK.S.add(m);
- // old tracks fade: every so often the whole picture is multiplied down a little (fresh snow drifting in)
- const fq=new THREE.Mesh(new THREE.PlaneGeometry(WW,WH),new THREE.ShaderMaterial({depthTest:false,depthWrite:false,side:THREE.DoubleSide,blending:THREE.CustomBlending,blendEquation:THREE.AddEquation,blendSrc:THREE.ZeroFactor,blendDst:202/*SrcColorFactor*/,
-  vertexShader:'void main(){gl_Position=projectionMatrix*viewMatrix*modelMatrix*vec4(position,1.);}',fragmentShader:'void main(){gl_FragColor=vec4(.965,.965,.965,1.);}'}));fq.position.set(WW/2,WH/2,0);fq.frustumCulled=false;TRK.F=new THREE.Scene();TRK.F.add(fq);TRK.ft=0;
- GW.u.uTrk.value=TRK.rt.texture;GW.u.uTrkPx.value.set(1/W,1/H);TRK.clear=1}
-const _tcc=new THREE.Color();
-function trkFrame(){
- if(!QL.hi||!GW.built)return;trkInit();if(!TRK.rt)return;const R=GFX.R;
- if(TRK.clear){const old=R.getRenderTarget();R.getClearColor(_tcc);const ca=R.getClearAlpha();R.setRenderTarget(TRK.rt);R.setClearColor(0x000000,1);R.clear(true,false,false);R.setClearColor(_tcc,ca);R.setRenderTarget(old);TRK.clear=0;TRK.last=[]}
- const P3=TRK.geo.attributes.position.array,AV=TRK.geo.attributes.aV.array,AI=TRK.geo.attributes.aI.array;let n=0;
- const seg=(a,b,hw,I)=>{if(n>=TRK.N)return;const dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy);if(l<.02)return;const nx=-dy/l*hw,ny=dx/l*hw,v=n*6,
-   c=[[a[0]-nx,a[1]-ny,-1],[a[0]+nx,a[1]+ny,1],[b[0]+nx,b[1]+ny,1],[a[0]-nx,a[1]-ny,-1],[b[0]+nx,b[1]+ny,1],[b[0]-nx,b[1]-ny,-1]];
-  for(let k=0;k<6;k++){P3[(v+k)*3]=c[k][0];P3[(v+k)*3+1]=c[k][1];P3[(v+k)*3+2]=0;AV[v+k]=c[k][2];AI[v+k]=I}n++};
- for(let q=1;q<=5;q++){const p=P[q],C=CARI[q];if(!p||!p.alive||!C||!C.root.visible){TRK.last[q]=null;continue}
-  const D=CARS3D[C.cl],cs=Math.cos(p.ra),sn=Math.sin(p.ra),k=CAR_K,rx=D.wx[1]*k,fx=D.wx[0]*k,wz=D.wz*k,hw=D.ww*k*.42,pts=[];
-  for(const sd of [-1,1])pts.push([p.rx+cs*rx-sn*wz*sd,p.ry+sn*rx+cs*wz*sd]);for(const sd of [-1,1])pts.push([p.rx+cs*fx-sn*wz*sd,p.ry+sn*fx+cs*wz*sd]);
-  const L=TRK.last[q];if(L&&Math.hypot(pts[0][0]-L[0][0],pts[0][1]-L[0][1])<3){const I=p.fSpr?.95:.8;for(let w=0;w<4;w++)seg(L[w],pts[w],hw,w<2?I:I*.6)}
-  TRK.last[q]=pts}
- if(GFX.time-TRK.ft>.8||GFX.time<TRK.ft){TRK.ft=GFX.time;const old=R.getRenderTarget();R.setRenderTarget(TRK.rt);R.render(TRK.F,TRK.cam);R.setRenderTarget(old)}
- if(!n)return;TRK.geo.setDrawRange(0,n*6);TRK.geo.attributes.position.needsUpdate=TRK.geo.attributes.aV.needsUpdate=TRK.geo.attributes.aI.needsUpdate=true;
- const old=R.getRenderTarget();R.setRenderTarget(TRK.rt);R.render(TRK.S,TRK.cam);R.setRenderTarget(old)}
-
-// ---- applying a look to the ground: which four materials, where each lies, how owned land is painted ----
-const tintOf=t=>!t?[1,1,1]:typeof t==='string'?linOf(t):t;
-function gwLook(th){
- const U=GW.u,NO=[0,0,0,0,0,0,0,0,-9,0,1,.1];
- for(let i=0;i<4;i++){const L=th.lay[i],t=tintOf(L[6]),M=(th.msk&&th.msk[i])||NO;
-  U.uLI.value[i]=Math.max(0,LAY.names.indexOf(L[0]));U.uLS.value[i].set(1/L[1],1/L[2],L[3],L[4]);U.uLT.value[i].set(t[0],t[1],t[2],L[5]);
-  U.uMa.value[i].set(M[0],M[1],M[2],M[3]);U.uMb.value[i].set(M[4],M[5],M[6],M[7]);U.uMc.value[i].set(M[8],M[9],M[10],M[11])}
- U.uMacro.value=th.macro===undefined?.2:th.macro;U.uCavK.value=th.cav===undefined?.26:th.cav;U.uSpark.value=th.spark||0;U.uWrap.value=th.wrap||0;U.uCloudK.value=th.cloud===undefined?.2:th.cloud;{const b=th.bnc||[.16,.16,.16];U.uBnc.value.set(b[0],b[1],b[2])}
- const T=Object.assign({},TERDEF,th.ter||{},TERSTY[TERSEL]||{});
- U.uTS.value.set(T.solid,T.tex,T.slab,T.rim);U.uTS2.value.set(T.emis,T.rough,T.det,T.bevel);U.uTSn.value=T.hill;
- const k=th.trk||{c:[.8,.8,.8],k:.4,n:1};U.uTrkC.value.set(k.c[0],k.c[1],k.c[2]);U.uTrkK.value.set(k.k,k.n);
- const mi=th.mist,mc=linOf(mi.c),ms=linOf(mi.s);U.uMist.value.setRGB(mc[0]*mi.i,mc[1]*mi.i,mc[2]*mi.i,THREE.LinearSRGBColorSpace);U.uMistS.value.setRGB(ms[0]*mi.i,ms[1]*mi.i,ms[2]*mi.i,THREE.LinearSRGBColorSpace);
- U.uMistY.value=mi.y;U.uMistD.value=mi.d;U.uMistK.value=mi.k===undefined?1:mi.k;U.uMistN.value=mi.n===undefined?2.4:mi.n;U.uRelK.value=th.relK===undefined?1.4:th.relK;
- U.uLA.value=LAY.arrA;U.uLN.value=LAY.arrN;U.uQ.value=QNAME==='high'?1:0}
-
-// ---- building the plateau of this match ----
+// ---- building the arena of this match ----
 function gwBuild(){
- if(!GFX.ok||IS_SRV||!LANDI||!LAY.ok)return;
+ if(!GFX.ok||IS_SRV||!LANDI)return;
  const t0=performance.now();
  if(!GW.u)gwUniforms();
  gwDispose();
- gfxSetTheme(gfxThemeFor(SEED));const th=GFX.theme,U=GW.u;
- gwLook(th);
- gwHeights();gwBake(th);
+ gfxSetTheme(0);
+ // where the arena ends (signed distance in units, -6..6, smoothed so the rim is round instead of stepped)
+ const inW=new Uint8Array(MW*MH);for(let i=0;i<inW.length;i++)inW[i]=ISL[i]?0:1;
+ const dIn=edt2(inW,MW,MH),dOut=edt2(ISL,MW,MH),sdc=new Float32Array(MW*MH);
+ for(let i=0;i<sdc.length;i++)sdc[i]=(ISL[i]?dIn[i]-.5:-(dOut[i]-.5))/MC;
+ blurSep(sdc,MW,MH,1.2);
+ const eb=new Uint8Array(MW*MH);for(let i=0;i<eb.length;i++)eb[i]=Math.max(0,Math.min(255,Math.round((sdc[i]/12+.5)*255)));
+ if(GW.texEdge)GW.texEdge.dispose();GW.texEdge=dtex(eb,MW,MH,THREE.RedFormat,THREE.UnsignedByteType,{clamp:1});GW.u.uEdge.value=GW.texEdge;
  // ownership picture (the game's land map, uploaded as it is)
  if(!GW.texOwn){GW.texOwn=new THREE.DataTexture(own,MW,MH,THREE.RedFormat,THREE.UnsignedByteType);GW.texOwn.unpackAlignment=1;GW.texOwn.minFilter=GW.texOwn.magFilter=THREE.NearestFilter;GW.texOwn.generateMipmaps=false}
- GW.texOwn.needsUpdate=true;U.uOwn.value=GW.texOwn;gwMaskInit();GW.maskDirty=1;TRK.clear=1;
- // how far each point is inside the rim (8 bits over -6..6 units)
- const HW=GW.HW,HH=GW.HH,sp=new Uint8Array(HW*HH);for(let i=0;i<sp.length;i++)sp[i]=Math.max(0,Math.min(255,Math.round((GW.SD[i]+6)/12*255)));
- if(GW.texShore)GW.texShore.dispose();GW.texShore=dtex(sp,HW,HH,THREE.RedFormat,THREE.UnsignedByteType,{clamp:1});U.uShore.value=GW.texShore;
- // the ground in chunks (so what is off screen is not drawn), reaching GPAD units beyond the map
- const mat=GW.terrainMat||(GW.terrainMat=gwTerrainMat());
- const MS=QL.mesh||.5,VX=Math.round((WW+2*GPAD)/MS)+1,VZ=Math.round((WH+2*GPAD)/MS)+1,CX=4,CZ=6;
- for(let cj=0;cj<CZ;cj++)for(let ci=0;ci<CX;ci++){
-  const i0=Math.round(ci*(VX-1)/CX),i1=Math.round((ci+1)*(VX-1)/CX),j0=Math.round(cj*(VZ-1)/CZ),j1=Math.round((cj+1)*(VZ-1)/CZ),nx=i1-i0+1,nz=j1-j0+1;
-  const pos=new Float32Array(nx*nz*3),nor=new Float32Array(nx*nz*3),idx=new Uint32Array((nx-1)*(nz-1)*6);let p=0;
-  for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const x=(i0+i)*MS-GPAD,y=(j0+j)*MS-GPAD,h=gfxH(x,y),e=.25,dx=gfxH(x+e,y)-gfxH(x-e,y),dz=gfxH(x,y+e)-gfxH(x,y-e),l=1/Math.sqrt(dx*dx/(4*e*e)+dz*dz/(4*e*e)+1);
-   pos[p]=x;pos[p+1]=h;pos[p+2]=y;nor[p]=-dx/(2*e)*l;nor[p+1]=l;nor[p+2]=-dz/(2*e)*l;p+=3}
-  let q=0;for(let j=0;j<nz-1;j++)for(let i=0;i<nx-1;i++){const a=j*nx+i,b=a+1,c=a+nx,d=c+1;idx[q++]=a;idx[q++]=c;idx[q++]=b;idx[q++]=b;idx[q++]=c;idx[q++]=d}
-  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('normal',new THREE.BufferAttribute(nor,3));g.setIndex(new THREE.BufferAttribute(idx,1));
-  g.computeBoundingSphere();g.boundingSphere.radius+=1;
-  const m=new THREE.Mesh(g,mat);m.receiveShadow=true;m.castShadow=false;GFX.S.add(m);GW.chunks.push(m)}
- // the low country carries on as one flat sheet beyond the drawn ground (same material, so there is no seam)
- const fg=new THREE.PlaneGeometry(WW+1600,WH+1600,1,1);fg.rotateX(-Math.PI/2);fg.translate(WW/2,GW.low-.06,WH/2);
- GW.far=new THREE.Mesh(fg,mat);GW.far.frustumCulled=false;GW.far.receiveShadow=false;GFX.S.add(GW.far);
- // a sheet of cloud over the valley, for looks that have one
- if(th.mist.k===undefined||th.mist.k>=1){const mg=new THREE.PlaneGeometry(WW+1600,WH+1600,1,1);mg.rotateX(-Math.PI/2);mg.translate(WW/2,U.uMistY.value-U.uMistN.value*.5-.02,WH/2);
-  GW.mist=new THREE.Mesh(mg,GW.mistMat||(GW.mistMat=gwMistMat()));GW.mist.frustumCulled=false;GW.mist.renderOrder=-1;GFX.S.add(GW.mist)}
- gwRocks();gwPads();gwProps();
+ GW.texOwn.needsUpdate=true;gwMaskInit();GW.maskDirty=1;
+ // scorched land
+ if(!GW.texScar){GW.scData=new Uint8Array(MW*MH);GW.texScar=dtex(GW.scData,MW,MH,THREE.RedFormat,THREE.UnsignedByteType,{clamp:1});GW.u.uScar.value=GW.texScar}
+ else{GW.scData.fill(0);GW.texScar.needsUpdate=true}GW.scOn=0;
+ // the floor: one sheet reaching a little beyond the map (past it the screen is cleared to black anyway)
+ const mat=GW.floorMat||(GW.floorMat=gwVoidMat()),PAD=34,g=new THREE.PlaneGeometry(WW+2*PAD,WH+2*PAD,1,1);g.rotateX(-Math.PI/2);g.translate(WW/2,0,WH/2);
+ GW.floor=new THREE.Mesh(g,mat);GW.floor.frustumCulled=false;GW.floor.renderOrder=-2;GW.floor.layers.enable(GLOW);GFX.S.add(GW.floor);
+ gwPads();
  GW.built=1;GW.buildMs=performance.now()-t0}
 function gwDispose(){
- for(const m of GW.chunks){GFX.S.remove(m);m.geometry.dispose()}GW.chunks=[];
- if(GW.mist){GFX.S.remove(GW.mist);GW.mist.geometry.dispose();GW.mist=null}
- if(GW.far){GFX.S.remove(GW.far);GW.far.geometry.dispose();GW.far=null}
- if(GW.rockM){GFX.S.remove(GW.rockM);for(const o of GW.rockM.children)o.dispose&&o.dispose();GW.rockM=null}
- // pad shapes and materials are shared and kept (see carFree for why materials are not disposed)
- for(const g of GW.pads)GFX.S.remove(g);GW.pads=[];gwPropsDispose();GW.built=0}
+ if(GW.floor){GFX.S.remove(GW.floor);GW.floor.geometry.dispose();GW.floor=null}
+ for(const g of GW.pads)GFX.S.remove(g);GW.pads=[];GW.built=0}
 
-// ---- rocks: boulders on the cliffs and stones along the rim (never on the land you drive on) ----
-const _m4=new THREE.Matrix4(),_q=new THREE.Quaternion(),_e=new THREE.Euler(),_v=new THREE.Vector3(),_s=new THREE.Vector3();
-function vnoise3(x,y,z,s){const ix=Math.floor(x),iy=Math.floor(y),iz=Math.floor(z),fx=x-ix,fy=y-iy,fz=z-iz,ux=fx*fx*(3-2*fx),uy=fy*fy*(3-2*fy),uz=fz*fz*(3-2*fz),H=(a,b,c)=>hash2(a+c*57,b+c*113,s);
- const x00=H(ix,iy,iz)+(H(ix+1,iy,iz)-H(ix,iy,iz))*ux,x10=H(ix,iy+1,iz)+(H(ix+1,iy+1,iz)-H(ix,iy+1,iz))*ux,x01=H(ix,iy,iz+1)+(H(ix+1,iy,iz+1)-H(ix,iy,iz+1))*ux,x11=H(ix,iy+1,iz+1)+(H(ix+1,iy+1,iz+1)-H(ix,iy+1,iz+1))*ux;
- const y0=x00+(x10-x00)*uy,y1=x01+(x11-x01)*uy;return y0+(y1-y0)*uz}
-// a boulder: a sphere pushed in and out by layered noise (ridged, so it has edges), a flat-ish underside, and creased normals so the faces catch the light
-function rockGeo(seed,detail,sx,sy,sz,crease,tall){let g=new THREE.IcosahedronGeometry(1,detail);g.deleteAttribute('uv');g.deleteAttribute('normal');g=THREE.mergeVertices(g,1e-4);const p=g.attributes.position;
- for(let i=0;i<p.count;i++){let x=p.getX(i),y=p.getY(i),z=p.getZ(i);const l=Math.hypot(x,y,z)||1;x/=l;y/=l;z/=l;
-  let n=0,rd=0,a=.5,f=1.5;for(let o=0;o<4;o++){const v=vnoise3(x*f+seed,y*f+seed*.3,z*f,seed+o*7);n+=(v-.5)*a;rd+=(1-Math.abs(v*2-1))*a;a*=.5;f*=2.15}
-  const r=Math.max(.35,1+n*.8+(rd-.4)*.5);let yy=y*r*sy;const fl=-.3*sy;if(yy<fl)yy=fl+(yy-fl)*.12;
-  p.setXYZ(i,x*r*sx,yy*(tall?1+Math.max(0,y)*.3:1),z*r*sz)}
- g.computeVertexNormals();return crease?THREE.toCreasedNormals(g,crease):g}
-function gwRockMat(){
- const rm=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.9,metalness:0,envMapIntensity:.4});
- rm.onBeforeCompile=sh=>{sh.uniforms.uLA=GW.u.uLA;Object.assign(sh.uniforms,GW.rockU);
-  sh.vertexShader=sh.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vWN;varying vec3 vWPos;varying float vLY;').replace('#include <begin_vertex>','#include <begin_vertex>\nvWN=normalize(mat3(modelMatrix*instanceMatrix)*normal);vWPos=(modelMatrix*instanceMatrix*vec4(position,1.)).xyz;vLY=position.y;');
-  sh.fragmentShader=sh.fragmentShader.replace('#include <common>','#include <common>\nprecision highp sampler2DArray;uniform sampler2DArray uLA;uniform vec4 uRL,uCap;uniform vec3 uRT;varying vec3 vWN;varying vec3 vWPos;varying float vLY;')
-   .replace('#include <color_fragment>',`#include <color_fragment>
-   {vec3 wn=normalize(vWN);vec3 bw=abs(wn);bw=bw*bw;bw/=bw.x+bw.y+bw.z;float rs=uRL.y;
-    vec3 rc=texture(uLA,vec3(vWPos.zy*rs,uRL.x)).rgb*bw.x+texture(uLA,vec3(vWPos.xz*rs,uRL.x)).rgb*bw.y+texture(uLA,vec3(vWPos.xy*rs,uRL.x)).rgb*bw.z;
-    rc*=uRT*mix(.58,1.,smoothstep(-.25,.45,vLY));
-    float cap=smoothstep(.45,.8,wn.y)*uCap.a;
-    diffuseColor.rgb=mix(rc,uCap.rgb,cap);}`)};
- rm.customProgramCacheKey=()=>'rock3';return rm}
-function gwRocks(){
- const R=mulberry32((SEED^0xA0C5)>>>0),th=GFX.theme,L3=th.lay[3],t=tintOf(L3[6]),mi=th.mist,clouds=mi.k===undefined||mi.k>=1,vis=clouds?mi.y+mi.d*.55:-1e9;
- if(!GW.rockU)GW.rockU={uRL:{value:new THREE.Vector4()},uRT:{value:new THREE.Vector3(1,1,1)},uCap:{value:new THREE.Vector4(1,1,1,0)}};
- GW.rockU.uRL.value.set(Math.max(0,LAY.names.indexOf(L3[0])),1/(L3[1]*.4),0,0);GW.rockU.uRT.value.set(t[0],t[1],t[2]);
- if(th.cap){const c=linOf(th.cap[0]);GW.rockU.uCap.value.set(c[0],c[1],c[2],th.cap[1])}else GW.rockU.uCap.value.set(1,1,1,0);
- const rm=GW.rockMat||(GW.rockMat=gwRockMat());
- // two detailed shapes for the large rocks, two plain ones for the small stones
- const geos=GW.rockGeos||(GW.rockGeos=[rockGeo(11,2,1.1,.85,1,.5),rockGeo(23,2,1.25,.65,1.05,.45),rockGeo(37,1,.95,1.0,.95,.5),rockGeo(51,1,1,.7,1,.4)]);
- const spots=[],cen=[];
- // on the cliffs and at their foot: one large rock with smaller ones round it (only where the cliff shows above the cloud)
- for(let k=0;k<9000&&cen.length<46;k++){const x=-8+R()*(WW+16),y=-8+R()*(WH+16),d=gfxSD(x,y);if(d>-1.4||d<-9||gfxH(x,y)<vis)continue;if(cen.some(s=>Math.hypot(s.x-x,s.y-y)<7))continue;cen.push({x,y})}
- for(const c of cen){const n=2+((R()*3)|0);for(let j=0;j<n;j++){const a=R()*6.28,rr=j?.7+R()*2:0,x=c.x+Math.cos(a)*rr,y=c.y+Math.sin(a)*rr,d=gfxSD(x,y);if(d>-.9||gfxH(x,y)<vis)continue;spots.push({x,y,s:(j?.3+R()*.5:.7+R()*.9),k:j?2+((R()*2)|0):(R()*2)|0,r:R()*6.28})}}
- // boulders strewn over the low country (not under cloud)
- if(!clouds)for(let k=0,n=0;k<4000&&n<70;k++){const x=-GPAD+3+R()*(WW+2*GPAD-6),y=-GPAD+3+R()*(WH+2*GPAD-6),d=gfxSD(x,y);if(d>-9)continue;n++;spots.push({x,y,s:.4+R()*R()*1.5,k:(R()*4)|0,r:R()*6.28})}
- // small stones along the rim, just beyond the land
- for(let k=0,n=0;k<9000&&n<130;k++){const x=R()*WW,y=R()*WH,d=gfxSD(x,y);if(d>-.6||d<-1.5)continue;n++;spots.push({x,y,s:.16+R()*R()*.4,k:2+((R()*2)|0),r:R()*6.28})}
- const grp=new THREE.Group(),CELL=38,byKey=new Map();
- for(const sp of spots){const key=Math.floor((sp.x+GPAD)/CELL)+'_'+Math.floor((sp.y+GPAD)/CELL)+'_'+sp.k;let l=byKey.get(key);if(!l){l=[];byKey.set(key,l)}l.push(sp)}
- for(const [key,list] of byKey){const k=list[0].k,im=new THREE.InstancedMesh(geos[k],rm,list.length);
-  list.forEach((sp,i)=>{const h=gfxH(sp.x,sp.y);_e.set((R()-.5)*.4,sp.r,(R()-.5)*.4);_q.setFromEuler(_e);_v.set(sp.x,h-sp.s*.14,sp.y);_s.set(sp.s*1.15,sp.s,sp.s*1.15);_m4.compose(_v,_q,_s);im.setMatrixAt(i,_m4)});
-  im.castShadow=QNAME==='high';im.receiveShadow=true;im.computeBoundingSphere();grp.add(im)}
- GFX.S.add(grp);GW.rockM=grp}
-
-// ---- power pads: a steel platform with a painted floor (hazard band, the pad's sign), lamps round the rim in the owner's colour, and a small machine in the middle ----
-const PADCOL={cannon:'#ff8a3d',fort:'#4fd8ff',strike:'#ff4d5e',nitro:'#ffc83d'},PADIC={cannon:'cannon',fort:'fort',strike:'orbital',nitro:'bolt'},PADTEX={};
-function padFloorTex(t){if(PADTEX[t])return PADTEX[t];const N=512,C=N/2,c=mkc(N,N),g=c.getContext('2d'),col=PADCOL[t];
- g.fillStyle='#1d232e';g.fillRect(0,0,N,N);
- // steel plates: six wedges, slightly different, with seams
- g.save();g.translate(C,C);for(let k=0;k<6;k++){g.fillStyle='rgba(255,255,255,'+(.015+.02*(k%3))+')';g.beginPath();g.moveTo(0,0);g.arc(0,0,C,k*1.0472,(k+1)*1.0472);g.closePath();g.fill();g.strokeStyle='rgba(0,0,0,.35)';g.lineWidth=3;g.beginPath();g.moveTo(0,0);g.lineTo(Math.cos(k*1.0472)*C,Math.sin(k*1.0472)*C);g.stroke()}
- for(let i=0;i<900;i++){const r=Math.random()*C,a=Math.random()*6.283;g.fillStyle='rgba(255,255,255,'+(Math.random()*.035)+')';g.fillRect(Math.cos(a)*r,Math.sin(a)*r,1+Math.random()*3,1)}g.restore();
- // hazard band
- g.save();g.translate(C,C);g.beginPath();g.arc(0,0,C*.985,0,7);g.arc(0,0,C*.85,0,7,true);g.clip();g.fillStyle='#121419';g.fillRect(-C,-C,N,N);
- for(let k=0;k<44;k+=2){const a0=k/44*6.2832,a1=(k+1)/44*6.2832,d=.07;g.fillStyle='#f0bd2c';g.beginPath();g.moveTo(Math.cos(a0+d)*C*.85,Math.sin(a0+d)*C*.85);g.lineTo(Math.cos(a0)*C,Math.sin(a0)*C);g.lineTo(Math.cos(a1)*C,Math.sin(a1)*C);g.lineTo(Math.cos(a1+d)*C*.85,Math.sin(a1+d)*C*.85);g.closePath();g.fill()}g.restore();
- g.strokeStyle='rgba(0,0,0,.6)';g.lineWidth=4;g.beginPath();g.arc(C,C,C*.85,0,7);g.stroke();
- // the pad's colour: a ring and the sign, large, with a glow
- g.strokeStyle=col;g.lineWidth=7;g.beginPath();g.arc(C,C,C*.76,0,7);g.stroke();g.strokeStyle='rgba(255,255,255,.16)';g.lineWidth=2;g.beginPath();g.arc(C,C,C*.66,0,7);g.stroke();
- const svg=IC[PADIC[t]]||'',ds=[...svg.matchAll(/\sd="([^"]+)"/g)].map(m=>m[1]),ev=/evenodd/.test(svg);
- g.save();g.translate(C,C);const sc=N*.52/24;g.scale(sc,sc);g.translate(-12,-12);g.shadowColor=col;g.shadowBlur=26;g.fillStyle=col;
- for(const d of ds){try{g.fill(new Path2D(d),ev?'evenodd':'nonzero')}catch(e){}}g.shadowBlur=0;g.fillStyle='rgba(255,255,255,.35)';for(const d of ds){try{g.fill(new Path2D(d),ev?'evenodd':'nonzero')}catch(e){}}g.restore();
- const tx=new THREE.CanvasTexture(c);tx.colorSpace=THREE.SRGBColorSpace;tx.anisotropy=8;return PADTEX[t]=tx}
-function gwPadModel(t){
- const g=new THREE.Group(),M=prMats(),glow=new THREE.MeshBasicMaterial({color:cLin(PADCOL[t]).multiplyScalar(2.4),toneMapped:false});g.userData={};
- const add=(o,par)=>{o.castShadow=QNAME==='high';o.receiveShadow=true;(par||g).add(o);return o};
- if(t==='cannon'){ // a twin-barrel turret that scans round
-  add(prMesh([gP(cyl(.62,.74,.3,20),0,.15,0)],M.dark));const tu=new THREE.Group();tu.position.y=.3;g.add(tu);
-  add(prMesh([gP(box(.95,.42,.8,.08),0,.25,0)],M.steel),tu);add(prMesh([gP(box(.97,.08,.82,.02),0,.3,0)],new THREE.MeshStandardMaterial({color:PADCOL[t],roughness:.45,metalness:.3})),tu);
-  add(prMesh([gP(cyl(.075,.075,1.25,10),.85,.3,.17,0,0,Math.PI/2),gP(cyl(.075,.075,1.25,10),.85,.3,-.17,0,0,Math.PI/2)],M.dark),tu);
-  const tip=new THREE.Mesh(gMerge([gP(cyl(.09,.09,.08,10),1.47,.3,.17,0,0,Math.PI/2),gP(cyl(.09,.09,.08,10),1.47,.3,-.17,0,0,Math.PI/2)]),glow);tip.layers.enable(GLOW);tu.add(tip);g.userData.spin=tu}
- else if(t==='fort'){ // a pylon with a floating crystal
-  add(prMesh([gP(cyl(.62,.74,.24,6),0,.12,0)],M.dark));const F=[];for(let k=0;k<3;k++){const a=k*2.0944;F.push(gP(box(.12,.85,.42,.03),Math.cos(a)*.34,.66,Math.sin(a)*.34,0,-a,0))}add(prMesh(F,M.steel));
-  const cr=new THREE.Mesh(new THREE.OctahedronGeometry(.42,0),glow);cr.scale.set(.75,1.35,.75);cr.position.y=1.45;cr.layers.enable(GLOW);cr.castShadow=QNAME==='high';g.add(cr);g.userData.spin=cr;g.userData.bob=cr}
- else if(t==='strike'){ // an open silo with a missile inside
-  add(prMesh([gP(new THREE.TorusGeometry(.6,.12,8,24),0,.12,0,Math.PI/2,0,0)],M.dark));add(prMesh([gP(box(1.15,.07,.55,.02),0,.4,.82,-1.15,0,0),gP(box(1.15,.07,.55,.02),0,.4,-.82,1.15,0,0)],M.steel));
-  add(prMesh([gP(cyl(.22,.22,1.0,14),0,.62,0)],M.white));add(prMesh([gP(new THREE.ConeGeometry(.22,.48,14),0,1.36,0),gP(box(.04,.3,.36),0,.3,0),gP(box(.36,.3,.04),0,.3,0)],M.red));
-  const bl=new THREE.Mesh(new THREE.SphereGeometry(.08,8,6),glow);bl.position.set(.62,.25,0);bl.layers.enable(GLOW);g.add(bl);g.userData.blink=bl}
- else{ // a fuel tank and a pump with a lit bolt
-  add(prMesh([gP(new THREE.CapsuleGeometry(.32,.95,4,14),-.15,.36,.0,0,0,Math.PI/2)],M.yellow));add(prMesh([gP(box(.12,.1,1.0),-.55,.08,0),gP(box(.12,.1,1.0),.25,.08,0)],M.dark));
-  add(prMesh([gP(box(.32,.85,.32,.05),.72,.43,0)],M.dark));const b=new THREE.Mesh(gMerge([gP(box(.05,.34,.2),.89,.6,0,0,0,.35)]),glow);b.layers.enable(GLOW);g.add(b)}
- return g}
-// one model per kind of pad, built once and copied (the copies share shapes and materials)
-const PADCACHE={},PADGEO={};
-function padModelOf(t){let T=PADCACHE[t];
- if(!T){T=PADCACHE[t]=gwPadModel(t);const u=T.userData;if(u.spin)u.spin.name='pspin';if(u.bob&&u.bob!==u.spin)u.bob.name='pbob';if(u.blink)u.blink.name='pblink'}
- const m=T.clone(),u=T.userData,sp=m.getObjectByName('pspin')||null;m.userData={spin:u.spin?sp:null,bob:u.bob?(u.bob===u.spin?sp:m.getObjectByName('pbob')):null,blink:u.blink?m.getObjectByName('pblink'):null};
- m.traverse(o=>{if(o.isMesh)o.castShadow=QNAME==='high'&&!(o.layers.mask&(1<<GLOW))});return m}
+// ---- power pads: a hologram on the floor (rings that turn, the pad's sign, how much of it you hold), a column of light,
+// and the pad's machine floating above it as a hologram. The pad shows its own colour until someone takes it, then the owner's ----
+const PADCOL={cannon:'#ff8a3d',fort:'#4fd8ff',strike:'#ff4d5e',nitro:'#ffc83d'},PADIC={cannon:'cannon',fort:'fort',strike:'orbital',nitro:'bolt'},PADTEX={},PADLIN={};
+function padIconTex(t){if(PADTEX[t])return PADTEX[t];const N=256,c=mkc(N,N),g=c.getContext('2d');
+ const svg=(typeof IC!=='undefined'&&IC[PADIC[t]])||'',ds=[...svg.matchAll(/\sd="([^"]+)"/g)].map(m=>m[1]),ev=/evenodd/.test(svg);
+ g.translate(N/2,N/2);const sc=N*.86/24;g.scale(sc,sc);g.translate(-12,-12);g.fillStyle='#fff';
+ for(const d of ds){try{g.fill(new Path2D(d),ev?'evenodd':'nonzero')}catch(e){}}
+ for(const m of svg.matchAll(/<circle cx="([\d.]+)" cy="([\d.]+)" r="([\d.]+)"/g)){g.beginPath();g.arc(+m[1],+m[2],+m[3],0,7);g.fill()}
+ const tx=new THREE.CanvasTexture(c);tx.colorSpace=THREE.NoColorSpace;tx.anisotropy=4;return PADTEX[t]=tx}
+const PAD_FS=`uniform vec3 uC,uMe;uniform float uT,uP,uK,uA;uniform sampler2D uIcon;varying vec2 vUv;
+float ln(float x,float w){return smoothstep(w,0.,abs(x));}
+void main(){vec2 d=vUv*2.-1.;float r=length(d),an=atan(d.y,d.x),u=an/6.2832;
+ float ring0=ln(r-.965,.012);
+ float dash=step(.42,fract(u*28.+uT*.22))*ln(r-.905,.028);
+ float tick=step(.7,fract(u*64.-uT*.35))*ln(r-.8,.035)*.8;
+ float ring2=ln(r-.66,.012)*.8;
+ float seg=step(.5,fract(u*3.-uT*.12))*ln(r-.72,.02);
+ // how much of the pad you hold, from nothing to the half that unlocks it
+ float arc=ln(r-.845,.03)*step(fract(.25-u),uP)*step(.001,uP);
+ vec2 iv=d/.72+.5;float ic=(abs(d.x)<.36&&abs(d.y)<.36)?texture2D(uIcon,iv).r:0.;
+ float hx=(1.-smoothstep(.07,.11,length(fract(d*7.)-.5)))*smoothstep(.62,.3,r)*.22;
+ float fill=smoothstep(.62,0.,r)*.07;
+ float pul=.85+.15*sin(uT*3.);
+ vec3 cw=mix(uC,vec3(1.),.35);
+ vec3 col=cw*((ring0*1.3+dash*1.5+tick*1.1+ring2*1.1+seg*.8)*pul)+uC*(fill+hx)+cw*ic*(1.7+.5*uK)+uMe*arc*2.4;
+ gl_FragColor=vec4(col*uA*smoothstep(1.,.97,r),1.);}`;
+const BEAM_FS=`uniform vec3 uC;uniform float uT,uA;varying vec2 vUv;
+void main(){float h=vUv.y;float a=(1.-h)*(1.-h)*smoothstep(0.,.14,h);float band=pow(.5+.5*sin(h*34.-uT*5.),10.)*(1.-h)*smoothstep(0.,.1,h);
+ gl_FragColor=vec4(uC*(a*.22+band*.22)*uA,1.);}`;
+const HOLO_VS='varying vec3 vN;varying vec3 vW;void main(){vN=normalize(normalMatrix*normal);vec4 w=modelMatrix*vec4(position,1.);vW=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}';
+const HOLO_FS=`uniform vec3 uC;uniform float uT,uA;varying vec3 vN;varying vec3 vW;
+void main(){float f=1.-abs(normalize(vN).z);f=f*f;float scan=.62+.38*sin(vW.y*28.-uT*7.);float fl=.9+.1*sin(uT*29.+vW.y*4.);
+ gl_FragColor=vec4(uC*(.16+f*1.6)*scan*fl*uA,1.);}`;
+// the machine of each kind of pad, as one shape (drawn as a hologram)
+const HOLOGEO={};
+function holoGeo(t){if(HOLOGEO[t])return HOLOGEO[t];let L;
+ if(t==='cannon')L=[gP(cyl(.5,.6,.16,24),0,.08,0),gP(box(.82,.34,.66,.06),0,.36,0),gP(cyl(.075,.075,1.25,10),.72,.4,.15,0,0,Math.PI/2),gP(cyl(.075,.075,1.25,10),.72,.4,-.15,0,0,Math.PI/2)];
+ else if(t==='fort')L=[gP(new THREE.OctahedronGeometry(.48,0),0,.95,0,0,0,0,.78,1.45,.78),gP(new THREE.TorusGeometry(.7,.035,6,40),0,.95,0,Math.PI/2,0,0)];
+ else if(t==='strike'){L=[gP(cyl(.18,.18,1.0,16),0,.7,0),gP(new THREE.ConeGeometry(.18,.46,16),0,1.43,0)];for(let k=0;k<4;k++)L.push(gP(box(.04,.32,.34),Math.cos(k*1.5708)*.18,.32,Math.sin(k*1.5708)*.18,0,-k*1.5708,0))}
+ else{const s=new THREE.Shape(),P2=[[13,2],[4,14],[10,14],[9,22],[18,10],[12,10]];P2.forEach((q,i)=>{const x=(q[0]-11)*.075,y=(12-q[1])*.075;i?s.lineTo(x,y):s.moveTo(x,y)});s.closePath();
+  const eg=new THREE.ExtrudeGeometry(s,{depth:.16,bevelEnabled:false});eg.translate(0,0,-.08);L=[gP(eg,0,1.0,0)]}
+ return HOLOGEO[t]=gMerge(L)}
 function gwPads(){
- GW.pads=[];const R0=ZR*1.04;
- if(!PADGEO.base){PADGEO.base=new THREE.CylinderGeometry(R0,R0+.2,.26,64,1,true);PADGEO.top=new THREE.CircleGeometry(R0*.99,64);const L=[];for(let k=0;k<16;k++){const a=k/16*6.2832;L.push(gP(box(.2,.09,.2,.02),Math.cos(a)*R0*.925,.3,Math.sin(a)*R0*.925,0,-a,0))}PADGEO.lamps=gMerge(L);PADGEO.ring=new THREE.RingGeometry(R0*.745,R0*.775,96)}
- for(let zi=0;zi<ZN.length;zi++){const z=ZN[zi],g=new THREE.Group(),h=z.gh!==undefined?z.gh:gfxH(z.x,z.y),R=ZR*1.04;g.position.set(z.x,h+.02,z.y);
-  const base=new THREE.Mesh(PADGEO.base,new THREE.MeshStandardMaterial({color:0x2a313d,roughness:.5,metalness:.75,envMapIntensity:.7}));base.position.y=.13;base.receiveShadow=true;base.castShadow=false;
-  const top=new THREE.Mesh(PADGEO.top,new THREE.MeshStandardMaterial({map:padFloorTex(z.t),emissiveMap:padFloorTex(z.t),emissive:new THREE.Color(1,1,1),emissiveIntensity:.5,roughness:.5,metalness:.3,envMapIntensity:.7}));top.rotation.x=-Math.PI/2;top.position.y=.262;top.receiveShadow=true;
-  const lampMat=new THREE.MeshBasicMaterial({color:0xffffff,toneMapped:false});
-  const lm=new THREE.Mesh(PADGEO.lamps,lampMat);lm.layers.enable(GLOW);
-  const ringMat=new THREE.MeshBasicMaterial({color:0xffffff,toneMapped:false,transparent:true,opacity:.95}),ring=new THREE.Mesh(PADGEO.ring,ringMat);ring.rotation.x=-Math.PI/2;ring.position.y=.272;ring.layers.enable(GLOW);
-  const mdl=padModelOf(z.t);mdl.position.y=.26;mdl.scale.setScalar(.95);
-  g.add(base,top,lm,ring,mdl);g.userData={ring:ringMat,lamp:lampMat,mdl};GFX.S.add(g);GW.pads.push(g)}}
+ GW.pads=[];const R0=ZR*1.3,disc=new THREE.PlaneGeometry(R0*2,R0*2);disc.rotateX(-Math.PI/2);
+ const cg=new THREE.CylinderGeometry(R0*.82,R0*.82,7,40,1,true);cg.translate(0,3.5,0);
+ const add={transparent:true,depthWrite:false,blending:THREE.CustomBlending,blendEquation:THREE.AddEquation,blendSrc:THREE.OneFactor,blendDst:THREE.OneFactor};
+ for(let zi=0;zi<ZN.length;zi++){const z=ZN[zi],g=new THREE.Group();g.position.set(z.x,0,z.y);
+  const pu={uC:{value:new THREE.Vector3(1,1,1)},uMe:{value:new THREE.Vector3(1,1,1)},uT:GFX.U.time,uP:{value:0},uK:{value:0},uA:{value:1},uIcon:{value:padIconTex(z.t)}};
+  const pad=new THREE.Mesh(disc,new THREE.ShaderMaterial(Object.assign({uniforms:pu,vertexShader:GRND_VS,fragmentShader:PAD_FS},add)));pad.position.y=.03;pad.renderOrder=1;pad.layers.enable(GLOW);
+  const bu={uC:pu.uC,uT:GFX.U.time,uA:{value:1}};
+  const beam=new THREE.Mesh(cg,new THREE.ShaderMaterial(Object.assign({uniforms:bu,vertexShader:GRND_VS,fragmentShader:BEAM_FS,side:THREE.DoubleSide},add)));beam.renderOrder=11;
+  const hu={uC:pu.uC,uT:GFX.U.time,uA:{value:1}};
+  const holo=new THREE.Mesh(holoGeo(z.t),new THREE.ShaderMaterial(Object.assign({uniforms:hu,vertexShader:HOLO_VS,fragmentShader:HOLO_FS,side:THREE.DoubleSide},add)));holo.position.y=.8;holo.scale.setScalar(1.6);holo.renderOrder=12;holo.layers.enable(GLOW);
+  g.add(pad,beam,holo);g.userData={pu,bu,hu,holo,k:0};GFX.S.add(g);GW.pads.push(g)}}
 function gwPadTick(){
- for(let zi=0;zi<GW.pads.length;zi++){const g=GW.pads[zi],o=(typeof ZOWN!=='undefined'&&ZOWN[zi])||0,c=o?COLLIN[o]:[.9,.95,1],u=g.userData,m=u.mdl.userData,pul=.75+.25*Math.sin(GFX.time*3+zi);
-  u.lamp.color.setRGB(c[0]*pul*2.2+.04,c[1]*pul*2.2+.04,c[2]*pul*2.2+.04);u.ring.color.setRGB(c[0]*1.5*pul,c[1]*1.5*pul,c[2]*1.5*pul);u.ring.opacity=o?.95:.5;
-  if(m.spin)m.spin.rotation.y=GFX.time*(m.bob?1.2:.5)+zi;if(m.bob)m.bob.position.y=1.45+Math.sin(GFX.time*2+zi)*.1;if(m.blink)m.blink.visible=((GFX.time+zi*.3)%1)<.4}}
+ const t=GFX.time,me3=COLLIN[VS]||[1,1,1];
+ for(let zi=0;zi<GW.pads.length;zi++){const g=GW.pads[zi],z=ZN[zi];if(!z)continue;const o=(typeof ZOWN!=='undefined'&&ZOWN[zi])||0,u=g.userData,c=o?COLLIN[o]:(PADLIN[z.t]||(PADLIN[z.t]=linOf(PADCOL[z.t])));
+  u.k+=((o?1:0)-u.k)*.08;
+  u.pu.uC.value.set(c[0],c[1],c[2]);u.pu.uMe.value.set(me3[0],me3[1],me3[2]);u.pu.uK.value=u.k;
+  // your progress toward the half of the pad that unlocks it (full once it is yours)
+  const mine=o===VS&&o?1:Math.min(1,((typeof ZMY!=='undefined'&&ZMY[zi])||0)*2);u.pu.uP.value=state==='menu'?0:mine;
+  u.bu.uA.value=.55+.45*u.k;u.hu.uA.value=.75+.25*u.k;
+  u.holo.rotation.y=t*.7+zi;u.holo.position.y=.8+Math.sin(t*1.8+zi)*.15}}
 
-// ---- every frame: ownership picture, capture flashes, pads, tyre tracks, the things round the plateau ----
+// ---- every frame: coverage of the land, scorched land, capture flashes, pads ----
 function gwFrame(dt){
  if(!GW.built)return;
- GFX.U.time.value=GFX.time;gwPadTick();gwMask();trkFrame();prTick(dt);
+ GFX.U.time.value=GFX.time;gwPadTick();gwMask();gwScar();
  // capture flashes (up to 4 at a time)
- const F=GW.u.uFlash.value;for(let i=0;i<4;i++){const c=CAPW[i];if(c){const age=(clk-c.t0)/.75;F[i].set(c.x,c.y,Math.min(1,age),c.c)}else F[i].z=1}}
+ const F=GW.u.uFlash.value;for(let i=0;i<4;i++){const c=CAPW[i];if(c){const age=(clk-c.t0)/.8;F[i].set(c.x,c.y,Math.min(1,age),c.c)}else F[i].z=1}}
 // ---------- 3D renderer, part 3: the four cars. Real vehicle shapes built from code: lofted bodies, a glass house with pillars and a painted roof, wheels, lights, class gear ----------
 // Car space: +x is the nose, +y is up, +z is the right-hand side. One unit is one unit of the game map (a car is about 2.5 long).
 const CAR_L=2.5,CAR_K=1.7;   // the model is about 2.5 long; on screen it is drawn CAR_K times bigger, so the car reads at a glance
@@ -842,8 +462,8 @@ function carBuild(cl,col,skin,id){
  // soft ground effects: the dark patch right under the car, and the head-light pool (only seen at dusk and night)
  const sp=spotTex();
  C.contact=new THREE.Mesh(new THREE.PlaneGeometry(3.3,2.1),new THREE.MeshBasicMaterial({map:sp,color:0x05070c,transparent:true,opacity:.5,depthWrite:false,toneMapped:false}));C.contact.rotation.x=-Math.PI/2;C.contact.position.y=.03;C.contact.renderOrder=2;root.add(C.contact);
- C.under=new THREE.Mesh(new THREE.PlaneGeometry(3.0,1.8),new THREE.MeshBasicMaterial({map:sp,color:new THREE.Color(C.lc[0]*1.5,C.lc[1]*1.5,C.lc[2]*1.5),transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending,toneMapped:false}));C.under.rotation.x=-Math.PI/2;C.under.position.y=.05;C.under.renderOrder=3;C.under.visible=false;root.add(C.under);
- C.beam=new THREE.Mesh(new THREE.PlaneGeometry(6,3.2),new THREE.MeshBasicMaterial({map:sp,color:new THREE.Color(1.2,1.1,.9),transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending,toneMapped:false}));C.beam.rotation.x=-Math.PI/2;C.beam.position.set(4,.06,0);C.beam.renderOrder=3;root.add(C.beam);
+ C.under=new THREE.Mesh(new THREE.PlaneGeometry(3.6,2.3),new THREE.MeshBasicMaterial({map:sp,color:new THREE.Color(C.lc[0]*1.5,C.lc[1]*1.5,C.lc[2]*1.5),transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending,toneMapped:false}));C.under.rotation.x=-Math.PI/2;C.under.position.y=.05;C.under.renderOrder=3;C.under.visible=false;C.under.layers.enable(GLOW);root.add(C.under);
+ C.beam=new THREE.Mesh(new THREE.PlaneGeometry(6,3.2),new THREE.MeshBasicMaterial({map:sp,color:new THREE.Color(.95,1.05,1.25),transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending,toneMapped:false}));C.beam.rotation.x=-Math.PI/2;C.beam.position.set(4,.06,0);C.beam.renderOrder=3;root.add(C.beam);
  // exhaust flame (sprint, lunge)
  C.flames=[];for(const z of (cl===1?[-.3,.3]:[-.2,.2])){const f=new THREE.Mesh(new THREE.ConeGeometry(.09,1,8,1,true),new THREE.MeshBasicMaterial({color:new THREE.Color(2.4,1.3,.55),transparent:true,opacity:.0,depthWrite:false,blending:THREE.AdditiveBlending,toneMapped:false,side:THREE.DoubleSide}));f.rotation.z=Math.PI/2;f.position.set(D.body[0].x-.2,.3,z);f.layers.enable(GLOW);f.visible=false;root.add(f);C.flames.push(f)}
  // armour plate / fortress dome (Titan), bladestorm ring (Striker), generic shield bubble for spawn protection
@@ -861,7 +481,11 @@ function carBuild(cl,col,skin,id){
   for(let k=0;k<4;k++)for(let g=0;g<3;g++){const m=new THREE.Mesh(bg,new THREE.MeshBasicMaterial({color:new THREE.Color(Math.min(1.2,lc[0]*1.15+.06),Math.min(1.2,lc[1]*1.15+.06),Math.min(1.2,lc[2]*1.15+.06)),toneMapped:false,transparent:g>0,opacity:g===1?.5:.24,depthWrite:false}));
    if(!g){const hub=new THREE.Mesh(new THREE.CircleGeometry(.2,16),new THREE.MeshBasicMaterial({color:new THREE.Color(1.6,1.6,1.7),toneMapped:false}));hub.rotation.x=-Math.PI/2;hub.position.y=.04;m.add(hub)}
    m.scale.setScalar(g?1.05:1);m.layers.enable(GLOW);C.ring.add(m);C.ringBl.push(m)}
-  const rr=new THREE.Mesh(new THREE.RingGeometry(1.64,1.76,72),new THREE.MeshBasicMaterial({color:new THREE.Color(Math.min(1.2,lc[0]*1.2+.1),Math.min(1.2,lc[1]*1.2+.1),Math.min(1.2,lc[2]*1.2+.1)),toneMapped:false,transparent:true,opacity:.7,depthWrite:false,side:THREE.DoubleSide}));rr.rotation.x=-Math.PI/2;rr.position.y=.06;rr.layers.enable(GLOW);C.ring.add(rr);
+  const rr=new THREE.Mesh(new THREE.RingGeometry(BAL.stormR/CAR_K-.07,BAL.stormR/CAR_K+.05,96),new THREE.MeshBasicMaterial({color:new THREE.Color(Math.min(1.2,lc[0]*1.2+.1),Math.min(1.2,lc[1]*1.2+.1),Math.min(1.2,lc[2]*1.2+.1)),toneMapped:false,transparent:true,opacity:.7,depthWrite:false,side:THREE.DoubleSide}));rr.rotation.x=-Math.PI/2;rr.position.y=.06;rr.layers.enable(GLOW);C.ring.add(rr);
+  C.vortex=new THREE.Mesh(new THREE.CircleGeometry(BAL.stormR/CAR_K,64),new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.CustomBlending,blendEquation:THREE.AddEquation,blendSrc:THREE.OneFactor,blendDst:THREE.OneFactor,
+   uniforms:{uC:{value:new THREE.Vector3(lc[0],lc[1],lc[2])},uT:GFX.U.time},vertexShader:GRND_VS,
+   fragmentShader:'uniform vec3 uC;uniform float uT;varying vec2 vUv;void main(){vec2 d=vUv*2.-1.;float r=length(d),a=atan(d.y,d.x);float sw=pow(.5+.5*sin(a*5.+r*9.-uT*14.),6.);float k=smoothstep(1.,.75,r)*smoothstep(.15,.5,r);gl_FragColor=vec4(uC*(sw*.55+.08)*k,1.);}'}));
+  C.vortex.rotation.x=-Math.PI/2;C.vortex.position.y=.04;C.vortex.layers.enable(GLOW);C.ring.add(C.vortex);
   C.ring.visible=false;root.add(C.ring)}
  if(cl===1){const sg=new THREE.CylinderGeometry(1.5,1.5,.7,24,1,true,-.75,1.5);sg.rotateY(Math.PI/2);
   C.ramShield=new THREE.Mesh(sg,new THREE.MeshBasicMaterial({color:new THREE.Color(1.2,.7,.15),transparent:true,opacity:0,depthWrite:false,side:THREE.DoubleSide,toneMapped:false}));
@@ -892,7 +516,8 @@ function carFrame(C,p,dt,tm,night){
  const st=Math.max(-.5,Math.min(.5,-C.yaw*.075));for(const s of C.steer)s.rotation.y=st;
  // lights
  // by day the lamps are plain lenses; they are switched on (and glow) at dusk and at night. The red ones flare when the car turns hard.
- const lon=night>.25?1:0,brk=Math.abs(C.yaw)>2.5;C.setHeadlights(lon&&p.alive?.34*night:0);
+ const lon=night>.25?1:0,brk=Math.abs(C.yaw)>2.5;C.setHeadlights(lon&&p.alive?.15*night:0);
+ C.under.visible=!!p.alive;if(p.alive)C.under.material.opacity=.5+Math.min(.3,C.sp/110)+(p.fSpr?.2:0);
  if(lon!==C.lampOn){C.lampOn=lon;if(lon){C.mLampF.material.color.setRGB(2.0,1.95,1.75);C.mLampF.layers.enable(GLOW)}else{C.mLampF.material.color.setRGB(.8,.82,.84);C.mLampF.layers.disable(GLOW)}}
  C.mLampR.material.color.setRGB(lon?1.5+(brk?2.4:0):brk?2.6:.62,lon?.07:.04,lon?.05:.03);if(lon||brk)C.mLampR.layers.enable(GLOW);else C.mLampR.layers.disable(GLOW);
  // flames at the exhaust: sprint, lunge, ultimate
@@ -900,13 +525,13 @@ function carFrame(C,p,dt,tm,night){
  for(let i=0;i<C.flames.length;i++){const f=C.flames[i];f.visible=C.flame>.05;if(f.visible){const s=(.6+.5*Math.sin(tm*60+i*2))*C.flame,len=.8*s+.3;f.scale.set(1,len,1);f.position.x=CARS3D[C.cl].body[0].x-.1-len*.5;f.material.opacity=.8*C.flame}}
  // abilities
  const ul=p.fUlt?1:0;
- if(C.ring){C.ring.visible=!!ul;if(ul){const t=tm*7;for(let k=0;k<4;k++)for(let g=0;g<3;g++){const m=C.ringBl[k*3+g],a=t+k*1.5708-g*.2;m.position.set(Math.cos(a)*1.7,.5,Math.sin(a)*1.7);m.rotation.y=-tm*34+k}}}
+ if(C.ring){C.ring.visible=!!ul;if(ul){const t=tm*7,R=BAL.stormR/CAR_K-.05;for(let k=0;k<4;k++)for(let g=0;g<3;g++){const m=C.ringBl[k*3+g],a=t+k*1.5708-g*.2;m.position.set(Math.cos(a)*R,.5,Math.sin(a)*R);m.rotation.y=-tm*34+k;m.scale.setScalar(g?1.35:1.3)}}}
  if(C.ramShield){const on=p.fMv===2?1:0;C.ramK=(C.ramK||0)+(on-(C.ramK||0))*Math.min(1,dt*16);C.ramShield.visible=C.ramK>.03;if(C.ramShield.visible){C.ramShield.material.opacity=.62*C.ramK;C.ramShield.scale.set(1,1+.1*Math.sin(tm*40),1)}}
  const dust=th.dust||'#dfe9fb';
- // dust (or snow) thrown up by the rear wheels: a little all the time at speed, a lot when the car slides through a turn or sprints
- if(!FF&&QL.fx>.5&&p.alive&&C.sp>10){const D=CARS3D[C.cl],slide=Math.abs(C.yaw)>2.3,pr=slide?.55:(p.fSpr?.5:.16);
-  if(Math.random()<pr){const sd=slide?(C.yaw>0?-1:1):(Math.random()<.5?-1:1),rx=D.wx[1]*CAR_K,wz=D.wz*CAR_K;
-   FX.push({x:x+cs*rx-sn*wz*sd,y:z+sn*rx+cs*wz*sd,h:.25,vh:slide?1.1:.7,vx:-cs*3-sn*sd*(slide?2.5:.6),vy:-sn*3+cs*sd*(slide?2.5:.6),l:slide?.6:.45,l0:slide?.6:.45,c:dust,k:2,s:slide?.55:.4,r:Math.random()*6,vr:1})}}
+ // sparks of light off the rear wheels: when the car slides through a turn or boosts
+ if(!FF&&QL.fx>.5&&p.alive&&C.sp>10){const D=CARS3D[C.cl],slide=Math.abs(C.yaw)>2.3,pr=slide?.6:(p.fSpr?.45:0);
+  if(pr&&Math.random()<pr){const sd=slide?(C.yaw>0?-1:1):(Math.random()<.5?-1:1),rx=D.wx[1]*CAR_K,wz=D.wz*CAR_K;
+   FX.push({x:x+cs*rx-sn*wz*sd,y:z+sn*rx+cs*wz*sd,h:.12,vh:.6+Math.random(),vx:-cs*6-sn*sd*(slide?4:.8)+(Math.random()-.5)*2,vy:-sn*6+cs*sd*(slide?4:.8)+(Math.random()-.5)*2,l:.32,l0:.32,c:slide?'#ffffff':COLS[p.id]||dust,k:1,s:.12,r:0,vr:0})}}
  // spray at the sides while ramming, a speed streak while dashing
  if(!FF&&QL.fx>.3){if(p.fMv===2&&Math.random()<.7){const sd=Math.random()<.5?-1:1;FX.push({x:x+cs*1.6+Math.cos(a+1.57*sd)*1.9,y:z+sn*1.6+Math.sin(a+1.57*sd)*1.9,h:.3,vh:.8,vx:Math.cos(a+1.57*sd)*3-cs*4,vy:Math.sin(a+1.57*sd)*3-sn*4,l:.6,l0:.6,c:dust,k:2,s:.55,r:Math.random()*6,vr:1})}
   else if(p.fMv===1){FX.push({x:x-cs*1.2,y:z-sn*1.2,h:.5,vh:0,vx:0,vy:0,l:.3,l0:.3,c:COLS[p.id]||'#ff4d5e',k:1,s:1.0,r:0,vr:0})}}
@@ -917,12 +542,8 @@ function carFrame(C,p,dt,tm,night){
  C.dome.visible=da2>.01;if(C.dome.visible){const u=C.dome.material.uniforms;u.uA.value=da2;u.uT.value=tm;u.uC.value.setRGB(col[0],col[1],col[2]);const sc=(p.fInv&&p.fUlt)?1.18+.06*Math.sin(tm*8):1;C.dome.scale.set(sc,.55*sc,.8*sc)}}
 function body0(C,gp,gr,kick,tm){const b=C.body;b.rotation.set(-gr*.9-C.roll,0,gp*.9+Math.sin(tm*17+C.ph)*.004*(C.flame+.3));b.position.y=Math.abs(Math.sin(tm*13+C.ph))*.006;
  if(C.barrel)C.barrel.position.x=-kick*.2}
-// ---------- 3D renderer, part 4: trails, tyre tracks, sparks and smoke, rings, scorch marks, drifting snow ----------
-// The ground under a point: the hills, plus the small raise of land that belongs to somebody (the terrain shader does the same)
-function covJS(x,y){const fx=x*MC-.5,fy=y*MC-.5,ix=Math.floor(fx),iy=Math.floor(fy),tx=fx-ix,ty=fy-iy;
- const g=(a,b)=>{a=a<0?0:a>=MW?MW-1:a;b=b<0?0:b>=MH?MH-1:b;return own[b*MW+a]?1:0};
- return(g(ix,iy)*(1-tx)+g(ix+1,iy)*tx)*(1-ty)+(g(ix,iy+1)*(1-tx)+g(ix+1,iy+1)*tx)*ty}
-function gfxGround(x,y){return Math.max(-.2,gfxH(x,y))}
+// ---------- 3D renderer, part 4: trails, sparks and smoke, rings, ember marks ----------
+function gfxGround(x,y){return 0}
 const colOf=c=>{if(c&&c.lc)return c.lc;return linOf(c&&c[0]==='#'?c:'#ffffff')};
 
 // ---------- trails ----------
@@ -946,8 +567,8 @@ void main(){
  vec3 V=vec3(0.,1.,0.);vec3 H=normalize(L+V);float nh=max(dot(n,H),0.);float F=.04+.96*pow(1.-n.y,4.);
  vec3 col,hc=uCol;float halo=0.;float grain=1.+(hs(floor(vec2(u,v)*46.))-.5)*.05;
  if(uStyle<.5){
-  float edge=smoothstep(.6,1.,r);col=uCol*(uSunCol*lam*.66+hemi*.8)*(1.-.34*edge);
-  col+=uSunCol*pow(nh,48.)*.16+F*uHor*.16;col=mix(col,col*1.22+.02,exp(-v*v*7.)*.5);col*=grain;halo=0.;
+  float core=exp(-v*v*10.),run=.82+.18*sin(u*.8-uT*8.);
+  col=uCol*(1.05+.45*run)*(1.-.3*smoothstep(.65,1.,r))+vec3(1.)*core*.6;halo=exp(-(r-1.)*2.5)*.4*uK;
  }else if(uStyle<1.5){
   vec3 cas=vec3(.02,.025,.05)*(uSunCol*lam*.5+hemi*.4)+uSunCol*pow(nh,40.)*.55+F*uHor*.30;float cm=1.-smoothstep(.50,.64,r);
   float ch=smoothstep(.15,1.,.5+.5*sin(u*1.35-uT*9.));vec3 cc=mix(uCol*2.2,vec3(2.2),smoothstep(.42,0.,r)*.8+ch*.30);cc*=.78+.22*ch+.12;
@@ -1005,14 +626,13 @@ function trBuild(m,tr,hx,hy,vis,HW,lift){
  g.setDrawRange(0,Math.max(0,(n-2)*3));m.len=u;return n}
 // the ground rectangle the camera sees (rough, for deciding what to subdivide)
 function trVis(){const c=GFX.cam,x=c.position.x,z=c.position.z,r=Math.max(30,CAM.vw*1.5);return[CAM.x-r,CAM.y-r,CAM.x+r,CAM.y+r]}
-const TRSTY={glow:0,neon:1,fire:2,track:3};
+const TRSTY={glow:0,neon:1,fire:2};
 function trailsFrame(){
  trInit();if(!TR3.ok)return;const vis=trVis();let k=0;
  const use=(tr,hx,hy,c,st,al,kk,hw,lift)=>{if(k>=22)return;const m=trMesh(k);const n=trBuild(m,tr,hx,hy,vis,hw,lift);m.grp.visible=n>0;if(!n)return;k++;
   for(const o of [m.sh,m.ln]){const u=o.material.uniforms;u.uCol.value.set(c[0],c[1],c[2]);u.uStyle.value=TRSTY[st]|0;u.uAl.value=al;u.uK.value=kk;u.uL.value=m.len;u.uHW.value=hw}
-  m.sh.visible=st!=='track'}
- // tyre tracks in the snow, then the ghosts of trails that were just closed, then the live trails
- if(QL.hi)for(let q=1;q<=5;q++){const p=P[q];if(!p||!p.alive||!p.hist||p.hist.length<6)continue;use(p.hist,p.rx,p.ry,(GFX.theme&&GFX.theme.tread)||[.13,.2,.34],'track',p.fSlow?.5:1,1,.95,.035)}
+  m.sh.visible=false}
+ // the ghosts of trails that were just closed, then the live trails
  for(let q=1;q<=5;q++){const p=P[q];if(!p||!p.ghost)continue;const a=1-(clk-p.ghost.t0)/.4;if(a<=0){p.ghost=null;continue}use(p.ghost.tr,undefined,undefined,COLLIN[q],'glow',a,.5,.42,.07)}
  for(let q=1;q<=5;q++){const p=P[q];if(!p||!p.tr||!p.tr.length)continue;const st=(COS[q]||[])[1]||'glow',tr=(q===1&&MP)?ncTrail(p):p.tr;if(!tr.length)continue;
   use(tr,p.alive?p.rx:undefined,p.alive?p.ry:undefined,COLLIN[q],st,p.fSlow?.55:1,QL.glow?1:.6,.42,.075);
@@ -1061,153 +681,214 @@ function particlesFrame(){
  for(const S of [PT.A,PT.N]){const G=S.g;G.instanceCount=S.n;for(const n of ['iP','iV','iC','iS'])G.attributes[n].needsUpdate=true}}
 
 // ---------- rings, scorch marks, falling snow ----------
-const RG3={pool:[],max:14,sc:[],scMax:22,snow:null};
+const RG3={pool:[],max:22,sc:[],scMax:22};
 const RG_FS=`uniform vec3 uC;uniform float uP,uA;varying vec2 vUv;
 void main(){vec2 d=vUv*2.-1.;float r=length(d);float rad=.08+uP*.92;float w=.075+.06*(1.-uP);
  float ring=exp(-pow((r-rad)/w,2.)),core=exp(-pow((r-rad)/(w*.35),2.)),rim=exp(-pow((r-rad)/(w*1.9),2.));
  float fill=smoothstep(rad,rad*.1,r)*.28*(1.-uP);float edge=smoothstep(1.,.9,r);float fade=(1.-uP*uP)*uA*edge;
  float a=clamp(ring*.95+fill+rim*.32,0.,1.)*fade;
- vec3 col=mix(vec3(.03,.05,.1),uC*.85,clamp(ring*1.4+fill*2.,0.,1.));col=mix(col,vec3(1.),core*.55);
+ vec3 col=mix(vec3(.0),uC*1.1,clamp(ring*1.4+fill*2.,0.,1.));col=mix(col,vec3(1.1),core*.3);
  gl_FragColor=vec4(col*a,a);}`;
 function ringsInit(){
  if(RG3.pool.length||!GFX.ok)return;const pg=new THREE.PlaneGeometry(1,1);pg.rotateX(-Math.PI/2);
  for(let i=0;i<RG3.max;i++){const m=new THREE.Mesh(pg,new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.CustomBlending,blendEquation:THREE.AddEquation,blendSrc:THREE.OneFactor,blendDst:THREE.OneMinusSrcAlphaFactor,
-  uniforms:{uC:{value:new THREE.Vector3(1,1,1)},uP:{value:0},uA:{value:1}},vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:RG_FS}));
+  uniforms:{uC:{value:new THREE.Vector3(1,1,1)},uP:{value:0},uA:{value:1}},vertexShader:GRND_VS,fragmentShader:RG_FS}));
   m.visible=false;m.renderOrder=9;m.layers.enable(GLOW);m.frustumCulled=false;GFX.S.add(m);RG3.pool.push(m)}
+ // ember marks: the hot middle of a blast glows on the floor and cools in a few seconds (the scorched land itself is drawn by the floor)
  const sg=new THREE.PlaneGeometry(1,1);sg.rotateX(-Math.PI/2);
- for(let i=0;i<RG3.scMax;i++){const m=new THREE.Mesh(sg,new THREE.ShaderMaterial({transparent:true,depthWrite:false,uniforms:{uA:{value:1},uSeed:{value:i*7.3}},
-  vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+ for(let i=0;i<RG3.scMax;i++){const m=new THREE.Mesh(sg,new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.CustomBlending,blendEquation:THREE.AddEquation,blendSrc:THREE.OneFactor,blendDst:THREE.OneFactor,
+  uniforms:{uA:{value:1},uSeed:{value:i*7.3}},vertexShader:GRND_VS,
   fragmentShader:`uniform float uA,uSeed;varying vec2 vUv;float h(vec2 p){p=fract(p*vec2(.1031,.1030));p+=dot(p,p.yx+33.33);return fract((p.x+p.y)*p.x);}
    float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1.,0.)),f.x),mix(h(i+vec2(0.,1.)),h(i+vec2(1.,1.)),f.x),f.y);}
-   void main(){vec2 d=vUv*2.-1.;float r=length(d);float an=atan(d.y,d.x);float rag=.72+.2*n(vec2(an*2.,uSeed))+.12*n(vec2(an*7.,uSeed+3.));float body=smoothstep(rag,rag*.55,r);float soot=smoothstep(1.,.2,r)*.55;float a=max(body*.62,soot*.4)*uA*(.8+.2*n(d*9.+uSeed));gl_FragColor=vec4(vec3(.015,.018,.03)*a,a);}`}));
-  m.visible=false;m.renderOrder=3;m.frustumCulled=false;GFX.S.add(m);RG3.sc.push(m)}
- // falling snow: moved entirely on the graphics chip, always around the camera
- const N=420,pos=new Float32Array(N*3),seed=new Float32Array(N*2);for(let i=0;i<N;i++){pos[i*3]=Math.random();pos[i*3+1]=Math.random();pos[i*3+2]=Math.random();seed[i*2]=Math.random();seed[i*2+1]=Math.random()}
- const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('aS',new THREE.BufferAttribute(seed,2));g.boundingSphere=new THREE.Sphere(new THREE.Vector3(),1e5);
- RG3.snow=new THREE.Points(g,new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.CustomBlending,blendEquation:THREE.AddEquation,blendSrc:THREE.OneFactor,blendDst:THREE.OneMinusSrcAlphaFactor,
-  uniforms:{uT:GFX.U.time,uC:{value:new THREE.Vector3(30,0,30)},uBox:{value:new THREE.Vector3(70,40,90)},uPx:{value:1},uK:{value:1}},
-  vertexShader:`attribute vec2 aS;uniform float uT,uPx,uK;uniform vec3 uC,uBox;varying float vA;
-   void main(){vec3 p=position*uBox;float sp=.7+aS.x*.8;p.y-=uT*(2.2+aS.y*2.4)*sp;p.x+=uT*(1.6+aS.x)+sin(uT*.8+aS.y*30.)*.7;p.z+=uT*.6+cos(uT*.7+aS.x*20.)*.7;
-    p=mod(p,uBox);p+=uC-uBox*vec3(.5,0.,.5);vec4 mv=viewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;
-    float sz=(.07+aS.y*.09)*uPx*projectionMatrix[1][1]*.5*1000./max(-mv.z,1.);gl_PointSize=clamp(sz,1.,14.);vA=smoothstep(0.,6.,p.y)*uK*(.35+.5*aS.x);}`,
-  fragmentShader:`varying float vA;void main(){vec2 d=gl_PointCoord*2.-1.;float a=smoothstep(1.,.2,length(d))*vA;gl_FragColor=vec4(vec3(1.)*a*1.4,a);}`}));
- RG3.snow.frustumCulled=false;RG3.snow.renderOrder=10;GFX.S.add(RG3.snow)}
+   void main(){vec2 d=vUv*2.-1.;float r=length(d),an=atan(d.y,d.x);float rag=.7+.2*n(vec2(an*2.,uSeed))+.12*n(vec2(an*7.,uSeed+3.));
+    float body=smoothstep(rag,rag*.3,r),gr=n(d*6.+uSeed);float heat=body*(.55+.45*gr)*uA;
+    gl_FragColor=vec4(mix(vec3(.5,.05,.0),vec3(2.2,.75,.15),heat*uA)*heat,1.);}`}));
+  m.visible=false;m.renderOrder=3;m.frustumCulled=false;m.layers.enable(GLOW);GFX.S.add(m);RG3.sc.push(m)}}
 function ringsFrame(){
  ringsInit();if(!RG3.pool.length)return;let k=0;
- for(let i=RINGS.length-1;i>=0;i--){const r=RINGS[i],dur=r.dur||.65,age=(clk-r.t0)/dur;if(age>=1){RINGS.splice(i,1);continue}if(k>=RG3.max)continue;
-  const m=RG3.pool[k++],R=(r.r||4.6)*2,c=colOf(r.c);m.visible=true;m.position.set(r.x,gfxGround(r.x,r.y)+.08,r.y);m.scale.set(R,1,R);const u=m.material.uniforms;u.uC.value.set(c[0],c[1],c[2]);u.uP.value=age;u.uA.value=r.a||1}
+ for(let i=RINGS.length-1;i>=0;i--){const r=RINGS[i],dur=r.dur||.65,age=(clk-r.t0)/dur;if(age>=1){RINGS.splice(i,1);continue}if(age<0||k>=RG3.max)continue;
+  const m=RG3.pool[k++],R=(r.r||4.6)*2,c=colOf(r.c);m.visible=true;m.position.set(r.x,.08,r.y);m.scale.set(R,1,R);const u=m.material.uniforms;u.uC.value.set(c[0],c[1],c[2]);u.uP.value=age;u.uA.value=r.a||1}
  for(;k<RG3.max;k++)RG3.pool[k].visible=false;
- let j=0;for(let i=SCORCH.length-1;i>=0&&j<RG3.scMax;i--){const s=SCORCH[i],age=clk-s.t0;if(age>14){SCORCH.splice(i,1);continue}const m=RG3.sc[j++];m.visible=true;m.position.set(s.x,gfxGround(s.x,s.y)+.045,s.y);const R=s.r*2.3;m.scale.set(R,1,R);m.material.uniforms.uA.value=Math.min(1,age*6)*(1-Math.max(0,age-9)/5)}
- for(;j<RG3.scMax;j++)RG3.sc[j].visible=false;
- const th=GFX.theme||{night:0};RG3.snow.material.uniforms.uC.value.set(CAM.x,0,CAM.y);RG3.snow.material.uniforms.uPx.value=GFX.pr;RG3.snow.material.uniforms.uK.value=QL.fx>.5?(th.night?1:.55)*(th.snowfall||0):0;RG3.snow.visible=QL.fx>.3&&(th.snowfall||0)>0}
+ let j=0;for(let i=SCORCH.length-1;i>=0&&j<RG3.scMax;i--){const s=SCORCH[i],age=clk-s.t0;if(age>3.2){SCORCH.splice(i,1);continue}const m=RG3.sc[j++];m.visible=true;m.position.set(s.x,.045,s.y);const R=s.r*2.3;m.scale.set(R,1,R);m.material.uniforms.uA.value=Math.min(1,age*8)*Math.pow(1-age/3.2,1.6)}
+ for(;j<RG3.scMax;j++)RG3.sc[j].visible=false}
 // a capture: the ground flashes outward from the point, with a ring
-function capFlash(x,y,id,n){CAPW.push({x,y,t0:clk,c:id,n});if(CAPW.length>4)CAPW.shift();RINGS.push({x,y,t0:clk,c:COLS[id],r:Math.min(9,3+n*.012),dur:.75})}
-// ---------- 3D renderer, part 5: shells, throwing blades, drones, mines, strike markers, the ring under your own car ----------
-// The game keeps these as small lists (SHV shells, BLV blades, MSV drones, MNV mines, STV strikes); here each one gets a model, taken from a pool.
-const PJ={ok:0,shell:[],blade:[],miss:[],mine:[],strike:[],pilot:null,beam:null};
+function capFlash(x,y,id,n){CAPW.push({x,y,t0:clk,c:id,n});if(CAPW.length>4)CAPW.shift();RINGS.push({x,y,t0:clk,c:COLS[id],r:Math.min(6,2.5+n*.004),dur:.6})}
+// ---------- 3D renderer, part 5: shells, blades, drones, plasma mines, strike reticles, railgun beams, laser wires, fault lines, black holes, the ring under your car ----------
+// The game keeps these as small lists (SHV shells, BLV blades, MSV drones, MNV mines, STV strikes; WIRES, FAULTS, HOLES straight from the match);
+// here each one gets a model, taken from a pool. Everything that shines is drawn additively and also feeds the bloom (GLOW layer).
+const PJ={ok:0,shell:[],blade:[],miss:[],mine:[],strike:[],rail:[],wire:[],fault:[],hole:[],spot:[],pilot:null};
 let MARKSEL=0;   // the ring under your own car: 0 ring with arrows, 1 thin ring, 2 none
+const RAILV=[],FAULTV=[];   // beams that are fading, cracks that are still glowing (with the fault they belong to)
 const _pv=new THREE.Vector3();
 const GRND_VS='varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}';
+const ADDB={transparent:true,depthWrite:false,blending:THREE.CustomBlending,blendEquation:THREE.AddEquation,blendSrc:THREE.OneFactor,blendDst:THREE.OneFactor};
+// a strike reticle: four brackets that turn, a ring that closes in as the strike falls, a crosshair, and a flash as it lands
 const STRIKE_FS=`uniform vec3 uC;uniform float uP,uT,uA;varying vec2 vUv;
-float ln(float x,float w){return smoothstep(w,w*.3,abs(x));}
-void main(){vec2 d=vUv*2.-1.;float r=length(d);float pul=.78+.22*sin(uT*18.);
- float an=atan(d.y,d.x);
- float edge=ln(r-.9,.06)*pul;
- float ring2=ln(r-.9*uP,.05);
- float fill=smoothstep(.9*uP+.02,.0,r)*.26*uP;
- float cross=(ln(d.x,.022)+ln(d.y,.022))*smoothstep(1.,.45,r)*.8;
- float tick=ln(fract(an*3.8197+uT*.7)-.5+.4,.07)*ln(r-.78,.07)*.9;
- float line=clamp(edge+ring2+cross+tick,0.,1.);
- float halo=clamp(ln(r-.9,.14)+ln(r-.9*uP,.11),0.,1.)*.55;
- float a=clamp(line+fill+halo,0.,1.)*smoothstep(1.,.88,r)*uA;
- vec3 col=mix(vec3(.10,.0,.03),uC,clamp(line*1.1+fill*1.5,0.,1.));col=mix(col,vec3(1.,.86,.7),ring2*.6);
- gl_FragColor=vec4(col*a,a);}`;
+float ln(float x,float w){return smoothstep(w,0.,abs(x));}
+void main(){vec2 d=vUv*2.-1.;float r=length(d),an=atan(d.y,d.x);
+ float br=step(.62,fract((an+uT*1.4)/1.5708));
+ float edge=ln(r-.93,.028)*(.25+.75*br)+ln(r-.985,.01)*.5;
+ float closing=ln(r-mix(.9,.1,uP),.03)*(.45+.55*uP);
+ float cross=(ln(d.x,.014)*step(abs(d.y),.2)+ln(d.y,.014)*step(abs(d.x),.2));
+ float tick=step(.85,fract(an/6.2832*36.))*ln(r-.8,.04)*.7;
+ float fill=smoothstep(.95,0.,r)*.1*uP*uP+step(.94,uP)*smoothstep(1.,0.,r)*.35;
+ float pul=.7+.3*sin(uT*18.);
+ gl_FragColor=vec4(uC*((edge*pul+closing+cross+tick)*1.5+fill)*uA*smoothstep(1.,.97,r),1.);}`;
 const PILOT_FS=`uniform vec3 uC;uniform float uT,uS,uA,uM;varying vec2 vUv;
 float ln(float x,float w){return smoothstep(w,w*.3,abs(x));}
 void main(){vec2 d=(vUv*2.-1.);float r=length(d);float an=atan(d.y,d.x);
- float ring=ln(r-.5,mix(.024,.016,uM));
- float seg=smoothstep(.02,.0,abs(fract(an/6.2832*3.+uT*.28)-.5)-.28)*ln(r-.56,.03)*(1.-uM);
- float halo=ln(r-.5,.07)*.5*(1.-uM);
+ float ring=ln(r-.5,mix(.02,.014,uM));
+ float seg=smoothstep(.02,.0,abs(fract(an/6.2832*3.+uT*.28)-.5)-.3)*ln(r-.555,.022)*(1.-uM);
+ float halo=ln(r-.5,.06)*.4*(1.-uM);
  // chevrons running ahead (to +x in the plane's own space); the thin ring keeps a single still one
  float ch=0.;for(int k=0;k<3;k++){float u=mix(fract(uT*(.8+uS*.9)+float(k)/3.),.3,uM);float cx=.58+u*.36;float w=abs(d.y)*1.0;float s=smoothstep(.03,.0,abs(cx-d.x-w*.9))*smoothstep(.3,.0,abs(d.y))*sin(u*3.1416);ch+=s*(k==0?1.:1.-uM);}
  float line=clamp(ring*.9+seg*.8+ch*.9,0.,1.);
- float a=clamp(line+halo,0.,1.)*uA*smoothstep(1.,.9,r);
- vec3 col=mix(vec3(.04,.06,.14),uC,clamp(line*1.2,0.,1.));col=mix(col,vec3(1.),ring*.35*(1.-uM)+uM*.12);
- gl_FragColor=vec4(col*a,a);}`;
-function pjMat(fs,uni){return new THREE.ShaderMaterial({transparent:true,depthWrite:false,blending:THREE.CustomBlending,blendEquation:THREE.AddEquation,blendSrc:THREE.OneFactor,blendDst:THREE.OneMinusSrcAlphaFactor,uniforms:uni,vertexShader:GRND_VS,fragmentShader:fs})}
+ gl_FragColor=vec4(uC*(line*1.25+halo)*uA*smoothstep(1.,.9,r),1.);}`;
+// a beam of light along +x of a flat quad: a white-hot core in a coloured glow. uF: flicker (laser wire), uH: a bright head running along it (0..1, or <0 for none)
+const BEAM_FS2=`uniform vec3 uC;uniform float uA,uT,uF,uH;varying vec2 vUv;
+void main(){float v=abs(vUv.y*2.-1.);float core=exp(-v*v*90.),glow=exp(-v*v*7.)*.6+exp(-v*v*30.)*.4;
+ float fl=1.-uF*(.35+.35*sin(uT*61.+vUv.x*40.))*step(.5,fract(uT*13.));
+ float head=uH>=0.?exp(-pow((vUv.x-uH)*9.,2.))*1.6:0.;
+ float ends=smoothstep(0.,.02,vUv.x)*smoothstep(1.,.98,vUv.x);
+ gl_FragColor=vec4((uC*(glow+core*.5+head)+vec3(1.)*core*(.9+head))*uA*fl*ends,1.);}`;
+// a fault line: a jagged glowing crack along +x; the front (uD, 0..1 of the quad) is white-hot
+const FAULT_FS=`uniform vec3 uC;uniform float uA,uT,uD,uL,uS;varying vec2 vUv;
+float h1(float x){return fract(sin(x*127.1+uS)*43758.5453);}
+float n1(float x){float i=floor(x),f=fract(x);f=f*f*(3.-2.*f);return mix(h1(i),h1(i+1.),f);}
+void main(){float u=vUv.x*uL;if(vUv.x>uD)discard;
+ float j=(n1(u*1.7)-.5)*.55+(n1(u*5.3+9.)-.5)*.22;float v=vUv.y*2.-1.-j;
+ float core=exp(-v*v*140.),glow=exp(-v*v*9.)*.55;float br=1.-smoothstep(0.,.9,vUv.x/max(uD,1e-3)-1.+.15);
+ float tip=exp(-pow((vUv.x-uD)*uL*.9,2.));
+ vec3 hot=mix(uC*1.4,vec3(2.6,1.6,.7),tip);
+ gl_FragColor=vec4((hot*(glow+core)+vec3(1.)*core*(.4+tip*1.5))*uA*(.55+.45*br),1.);}`;
+// a black hole: spiral arms of light pulled in toward a black core, with a bright ring at its edge
+const HOLE_FS=`uniform vec3 uC;uniform float uT,uA,uR;varying vec2 vUv;
+void main(){vec2 d=vUv*2.-1.;float r=length(d),an=atan(d.y,d.x);
+ float sw=pow(.5+.5*sin(an*3.+2.6/(r+.08)-uT*10.),5.);
+ float disk=smoothstep(1.,.35,r)*smoothstep(uR*1.05,uR*1.9,r);
+ float ring=exp(-pow((r-uR*1.08)/.022,2.));
+ float outer=exp(-pow((r-.97)/.015,2.))*.35;
+ gl_FragColor=vec4((uC*(sw*disk*.55+disk*.04+outer)+vec3(.9,.95,1.)*ring*1.1)*uA,1.);}`;
+function pjMat(fs,uni,blend){return new THREE.ShaderMaterial(Object.assign({uniforms:uni,vertexShader:GRND_VS,fragmentShader:fs},blend||ADDB))}
 function pjInit(){
  if(PJ.ok||!GFX.ok)return;PJ.ok=1;
- const S=GFX.S,add=(o,l)=>{o.frustumCulled=false;if(l)o.layers.enable(l);S.add(o);o.visible=false;return o};
- const sp=spotTex();
- // a soft dark spot on the ground under things that fly (they sit above the snow, so without it they look as if they float)
- PJ.sh=[];for(let i=0;i<40;i++){const m=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({map:sp,color:0x0c1830,transparent:true,opacity:.34,depthWrite:false,toneMapped:false}));m.rotation.x=-Math.PI/2;m.renderOrder=2;add(m);PJ.sh.push(m)}
- PJ.shN=0;
- // shells: dark steel with a glowing tail
- const sg=gP(new THREE.CapsuleGeometry(.17,.8,3,10),0,0,0,0,0,Math.PI/2),sm=new THREE.MeshStandardMaterial({color:0x2c3340,roughness:.32,metalness:.85,envMapIntensity:1}),
+ const S=GFX.S,add=(o,l)=>{o.frustumCulled=false;if(l)o.layers.enable(l);S.add(o);o.visible=false;return o},flat=()=>{const g=new THREE.PlaneGeometry(1,1);g.rotateX(-Math.PI/2);return g};
+ const sp=spotTex(),fg=flat();
+ // a pool of light spots on the floor under things that fly
+ for(let i=0;i<36;i++){const m=new THREE.Mesh(fg,new THREE.MeshBasicMaterial({map:sp,color:0xffffff,transparent:true,opacity:1,depthWrite:false,blending:THREE.AdditiveBlending,toneMapped:false}));m.position.y=.04;m.renderOrder=2;add(m,GLOW);PJ.spot.push(m)}
+ PJ.spN=0;
+ // shells: a slug of light with a hot tail
+ const sg=gP(new THREE.CapsuleGeometry(.17,.8,3,10),0,0,0,0,0,Math.PI/2),sm=new THREE.MeshBasicMaterial({color:new THREE.Color(2.6,1.7,.9),toneMapped:false}),
   tg=new THREE.Mesh(new THREE.SphereGeometry(.2,10,8),new THREE.MeshBasicMaterial({color:new THREE.Color(3.2,1.5,.45),toneMapped:false}));
- for(let i=0;i<16;i++){const g=new THREE.Group(),m=new THREE.Mesh(sg,sm),t=tg.clone();t.position.x=-.52;t.scale.set(1.4,1,1);m.castShadow=true;g.add(m,t);add(g);t.layers.enable(GLOW);PJ.shell.push(g)}
- // blades: a four-point throwing star, in the owner's colour with a bright middle
+ for(let i=0;i<10;i++){const g=new THREE.Group(),m=new THREE.Mesh(sg,sm),t=tg.clone();t.position.x=-.52;t.scale.set(1.4,1,1);g.add(m,t);add(g);m.layers.enable(GLOW);t.layers.enable(GLOW);PJ.shell.push(g)}
+ // ricochet blades: a four-point star in the owner's colour with a white-hot middle
  const sh=new THREE.Shape(),R0=.86,R1=.28;for(let k=0;k<8;k++){const a=k/8*6.2832,r=k&1?R1:R0;k?sh.lineTo(Math.cos(a)*r,Math.sin(a)*r):sh.moveTo(Math.cos(a)*r,Math.sin(a)*r)}sh.closePath();
  const hole=new THREE.Path();hole.absarc(0,0,.13,0,6.2832,true);sh.holes.push(hole);
  const bg=new THREE.ExtrudeGeometry(sh,{depth:.07,bevelEnabled:true,bevelThickness:.02,bevelSize:.02,bevelSegments:1});bg.rotateX(-Math.PI/2);bg.translate(0,-.035,0);
- for(let i=0;i<14;i++){const g=new THREE.Group(),m1=new THREE.Mesh(bg,new THREE.MeshBasicMaterial({color:new THREE.Color(1,1,1),toneMapped:false})),m2=new THREE.Mesh(bg,new THREE.MeshBasicMaterial({color:new THREE.Color(1,1,1),toneMapped:false}));
-  m2.scale.set(1.0,1,1.0);m1.scale.set(.5,1.6,.5);g.add(m2,m1);g.userData={m1,m2};add(g);m2.layers.enable(GLOW);PJ.blade.push(g)}
- // drones: a small rocket with a flame
+ for(let i=0;i<16;i++){const g=new THREE.Group(),m1=new THREE.Mesh(bg,new THREE.MeshBasicMaterial({color:new THREE.Color(1,1,1),toneMapped:false})),m2=new THREE.Mesh(bg,new THREE.MeshBasicMaterial({color:new THREE.Color(1,1,1),toneMapped:false}));
+  m2.scale.set(1.0,1,1.0);m1.scale.set(.5,1.6,.5);g.add(m2,m1);g.userData={m1,m2};add(g);m2.layers.enable(GLOW);m1.layers.enable(GLOW);PJ.blade.push(g)}
+ // swarm drones: a small rocket in the owner's colour with a flame
  const metal=new THREE.MeshStandardMaterial({color:0xcfd6e2,roughness:.3,metalness:.85,envMapIntensity:1});
- for(let i=0;i<8;i++){const g=new THREE.Group(),col=new THREE.MeshStandardMaterial({color:0x1fbf75,roughness:.35,metalness:.3}),
+ for(let i=0;i<15;i++){const g=new THREE.Group(),col=new THREE.MeshBasicMaterial({color:0x1fbf75,toneMapped:false}),
    body=new THREE.Mesh(gP(new THREE.CylinderGeometry(.17,.17,1.05,12),0,0,0,0,0,Math.PI/2),metal),nose=new THREE.Mesh(gP(new THREE.ConeGeometry(.17,.46,12),.74,0,0,0,0,-Math.PI/2),col);
   const fins=[];for(let k=0;k<4;k++){const f=new THREE.Mesh(new THREE.BoxGeometry(.34,.03,.3),col);f.rotation.x=k*1.5708;f.position.set(-.42,Math.cos(k*1.5708)*.16,Math.sin(k*1.5708)*.16);fins.push(f)}
   const fl=new THREE.Mesh(gP(new THREE.ConeGeometry(.15,1.1,8,1,true),-.6,0,0,0,0,Math.PI/2),new THREE.MeshBasicMaterial({color:new THREE.Color(3,1.6,.6),transparent:true,opacity:.9,depthWrite:false,blending:THREE.AdditiveBlending,toneMapped:false,side:THREE.DoubleSide}));
-  g.add(body,nose,fl,...fins);g.userData={col,fl};body.castShadow=true;add(g);fl.layers.enable(GLOW);g.position.y=.6;PJ.miss.push(g)}
- // mines
- const dark=new THREE.MeshStandardMaterial({color:0x2a303c,roughness:.5,metalness:.7,envMapIntensity:.7});
- for(let i=0;i<30;i++){const g=new THREE.Group(),b=new THREE.Mesh(new THREE.CylinderGeometry(.5,.58,.16,18),dark),top=new THREE.Mesh(new THREE.CylinderGeometry(.34,.4,.07,18),dark),
-   ring=new THREE.Mesh(new THREE.TorusGeometry(.5,.055,6,24),new THREE.MeshBasicMaterial({color:0xffffff,toneMapped:false})),led=new THREE.Mesh(new THREE.SphereGeometry(.12,10,8),new THREE.MeshBasicMaterial({color:0xff2030,toneMapped:false}));
-  b.position.y=.08;top.position.y=.19;ring.rotation.x=Math.PI/2;ring.position.y=.17;led.position.y=.28;b.castShadow=true;ring.layers.enable(GLOW);led.layers.enable(GLOW);
-  const spikes=[];for(let k=0;k<6;k++){const spk=new THREE.Mesh(new THREE.BoxGeometry(.13,.13,.13),dark);const an=k/6*6.2832;spk.position.set(Math.cos(an)*.56,.1,Math.sin(an)*.56);spikes.push(spk)}
-  g.add(b,top,ring,led,...spikes);g.userData={ring,led};add(g);PJ.mine.push(g)}
- // strike markers: a ring that tightens and a column of light
+  g.add(body,nose,fl,...fins);g.userData={col,fl};add(g);fl.layers.enable(GLOW);nose.layers.enable(GLOW);g.position.y=.6;PJ.miss.push(g)}
+ // plasma mines: a dark puck holding a ball of plasma in the owner's colour
+ const dark=new THREE.MeshStandardMaterial({color:0x1a1f2a,roughness:.45,metalness:.8,envMapIntensity:.9});
+ const puck=new THREE.CylinderGeometry(.5,.6,.16,20),orbG=new THREE.SphereGeometry(.24,16,12),ringG=new THREE.TorusGeometry(.48,.045,6,28);
+ for(let i=0;i<36;i++){const g=new THREE.Group(),b=new THREE.Mesh(puck,dark),orb=new THREE.Mesh(orbG,new THREE.MeshBasicMaterial({color:0xffffff,toneMapped:false})),
+   ring=new THREE.Mesh(ringG,new THREE.MeshBasicMaterial({color:0xffffff,toneMapped:false}));
+  b.position.y=.08;orb.position.y=.3;ring.rotation.x=Math.PI/2;ring.position.y=.17;orb.layers.enable(GLOW);ring.layers.enable(GLOW);
+  g.add(b,orb,ring);g.userData={ring,orb};add(g);PJ.mine.push(g)}
+ // strike reticles and a column of light that grows as the strike falls
  const bm=new THREE.CylinderGeometry(.5,.5,50,16,1,true);bm.translate(0,25,0);
- for(let i=0;i<10;i++){const m=new THREE.Mesh(new THREE.PlaneGeometry(1,1),pjMat(STRIKE_FS,{uC:{value:new THREE.Vector3(1,.14,.2)},uP:{value:0},uT:GFX.U.time,uA:{value:1}}));m.rotation.x=-Math.PI/2;m.renderOrder=9;
-  const beam=new THREE.Mesh(bm,new THREE.ShaderMaterial({transparent:true,depthWrite:false,side:THREE.DoubleSide,blending:THREE.CustomBlending,blendEquation:THREE.AddEquation,blendSrc:THREE.OneFactor,blendDst:THREE.OneMinusSrcAlphaFactor,uniforms:{uC:{value:new THREE.Vector3(1,.2,.2)},uP:{value:0}},
-   vertexShader:'varying float vH;void main(){vH=position.y/50.;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'uniform vec3 uC;uniform float uP;varying float vH;void main(){float a=smoothstep(0.,.35,vH)*(1.-vH)*uP*uP*.55;gl_FragColor=vec4(uC*a,a);}'}));
+ for(let i=0;i<26;i++){const m=new THREE.Mesh(fg,pjMat(STRIKE_FS,{uC:{value:new THREE.Vector3(1,.14,.2)},uP:{value:0},uT:GFX.U.time,uA:{value:1}}));m.renderOrder=9;
+  const beam=new THREE.Mesh(bm,new THREE.ShaderMaterial(Object.assign({side:THREE.DoubleSide,uniforms:{uC:{value:new THREE.Vector3(1,.2,.2)},uP:{value:0}},
+   vertexShader:'varying float vH;void main(){vH=position.y/50.;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'uniform vec3 uC;uniform float uP;varying float vH;void main(){float a=smoothstep(0.,.3,vH)*(1.-vH)*uP*uP*.6;gl_FragColor=vec4(uC*a,1.);}'},ADDB)));
   const g=new THREE.Group();g.add(m,beam);g.userData={m,beam};add(g,GLOW);m.layers.enable(GLOW);beam.layers.enable(GLOW);PJ.strike.push(g)}
+ // railgun beams and laser wires (the same beam of light; a wire flickers and stands on two little posts)
+ for(let i=0;i<8;i++){const m=new THREE.Mesh(fg,pjMat(BEAM_FS2,{uC:{value:new THREE.Vector3(1,1,1)},uA:{value:1},uT:GFX.U.time,uF:{value:0},uH:{value:-1}}));m.renderOrder=10;add(m,GLOW);PJ.rail.push(m)}
+ const postG=gP(cyl(.11,.16,.9,10),0,.45,0),capG=new THREE.SphereGeometry(.22,12,8);
+ for(let i=0;i<12;i++){const g=new THREE.Group(),m=new THREE.Mesh(fg,pjMat(BEAM_FS2,{uC:{value:new THREE.Vector3(1,1,1)},uA:{value:1},uT:GFX.U.time,uF:{value:1},uH:{value:-1}}));m.renderOrder=10;m.layers.enable(GLOW);
+  const capM=new THREE.MeshBasicMaterial({color:0xffffff,toneMapped:false}),posts=[];for(let k=0;k<2;k++){const ps=new THREE.Mesh(postG,dark),cp=new THREE.Mesh(capG,capM);cp.position.y=.95;cp.layers.enable(GLOW);const pg=new THREE.Group();pg.add(ps,cp);posts.push(pg);g.add(pg)}
+  g.add(m);g.userData={m,posts,capM};add(g);PJ.wire.push(g)}
+ // fault lines
+ for(let i=0;i<8;i++){const m=new THREE.Mesh(fg,pjMat(FAULT_FS,{uC:{value:new THREE.Vector3(1,1,1)},uA:{value:1},uT:GFX.U.time,uD:{value:1},uL:{value:14},uS:{value:i*3.7}}));m.renderOrder=8;add(m,GLOW);PJ.fault.push(m)}
+ // black holes: the swirl, and a black core that hides the floor under it
+ for(let i=0;i<5;i++){const g=new THREE.Group(),sw=new THREE.Mesh(fg,pjMat(HOLE_FS,{uC:{value:new THREE.Vector3(1,1,1)},uT:GFX.U.time,uA:{value:1},uR:{value:.3}})),
+   core=new THREE.Mesh(new THREE.CircleGeometry(1,40),new THREE.MeshBasicMaterial({color:0x000000,depthWrite:false,toneMapped:false})),
+   shade=new THREE.Mesh(new THREE.PlaneGeometry(2,2),new THREE.MeshBasicMaterial({map:sp,color:0x000000,transparent:true,opacity:.92,depthWrite:false,toneMapped:false}));
+  core.rotation.x=-Math.PI/2;core.position.y=.075;core.renderOrder=9;shade.rotation.x=-Math.PI/2;shade.position.y=.07;shade.renderOrder=8;sw.position.y=.09;sw.renderOrder=10;sw.layers.enable(GLOW);core.layers.enable(GLOW);shade.layers.enable(GLOW);
+  g.add(shade,core,sw);g.userData={sw,core,shade};add(g);PJ.hole.push(g)}
  // the ring that follows the car you drive
- const pm=new THREE.Mesh(new THREE.PlaneGeometry(1,1),pjMat(PILOT_FS,{uC:{value:new THREE.Vector3(1,1,1)},uT:GFX.U.time,uS:{value:0},uA:{value:1},uM:{value:0}}));pm.rotation.x=-Math.PI/2;pm.renderOrder=6;
+ const pm=new THREE.Mesh(fg,pjMat(PILOT_FS,{uC:{value:new THREE.Vector3(1,1,1)},uT:GFX.U.time,uS:{value:0},uA:{value:1},uM:{value:0}}));pm.renderOrder=6;
  const pg=new THREE.Group();pg.add(pm);add(pg,GLOW);pm.layers.enable(GLOW);pg.userData={m:pm};PJ.pilot=pg}
 const ownerC=o=>(COLLIN[o]||[1,1,1]);
-function pjShadow(x,y,h,sz){const m=PJ.sh[PJ.shN++];if(!m)return;m.visible=true;const L=GFX.U.sunDir.value,k=h/Math.max(L.y,.25);m.position.set(x-L.x*k,gfxGround(x,y)+.05,y-L.z*k);m.scale.set(sz*1.3,sz,1)}
+// a pool spot of light on the floor, in colour c, of size sz
+function pjSpot(x,y,c,sz,a){const m=PJ.spot[PJ.spN++];if(!m)return;m.visible=true;m.position.x=x;m.position.z=y;m.scale.set(sz,1,sz);m.material.color.setRGB(c[0]*a,c[1]*a,c[2]*a)}
+// a beam from (x0,y0) to (x1,y1) at height h, w wide
+function pjBeam(m,x0,y0,x1,y1,h,w){const dx=x1-x0,dy=y1-y0,L=Math.hypot(dx,dy)||.01;m.position.set((x0+x1)/2,h,(y0+y1)/2);m.rotation.set(0,-Math.atan2(dy,dx),0);m.scale.set(L,1,w)}
+const STRIKEC=[1,.16,.24];
 function pjFrame(dt){
- pjInit();if(!PJ.ok)return;PJ.shN=0;for(const m of PJ.sh)m.visible=false;
+ pjInit();if(!PJ.ok)return;PJ.spN=0;
  // shells
- for(let i=0;i<PJ.shell.length;i++){const g=PJ.shell[i],s=SHV[i];if(!s){g.visible=false;continue}g.visible=true;const x=s[0],y=s[1];g.position.set(x,gfxGround(x,y)+.75,y);g.rotation.y=-Math.atan2(s[3],s[2]);g.scale.setScalar(1.7);pjShadow(x,y,.75,2);
-  if(QL.fx>.3&&!FF){FX.push({x:x-s[2]*.012,y:y-s[3]*.012,h:.75,vh:.2,vx:-s[2]*.02,vy:-s[3]*.02,l:.34,l0:.34,c:'#ff8a20',k:1,s:.8,r:0,vr:0});
-   if(Math.random()<.6)FX.push({x,y,h:.7,vh:.6,vx:(Math.random()-.5)*2,vy:(Math.random()-.5)*2,l:.8,l0:.8,c:'#ffffff',k:2,s:.34,r:Math.random()*6,vr:1})}}
+ for(let i=0;i<PJ.shell.length;i++){const g=PJ.shell[i],s=SHV[i];if(!s){g.visible=false;continue}g.visible=true;const x=s[0],y=s[1];g.position.set(x,.75,y);g.rotation.y=-Math.atan2(s[3],s[2]);g.scale.setScalar(1.6);pjSpot(x,y,[1,.55,.2],3,.55);
+  if(QL.fx>.3&&!FF)FX.push({x:x-s[2]*.012,y:y-s[3]*.012,h:.75,vh:.2,vx:-s[2]*.02,vy:-s[3]*.02,l:.3,l0:.3,c:'#ff8a20',k:1,s:.8,r:0,vr:0})}
  // blades
- for(let i=0;i<PJ.blade.length;i++){const g=PJ.blade[i],s=BLV[i];if(!s){g.visible=false;continue}g.visible=true;const x=s[0],y=s[1],c=ownerC(s[4]);g.position.set(x,gfxGround(x,y)+.7,y);g.rotation.y=clk*26+i;g.scale.setScalar(1.5);pjShadow(x,y,.7,1.4);
-  g.userData.m2.material.color.setRGB(c[0]*1.1+.05,c[1]*1.1+.05,c[2]*1.1+.05);g.userData.m1.material.color.setRGB(1.6,1.6,1.6);
-  if(QL.fx>.3&&!FF)FX.push({x:x-s[2]*.01,y:y-s[3]*.01,h:.7,vh:0,vx:0,vy:0,l:.34,l0:.34,c:COLS[s[4]]||'#ff4d5e',k:1,s:.8,r:0,vr:0})}
+ for(let i=0;i<PJ.blade.length;i++){const g=PJ.blade[i],s=BLV[i];if(!s){g.visible=false;continue}g.visible=true;const x=s[0],y=s[1],c=ownerC(s[4]);g.position.set(x,.7,y);g.rotation.y=clk*26+i;g.scale.setScalar(1.45);pjSpot(x,y,c,2.6,.7);
+  g.userData.m2.material.color.setRGB(c[0]*1.5+.08,c[1]*1.5+.08,c[2]*1.5+.08);g.userData.m1.material.color.setRGB(2,2,2);
+  if(QL.fx>.3&&!FF)FX.push({x:x-s[2]*.01,y:y-s[3]*.01,h:.7,vh:0,vx:0,vy:0,l:.3,l0:.3,c:COLS[s[4]]||'#ff4d5e',k:1,s:.8,r:0,vr:0})}
  // drones
- for(let i=0;i<PJ.miss.length;i++){const g=PJ.miss[i],s=MSV[i];if(!s){g.visible=false;continue}g.visible=true;const x=s[0],y=s[1],c=ownerC(s[3]);g.position.set(x,gfxGround(x,y)+.8,y);g.rotation.y=-s[2];g.scale.setScalar(1.4);pjShadow(x,y,.8,1.4);
-  g.userData.col.color.setRGB(c[0],c[1],c[2]);const f=g.userData.fl;f.scale.set(.8+.5*Math.sin(clk*70+i),1,1);
-  if(QL.fx>.3&&!FF){FX.push({x:x-Math.cos(s[2])*.8,y:y-Math.sin(s[2])*.8,h:.7,vh:.4,vx:0,vy:0,l:1,l0:1,c:'#ffffff',k:2,s:.4,r:Math.random()*6,vr:1});FX.push({x:x-Math.cos(s[2])*.7,y:y-Math.sin(s[2])*.7,h:.7,vh:0,vx:0,vy:0,l:.2,l0:.2,c:'#ff9a3a',k:1,s:.5,r:0,vr:0})}}
- // mines
- for(let i=0;i<PJ.mine.length;i++){const g=PJ.mine[i],s=MNV[i];if(!s){g.visible=false;continue}g.visible=true;const x=s[0],y=s[1],c=ownerC(s[2]),k=(s[4]?.8:1)*1.5;g.position.set(x,gfxGround(x,y)+.02,y);g.scale.setScalar(k);
-  g.userData.ring.material.color.setRGB(c[0]*1.3+.05,c[1]*1.3+.05,c[2]*1.3+.05);
-  const on=s[3]?(Math.sin(clk*14+i)>0):(Math.sin(clk*3)>.6);g.userData.led.material.color.setRGB(on?(s[3]?4:1.6):.12,on?(s[3]?.2:1.1):.05,on?.2:.05)}
- // strikes
- for(let i=0;i<PJ.strike.length;i++){const g=PJ.strike[i],s=STV[i];if(!s){g.visible=false;continue}g.visible=true;const x=s[0],y=s[1],r=s[4]||2.6,p=Math.max(0,Math.min(1,1-Math.max(0,s[2])/1.45));
-  g.position.set(x,gfxGround(x,y)+.09,y);const R=r*2.3;g.userData.m.scale.set(R,R,1);const u=g.userData.m.material.uniforms;u.uC.value.set(.95,.06+.16*p,.1);u.uP.value=p;u.uA.value=1;
-  const bu=g.userData.beam.material.uniforms;bu.uC.value.set(1,.22+.3*p,.2);bu.uP.value=p;g.userData.beam.scale.set(r*.45,1,r*.45)}
+ for(let i=0;i<PJ.miss.length;i++){const g=PJ.miss[i],s=MSV[i];if(!s){g.visible=false;continue}g.visible=true;const x=s[0],y=s[1],c=ownerC(s[3]);g.position.set(x,.8,y);g.rotation.y=-s[2];g.scale.setScalar(1.35);pjSpot(x,y,c,2.4,.6);
+  g.userData.col.color.setRGB(c[0]*1.6,c[1]*1.6,c[2]*1.6);const f=g.userData.fl;f.scale.set(.8+.5*Math.sin(clk*70+i),1,1);
+  if(QL.fx>.3&&!FF)FX.push({x:x-Math.cos(s[2])*.7,y:y-Math.sin(s[2])*.7,h:.75,vh:0,vx:0,vy:0,l:.28,l0:.28,c:COLS[s[3]]||'#ff9a3a',k:1,s:.55,r:0,vr:0})}
+ // plasma mines (armed ones pulse fast)
+ for(let i=0;i<PJ.mine.length;i++){const g=PJ.mine[i],s=MNV[i];if(!s){g.visible=false;continue}g.visible=true;const x=s[0],y=s[1],c=ownerC(s[2]),k=(s[4]?.8:1)*1.45;g.position.set(x,.02,y);g.scale.setScalar(k);
+  const pu=s[3]?.7+.6*(.5+.5*Math.sin(clk*12+i)):.45;g.userData.ring.material.color.setRGB(c[0]*1.4+.05,c[1]*1.4+.05,c[2]*1.4+.05);g.userData.orb.material.color.setRGB(c[0]*2.2*pu+.2,c[1]*2.2*pu+.2,c[2]*2.2*pu+.2);
+  g.userData.orb.scale.setScalar(.85+.25*pu);pjSpot(x,y,c,2.2*k,.35*pu)}
+ // strikes: red for a rival's, your colour for your own
+ for(let i=0;i<PJ.strike.length;i++){const g=PJ.strike[i],s=STV[i];if(!s){g.visible=false;continue}g.visible=true;const x=s[0],y=s[1],r=s[4]||2.6,p=Math.max(0,Math.min(1,1-Math.max(0,s[2])/1.4)),c=s[3]===VS&&!RPL?ownerC(VS):STRIKEC;
+  g.position.set(x,.09,y);const R=r*2.25;g.userData.m.scale.set(R,1,R);const u=g.userData.m.material.uniforms;u.uC.value.set(c[0],c[1],c[2]);u.uP.value=p;u.uA.value=Math.min(1,p*4+.3);
+  const bu=g.userData.beam.material.uniforms;bu.uC.value.set(c[0]*1.2,c[1]*1.2+.1,c[2]*1.2+.1);bu.uP.value=p;g.userData.beam.scale.set(r*.4,1,r*.4)}
+ // railgun beams (fired in the last half second)
+ {let k=0;for(let i=RAILV.length-1;i>=0;i--){const b=RAILV[i],age=(clk-b.t0)/.5;if(age>=1){RAILV.splice(i,1);continue}if(k>=PJ.rail.length)continue;const m=PJ.rail[k++];m.visible=true;
+   pjBeam(m,b.x0,b.y0,b.x1,b.y1,.7,1.6*(1-age*.6));const u=m.material.uniforms;u.uC.value.set(b.c[0]*1.3,b.c[1]*1.3,b.c[2]*1.3);u.uA.value=Math.pow(1-age,1.5)*1.3;u.uH.value=age<.35?age/.35:-1}
+  for(;k<PJ.rail.length;k++)PJ.rail[k].visible=false}
+ // laser wires
+ {let k=0;for(const w of WIRES){if(k>=PJ.wire.length)break;const g=PJ.wire[k++],c=ownerC(w.o),u=g.userData;g.visible=true;g.position.set(0,0,0);
+   pjBeam(u.m,w.x1,w.y1,w.x2,w.y2,.62,1.1);const mu=u.m.material.uniforms,fade=Math.min(1,w.t/.6);mu.uC.value.set(c[0]*1.4,c[1]*1.4,c[2]*1.4);mu.uA.value=fade*(w.t<1.2?(.6+.4*Math.sin(clk*40)):1);
+   u.posts[0].position.set(w.x1,0,w.y1);u.posts[1].position.set(w.x2,0,w.y2);u.capM.color.setRGB(c[0]*2.4+.3,c[1]*2.4+.3,c[2]*2.4+.3);
+   pjSpot(w.x1,w.y1,c,2,.5);pjSpot(w.x2,w.y2,c,2,.5)}
+  for(;k<PJ.wire.length;k++)PJ.wire[k].visible=false}
+ // fault lines: the crack races ahead, then glows for a moment once it stops
+ {for(const f of FAULTS){if(!FAULTV.some(v=>v.f===f))FAULTV.push({f,x:f.x,y:f.y,c:f.c,s:f.s,o:f.o,d:f.d,end:0})}
+  let k=0;for(let i=FAULTV.length-1;i>=0;i--){const v=FAULTV[i];if(!v.end&&!FAULTS.includes(v.f)){v.end=clk;v.d=Math.max(v.d,v.f.d)}if(!v.end)v.d=v.f.d;
+   const age=v.end?(clk-v.end)/.9:0;if(age>=1){FAULTV.splice(i,1);continue}const dd=Math.min(v.d,v.f.e===undefined?BAL.faultL:v.f.e);if(k>=PJ.fault.length)continue;const m=PJ.fault[k++],L=BAL.faultL,c=ownerC(v.o);m.visible=true;
+   pjBeam(m,v.x,v.y,v.x+v.c*L,v.y+v.s*L,.06,2.2);const u=m.material.uniforms;u.uC.value.set(c[0],c[1],c[2]);u.uD.value=Math.max(.001,dd/L);u.uL.value=L;u.uA.value=Math.pow(1-age,1.3);
+   if(!v.end&&!FF&&QL.fx>.3){const fx=v.x+v.c*dd,fy=v.y+v.s*dd;for(let j=0;j<2;j++){const a=Math.random()*6.28;FX.push({x:fx,y:fy,h:.2,vh:2+Math.random()*3,vx:Math.cos(a)*3+v.c*6,vy:Math.sin(a)*3+v.s*6,l:.5,l0:.5,c:j?'#ffd27a':COLS[v.o]||'#ffb020',k:j?4:3,s:j?.18:.16,r:Math.random()*6,vr:8})}}}
+  for(;k<PJ.fault.length;k++)PJ.fault[k].visible=false}
+ // black holes
+ {let k=0;for(const h of HOLES){if(k>=PJ.hole.length)break;const g=PJ.hole[k++],u=g.userData,c=ownerC(h.o),R=Math.max(.5,(h.r||1)*1.9),life=Math.min(1,h.t/.35);g.visible=true;g.position.set(h.x,0,h.y);
+   u.sw.scale.set(R*2,1,R*2);const su=u.sw.material.uniforms;su.uC.value.set(c[0]*1.3,c[1]*1.3,c[2]*1.3);su.uR.value=BAL.holeCore*1.15/R;su.uA.value=life;u.core.scale.setScalar(BAL.holeCore*1.15*(.6+.4*life));u.shade.scale.setScalar(R*.85*life);
+   if(!FF&&QL.fx>.3)for(let j=0;j<3;j++){const a=Math.random()*6.283,rr=R*(.7+Math.random()*.4),px=h.x+Math.cos(a)*rr,py=h.y+Math.sin(a)*rr,tx=-Math.sin(a),ty=Math.cos(a);
+    FX.push({x:px,y:py,h:.15,vh:0,vx:tx*9-Math.cos(a)*7,vy:ty*9-Math.sin(a)*7,l:.35,l0:.35,c:j?COLS[h.o]||'#ffffff':'#ffffff',k:1,s:.2,r:0,vr:0})}}
+  for(;k<PJ.hole.length;k++)PJ.hole[k].visible=false}
+ for(let i=PJ.spN;i<PJ.spot.length;i++)PJ.spot[i].visible=false;
  // your own car's ring
  const pg=PJ.pilot,mp=me;if(pg){const show=mp&&mp.alive&&(state==='play'||state==='replay')&&VS>=1&&MARKSEL<2;pg.visible=!!show;
-  if(show){pg.position.set(mp.rx,gfxGround(mp.rx,mp.ry)+.07,mp.ry);pg.rotation.y=-mp.ra;const R=10,m=pg.userData.m;m.scale.set(R,R,1);const u=m.material.uniforms,c=COLLIN[VS]||[1,1,1];u.uC.value.set(Math.min(1,c[0]*1.1+.12),Math.min(1,c[1]*1.1+.12),Math.min(1,c[2]*1.1+.12));u.uS.value=(boost&&en>0)?1:0;u.uA.value=.9;u.uM.value=MARKSEL===1?1:0}}}
-// the burst when a car is lost: flames, smoke and a scorch mark; the car itself tumbles and shrinks (see carsFrame)
+  if(show){pg.position.set(mp.rx,.07,mp.ry);pg.rotation.y=-mp.ra;const R=10,m=pg.userData.m;m.scale.set(R,1,R);const u=m.material.uniforms,c=COLLIN[VS]||[1,1,1];u.uC.value.set(Math.min(1.2,c[0]*1.2+.12),Math.min(1.2,c[1]*1.2+.12),Math.min(1.2,c[2]*1.2+.12));u.uS.value=(boost&&en>0)?1:0;u.uA.value=.85;u.uM.value=MARKSEL===1?1:0}}}
+// a railgun shot: the beam (drawn for half a second), sparks along it and a flash where it stops
+function railFx(id,x0,y0,x1,y1){if(FF||!GFX.ok)return;const c=ownerC(id);RAILV.push({x0,y0,x1,y1,c,t0:clk});if(RAILV.length>8)RAILV.shift();
+ const L=Math.hypot(x1-x0,y1-y0)||1,ux=(x1-x0)/L,uy=(y1-y0)/L,n=Math.round(L*.9*QL.fx);
+ for(let i=0;i<n;i++){const t=Math.random()*L,a=Math.random()*6.28,v=1+Math.random()*3;FX.push({x:x0+ux*t,y:y0+uy*t,h:.7,vh:Math.random()*2,vx:Math.cos(a)*v+ux*4,vy:Math.sin(a)*v+uy*4,l:.4,l0:.4,c:Math.random()<.5?'#ffffff':COLS[id]||'#5ee1ff',k:1,s:.14,r:0,vr:0})}
+ burst(x1,y1,COLS[id]||'#ffffff',16,10,.6);RINGS.push({x:x1,y:y1,t0:clk,c:COLS[id],r:2.4,dur:.35});RINGS.push({x:x0,y:y0,t0:clk,c:'#ffffff',r:1.8,dur:.25})}
+// the burst when a car is lost: sparks, a flash and an ember mark; the car itself tumbles and shrinks (see carsFrame)
 function wreckFx(p){const w=p.wreck;if(!w||w.fx)return;w.fx=1;if(FF)return;const c=COLS[p.id];
- for(let i=0;i<12*QL.fx;i++){const a=Math.random()*6.28,v=2+Math.random()*7;FX.push({x:w.x,y:w.y,h:.5,vh:2+Math.random()*5,vx:Math.cos(a)*v,vy:Math.sin(a)*v,l:.7+Math.random()*.8,l0:1.4,c:Math.random()<.5?'#ff9a3a':'#ffd070',k:4,s:.2,r:0,vr:0})}
- for(let i=0;i<7*QL.fx;i++){const a=Math.random()*6.28,v=Math.random()*2.4;FX.push({x:w.x,y:w.y,h:.5,vh:1.4+Math.random()*1.6,vx:Math.cos(a)*v,vy:Math.sin(a)*v,l:1.2+Math.random()*.9,l0:2,c:'#3a4050',k:2,s:.6+Math.random()*.6,r:Math.random()*6,vr:1})}
- FX.push({x:w.x,y:w.y,h:.8,vh:0,vx:0,vy:0,l:.28,l0:.28,c:'#fff0cc',k:0,s:4.6,r:0,vr:0});
- SCORCH.push({x:w.x,y:w.y,r:1.5,t0:clk});if(SCORCH.length>22)SCORCH.shift();RINGS.push({x:w.x,y:w.y,t0:clk,c,r:4.2,dur:.6})}
+ for(let i=0;i<14*QL.fx;i++){const a=Math.random()*6.28,v=2+Math.random()*8;FX.push({x:w.x,y:w.y,h:.5,vh:2+Math.random()*5,vx:Math.cos(a)*v,vy:Math.sin(a)*v,l:.6+Math.random()*.7,l0:1.3,c:Math.random()<.5?c:'#ffffff',k:Math.random()<.5?1:4,s:.18,r:0,vr:0})}
+ for(let i=0;i<5*QL.fx;i++){const a=Math.random()*6.28,v=Math.random()*2.4;FX.push({x:w.x,y:w.y,h:.5,vh:1.4+Math.random()*1.6,vx:Math.cos(a)*v,vy:Math.sin(a)*v,l:1+Math.random()*.8,l0:1.8,c:'#262c3a',k:2,s:.6+Math.random()*.6,r:Math.random()*6,vr:1})}
+ FX.push({x:w.x,y:w.y,h:.8,vh:0,vx:0,vy:0,l:.26,l0:.26,c:'#ffffff',k:0,s:4.6,r:0,vr:0});
+ SCORCH.push({x:w.x,y:w.y,r:1.5,t0:clk});if(SCORCH.length>22)SCORCH.shift();RINGS.push({x:w.x,y:w.y,t0:clk,c,r:4.6,dur:.55})}
 // ---------- 3D renderer, part 6: screen size, the camera, the cars on screen and one frame; plain 2D picture for phones without WebGL2 ----------
 let LASTRB=-9,CAPW=[],TEXOK=0,SPDFX=0,HURT=0,CAMK=1;
 const CP={pitch:66*Math.PI/180,fov:34};
@@ -1228,11 +909,11 @@ function fit(){if(IS_SRV)return;const wr=$('wrap');vw=Math.max(200,wr.clientWidt
 function camStep(dt){const t=camTarget(),fy=CAM.fy===undefined?.5:CAM.fy;
  const asp=vw/vh,tv=Math.tan(CP.fov*Math.PI/360),thh=tv*asp;
  if(t){const k=1-Math.exp(-dt*8);
-  const la=state==='menu'?0:3.4+(boost&&en>0?1.4:0),ax=(t.ra!==undefined?Math.cos(t.ra):0)*la,ay=(t.ra!==undefined?Math.sin(t.ra):0)*la;
+  const la=state==='menu'?0:4.8+(boost&&en>0?2.2:0),ax=(t.ra!==undefined?Math.cos(t.ra):0)*la,ay=(t.ra!==undefined?Math.sin(t.ra):0)*la;
   CAM.lx=(CAM.lx||0)+(ax-(CAM.lx||0))*(1-Math.exp(-dt*2.2));CAM.ly=(CAM.ly||0)+(ay-(CAM.ly||0))*(1-Math.exp(-dt*2.2));
   const hh0=(CAM.d||50)*tv/Math.sin(CP.pitch);
   CAM.x+=(t.rx+CAM.lx-CAM.x)*k;CAM.y+=(t.ry+CAM.ly+(.5-fy)*2*hh0-CAM.y)*k}
- const area=(CN[VS]||0)/(MC*MC),V=(state==='menu'?42:Math.min(45,29+Math.sqrt(area)*.3+(boost&&en>0?2.6:0)))/CAMK;CAM.vz+=(V-CAM.vz)*(1-Math.exp(-dt*2));
+ const area=(CN[VS]||0)/(MC*MC),V=(state==='menu'?54:Math.min(58,39+Math.sqrt(area)*.22+(boost&&en>0?3.2:0)))/CAMK;CAM.vz+=(V-CAM.vz)*(1-Math.exp(-dt*2));
  const d=asp<1?CAM.vz/(2*thh):CAM.vz*Math.sin(CP.pitch)/(2*tv);CAM.d=d;CAM.z=Math.min(vw,vh)/CAM.vz;
  const hw=thh*d,hh=tv*d/Math.sin(CP.pitch);
  CAM.x=hw*2>WW+6?WW/2:Math.min(WW+3-hw,Math.max(hw-3,CAM.x));CAM.y=hh*2>WH+6?WH/2:Math.min(WH+3-hh,Math.max(hh-3,CAM.y))}
@@ -1248,26 +929,31 @@ function camApply(dt){
   const fn=d*(th.fogN/48),ff=d*(th.fogF/48);GFX.S.fog.near=fn;GFX.S.fog.far=ff;GFX.U.fogNear.value=fn;GFX.U.fogFar.value=ff}}
 
 // ---------- when territory changes: the ground picture, the minimap and the capture flash ----------
+let LANDV=-1,MINIT=-9,MINID=0;
 function rebuildLand(){if(IS_SRV)return;
- if(PREV&&me&&state==='play'){let n=0;for(let i=0;i<own.length;i++)if(own[i]===VS&&PREV[i]!==VS)n++;
-  if(n>20&&me.alive)capFlash(me.rx,me.ry,VS,n)}
- if(GFX.ok){if(GW.texOwn)GW.texOwn.needsUpdate=true;GW.maskDirty=1}else fbPaint();
- PREV=own.slice();ZMY=ZN.map(z=>{let n=0;for(let k=0;k<z.c.length;k++)if(own[z.c[k]]===VS)n++;return z.c.length?n/z.c.length:0});
+ // your land count (kept by the match offline, counted online) decides the capture flash
+ {let c=0;if(!MP)c=CNI[VS]||0;else for(let i=0;i<own.length;i++)if(own[i]===VS)c++;
+  if(LANDV>=0&&c-LANDV>20&&me&&me.alive&&state==='play')capFlash(me.rx,me.ry,VS,c-LANDV);LANDV=c}
+ if(GFX.ok){if(GW.texOwn)GW.texOwn.needsUpdate=true;GW.maskDirty=1;GW.scDirty=1}else fbPaint();
+ ZMY=ZN.map(z=>{let n=0;for(let k=0;k<z.c.length;k++)if(own[z.c[k]]===VS)n++;return z.c.length?n/z.c.length:0});
+ MINID=1;miniPaint()}
+// the minimap picture: the arena dark, land in the owners' colours, outside the arena clear
+function miniPaint(force){if(!MINID||(!force&&clk-MINIT<.15&&MINIT>=0))return;MINID=0;MINIT=clk;
  if(!MINI){MINI=mkc(WW*2,WH*2);MINI.g=MINI.getContext('2d');MINI.img=MINI.g.createImageData(WW*2,WH*2);MINI.cl=COLS.map(c=>c?rgbOf(c):[200,214,232])}
- MINI.land=(GFX.theme&&GFX.theme.mini)||[218,229,243];MINI.out=[38,44,56];
- {const d=MINI.img.data,cl=MINI.cl,W2=WW*2;for(let y=0;y<WH*2;y++){const r=((y*1.5+.75)|0)*MW;for(let x=0;x<W2;x++){const i=r+((x*1.5+.75)|0),c=own[i]?cl[own[i]]:(ISL[i]?MINI.land:MINI.out),k=(y*W2+x)*4;d[k]=c[0];d[k+1]=c[1];d[k+2]=c[2];d[k+3]=255}}
-  MINI.g.putImageData(MINI.img,0,0)}}
+ const L=(GFX.theme&&GFX.theme.mini)||[16,20,32],d=MINI.img.data,cl=MINI.cl,W2=WW*2;
+ for(let y=0;y<WH*2;y++){const r=((y*1.5+.75)|0)*MW;for(let x=0;x<W2;x++){const i=r+((x*1.5+.75)|0),o=own[i],k=(y*W2+x)*4;
+  if(o){const c=cl[o];d[k]=c[0];d[k+1]=c[1];d[k+2]=c[2];d[k+3]=235}else if(ISL[i]){d[k]=L[0];d[k+1]=L[1];d[k+2]=L[2];d[k+3]=225}else d[k+3]=0}}
+ MINI.g.putImageData(MINI.img,0,0)}
 function buildIsland(){if(IS_SRV||!LANDI)return;
- LASTRB=-9;PREV=null;FLASH=null;CAPW.length=0;SCORCH.length=0;RINGS.length=0;
- for(let i=1;i<=5;i++){const p=P[i];if(p){p.hist=[];p.ghost=null;p.wreck=null}}
+ LASTRB=-9;LANDV=-1;MINID=1;FLASH=null;CAPW.length=0;RAILV.length=0;FAULTV.length=0;SCORCH.length=0;RINGS.length=0;
+ for(let i=1;i<=5;i++){const p=P[i];if(p){p.ghost=null;p.wreck=null}}
  if(GFX.ok){tierApply();gwBuild();try{GFX.R.compile(GFX.S,GFX.cam)}catch(e){}}else fbMap();
  MDIRTY=true}
 
 // ---------- loading steps for the start screen ----------
 function buildTexSteps(){return[
  ['Starting the 3D engine...',()=>{const ok=gfxInit($('gl'));if(ok){gfxSetTheme(gfxThemeFor(1));fit()}else{$('gl').style.display='none';TEXOK=1}}],
- ['Unpacking the ground...',async()=>{if(!GFX.ok)return;await layLoad(async(k,n)=>{if(typeof BSTEP==='function')BSTEP(20+Math.round(k/n*26),'Unpacking the ground... '+k+'/'+n);await tick()});if(LAY.miss)setTimeout(()=>{try{toast(LAY.miss+' ground pictures did not load: the ground will look plain',6000)}catch(e){}},1500)}],
- ['Raising the plateau...',()=>{if(!GFX.ok)return;genMap(20241008);gwBuild();gfxSetTheme(gfxThemeFor(SEED))}],
+ ['Building the arena...',()=>{if(!GFX.ok)return;genMap(20241008);gwBuild();gfxSetTheme(0)}],
  ['Tuning the engines...',()=>{if(!GFX.ok)return;trInit();ptInit();ringsInit();pjInit();for(let c=0;c<4;c++){const C=carBuild(c,CLS[c].col,'sport',0);C.root.position.set(WW/2+c*3,0,WH/2);GFX.S.add(C.root);CARI[0]=CARI[0]||[];CARI[0].push(C)}
    // every shader the game uses is built now, behind the loading screen: the scene, the shadow pass, the glow and finishing passes (one real frame does the last ones)
    camSet(WW/2+4,WH/2);camApply(0);try{GFX.R.compile(GFX.S,GFX.cam);gfxRender(GFX.S,GFX.cam)}catch(e){}
@@ -1287,8 +973,6 @@ function carsFrame(dt){
   if(!C||C.key!==key){if(C){GFX.S.remove(C.root);carFree(C)}C=CARI[q]=carBuild(cl,COLS[q],skin,q);C.key=key;GFX.S.add(C.root);C.lastA=p.ra||0;C.px=undefined}
   C.root.visible=true;
   if(p.alive){
-   // a little history of where the car has been, for the tyre tracks
-   {const h=p.hist||(p.hist=[]),n=h.length;if(!n||Math.hypot(p.rx-h[n-2],p.ry-h[n-1])>.4){if(n&&Math.hypot(p.rx-h[n-2],p.ry-h[n-1])>3)h.length=0;h.push(p.rx,p.ry);if(h.length>360)h.splice(0,2)}}
    const born=p.born!==undefined?clk-p.born:9,sc=born<.4?.35+.65*Math.sin(born/.4*1.5708):1;
    carFrame(C,p,dt,clk,night);C.root.scale.setScalar(sc*CAR_K);
    if(born<.5&&!p.bfx&&!FF){p.bfx=1;RINGS.push({x:p.rx,y:p.ry,t0:clk,c:COLS[q],r:3.2,dur:.55})}if(born>.6)p.bfx=0}
@@ -1313,14 +997,14 @@ let FBC=null,FBL=null;
 function fbMap(){if(!FBC)FBC=mkc(MW,MH);
  const m=mkc(MW,MH),g=m.getContext('2d'),img=g.createImageData(MW,MH),d=img.data;for(let i=0;i<ISL.length;i++){const k=i*4,v=ISL[i]?255:0;d[k]=d[k+1]=d[k+2]=v;d[k+3]=255}g.putImageData(img,0,0);
  FBL=mkc(MW*3,MH*3);const b=FBL.getContext('2d');b.imageSmoothingEnabled=true;b.imageSmoothingQuality='high';b.filter='blur(5px) contrast(9)';b.drawImage(m,0,0,MW*3,MH*3);b.filter='none';
- const id=b.getImageData(0,0,MW*3,MH*3),q=id.data;for(let i=0;i<q.length;i+=4){const l=q[i]/255;q[i]=30+(236-30)*l;q[i+1]=96+(242-96)*l;q[i+2]=140+(250-140)*l;q[i+3]=255}b.putImageData(id,0,0);
+ const id=b.getImageData(0,0,MW*3,MH*3),q=id.data;for(let i=0;i<q.length;i+=4){const l=q[i]/255,e=Math.max(0,1-Math.abs(l-.5)*6);q[i]=4+10*l+40*e;q[i+1]=6+14*l+150*e;q[i+2]=10+24*l+190*e;q[i+3]=255}b.putImageData(id,0,0);
  fbPaint()}
 function fbPaint(){if(!FBC)return;const g=FBC.getContext('2d'),img=g.createImageData(MW,MH),d=img.data,cl=COLS.map(c=>c?rgbOf(c):[0,0,0]);
  for(let i=0;i<own.length;i++){const o=own[i],k=i*4;if(o){const c=cl[o];d[k]=c[0]*.85+30;d[k+1]=c[1]*.85+30;d[k+2]=c[2]*.85+30;d[k+3]=255}}
  g.putImageData(img,0,0)}
 function frame2d(dt){
  const asp=vw/vh;CAM.vz=44;CAM.z=Math.min(vw,vh)/CAM.vz;camStep2d(dt);const z=CAM.z,ox=vw/2-CAM.x*z,oy=vh/2-CAM.y*z;
- ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#1e6088';ctx.fillRect(0,0,cv.width,cv.height);
+ ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#000000';ctx.fillRect(0,0,cv.width,cv.height);
  ctx.setTransform(dpr*z,0,0,dpr*z,dpr*ox,dpr*oy);ctx.imageSmoothingEnabled=true;
  if(FBL)ctx.drawImage(FBL,0,0,WW,WH);if(FBC)ctx.drawImage(FBC,0,0,WW,WH);
  ctx.lineCap=ctx.lineJoin='round';
@@ -1339,6 +1023,7 @@ function draw(){
  if(!TEXOK&&!GFX.ok)buildTexAll();
  const dt=Math.max(0,Math.min(.1,clk-(draw.lt===undefined?clk:draw.lt)));draw.lt=clk;
  if(MDIRTY&&(clk-LASTRB>=.05||LASTRB<0)){rebuildLand();MDIRTY=false;LASTRB=clk}
+ miniPaint();
  if(GFX.ok&&GFX.mode==='world'){ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,cv.width,cv.height);frame3d(dt)}
  else if(GFX.ok&&GFX.mode==='garage')garageFrame(dt);
  else if(!GFX.ok)frame2d(dt);
@@ -1355,8 +1040,8 @@ function ggPlatTex(){const N=512,c=mkc(N,N),g=c.getContext('2d');g.fillStyle='#2
  g.lineWidth=1;g.strokeStyle='rgba(150,195,255,.13)';for(let k=0;k<48;k++){const a=k/48*6.2832;g.beginPath();g.moveTo(Math.cos(a)*100,Math.sin(a)*100);g.lineTo(Math.cos(a)*212,Math.sin(a)*212);g.stroke()}
  g.fillStyle='rgba(0,0,0,.18)';g.beginPath();g.arc(0,0,92,0,6.2832);g.fill();
  const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;return t}
-function ggFloorTex(){const N=512,c=mkc(N,N),g=c.getContext('2d');g.fillStyle=rg(g,N/2,N/2,0,N/2,N/2,N/2,[[0,'#27508f'],[.3,'#18386f'],[.62,'#0c1f46'],[1,'#040a1a']]);g.fillRect(0,0,N,N);
- g.translate(N/2,N/2);g.strokeStyle='rgba(120,180,255,.10)';g.lineWidth=1.2;for(let r=40;r<N/2;r+=34){g.beginPath();g.arc(0,0,r,0,6.2832);g.stroke()}
+function ggFloorTex(){const N=512,c=mkc(N,N),g=c.getContext('2d');g.fillStyle=rg(g,N/2,N/2,0,N/2,N/2,N/2,[[0,'#0f2650'],[.3,'#081736'],[.62,'#030a1c'],[1,'#000000']]);g.fillRect(0,0,N,N);
+ g.translate(N/2,N/2);g.strokeStyle='rgba(56,180,255,.16)';g.lineWidth=1.2;for(let r=40;r<N/2;r+=34){g.beginPath();g.arc(0,0,r,0,6.2832);g.stroke()}
  for(let k=0;k<32;k++){const a=k/32*6.2832;g.beginPath();g.moveTo(Math.cos(a)*40,Math.sin(a)*40);g.lineTo(Math.cos(a)*N/2,Math.sin(a)*N/2);g.stroke()}
  const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;return t}
 function ggTickTex(){const N=512,c=mkc(N,N),g=c.getContext('2d');g.translate(N/2,N/2);g.strokeStyle='#fff';g.lineCap='round';
@@ -1366,9 +1051,9 @@ function ggTickTex(){const N=512,c=mkc(N,N),g=c.getContext('2d');g.translate(N/2
 function ggInit(){
  if(GG.S||!GFX.ok)return;
  const S=GG.S=new THREE.Scene(),R0=2.75;
- S.background=cLin('#071022');S.fog=new THREE.Fog(cLin('#071022'),16,46);
+ S.background=cLin('#01030a');S.fog=new THREE.Fog(cLin('#01030a'),16,46);
  GG.cam=new THREE.PerspectiveCamera(30,1,.5,90);
- S.environment=gfxEnv(GTH[2]);S.environmentIntensity=.95;
+ S.environment=gfxEnv(GTH[0]);S.environmentIntensity=.95;
  // light: a warm key from the front right with shadows, cold and pink edge lights from behind, a soft fill
  const sun=GG.sun=new THREE.DirectionalLight(0xfff0dc,3.4);sun.position.set(4.5,8,5.5);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);
  const sc=sun.shadow.camera;sc.near=2;sc.far=26;sc.left=-4.2;sc.right=4.2;sc.top=4.2;sc.bottom=-4.2;sun.shadow.bias=-.0005;sun.shadow.normalBias=.02;sun.shadow.radius=3;S.add(sun,sun.target);

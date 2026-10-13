@@ -9,7 +9,7 @@ function loop(t){requestAnimationFrame(loop);
  rush();autoQuality(raw);musicTick(dt);
  if(MP&&state==='play'&&(hudT+=dt)>.25){hudT=0;hud(1)}
  draw();
- abHud();updatePowDock(state==='play');if(typeof labTick==='function')labTick();
+ abHud();updatePowDock(state==='play');
  if(RPL&&(++rpT2%5===0))rpProg();
  if(SET.fps)fpsTick(raw,performance.now()-p0)}
 // ---------- picture quality ----------
@@ -25,7 +25,7 @@ function autoQuality(raw){
  if(QC.grace>0){QC.grace--;return}
  QC.w.push(raw);if(QC.w.length<60)return;
  const a=QC.w.slice().sort((x,y)=>x-y);QC.w.length=0;
- const p10=a[6],p90=a[54],hz=p10<.0115?120:60,fT=1/hz;QC.hz=hz;
+ const p10=a[6],p90=a[54],hz=p10<.0078?144:p10<.0115?120:60,fT=1/hz;QC.hz=hz;
  if(p10>.028&&p90<.04)return;
  let slow=0;for(const v of a)if(v>fT*1.4)slow++;
  const bad=slow>=9,great=slow<=1&&p90<fT*1.2;
@@ -83,7 +83,6 @@ function SEEDMOOD(){return(SEED>>>0)%3}
 const tick=()=>new Promise(r=>requestAnimationFrame(()=>setTimeout(r,0)));
 const BSTEP=(p,t)=>{const b=document.querySelector('#bbar i');if(b)b.style.width=p+'%';$('bmsg').textContent=t};
 async function bootRun(skip){
- if(typeof labLoad==='function')labLoad();
  grainCss();BSTEP(6,'Warming up the engines...');await tick();
  fit();readSafe();BSTEP(14,'Starting the 3D engine...');await tick();
  if(typeof buildTexSteps==='function'){const st=buildTexSteps();for(let i=0;i<st.length;i++){BSTEP(14+Math.round(i/st.length*52),st[i][0]);await tick();await st[i][1]()}}
@@ -111,39 +110,32 @@ function bootWM(w,dp){const key=w+'@'+dp;if(WMS[key])return WMS[key];
  g.font='900 italic '+f1+'px '+WF;g.lineWidth=f1*.13;g.strokeStyle='#0a1030';g.strokeText('TERRITORY',0,y1);let gr=g.createLinearGradient(0,y1-f1*.8,0,y1);gr.addColorStop(0,'#ffffff');gr.addColorStop(1,'#a9c6ff');g.fillStyle=gr;g.fillText('TERRITORY',0,y1);
  g.font='900 italic '+f2+'px '+WF;g.lineWidth=f2*.11;g.strokeStyle='#1a0a30';g.strokeText('CONTROL',0,y2);const tw=g.measureText('CONTROL').width;gr=g.createLinearGradient(-tw/2,0,tw/2,0);gr.addColorStop(0,'#ffbf4a');gr.addColorStop(.5,'#ff5d7b');gr.addColorStop(1,'#a56bff');g.fillStyle=gr;g.fillText('CONTROL',0,y2);g.restore();
  const c2=mk2(w,H2);return WMS[key]={w,dp,c,c2,H:H2,f1,f2,y2}}
-// ---------- the loading screen: polar night with an aurora, glaciers and drifting snow ----------
+// ---------- the loading screen: the void, a neon floor running toward a glowing horizon ----------
 let BGC=null,BGK='',STARS=null;
 function bootStatic(w,h,dp){const c=mkc(Math.round(w*dp),Math.round(h*dp)),g=c.getContext('2d');g.scale(dp,dp);
- g.fillStyle=lg(g,0,0,0,h,[[0,'#02050c'],[.34,'#06122c'],[.58,'#0c2554'],[.65,'#173f78'],[.67,'#0b2044'],[1,'#030812']]);g.fillRect(0,0,w,h);
- g.fillStyle=rg(g,w/2,h*.66,0,w/2,h*.66,w*.85,[[0,'rgba(100,180,255,.34)'],[1,'rgba(100,180,255,0)']]);g.fillRect(0,h*.28,w,h*.72);
- const R=mulberry32(4242);
- const ridge=(y0,amp,ph,col,rim)=>{const pts=[];for(let x=-12;x<=w+12;x+=12){const n=Math.abs(Math.sin(x*.0042+ph))*amp+(Math.sin(x*.0113+ph*2)*.5+.5)*amp*.55+R()*amp*.28;pts.push([x,y0-n])}
-  g.beginPath();g.moveTo(-12,h);for(const p of pts)g.lineTo(p[0],p[1]);g.lineTo(w+12,h);g.closePath();g.fillStyle=col;g.fill();
-  g.beginPath();pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.strokeStyle=rim;g.lineWidth=1.3;g.stroke()};
- ridge(h*.68,h*.085,1.3,'#0b1e40','rgba(160,210,255,.38)');ridge(h*.715,h*.06,4.1,'#071530','rgba(130,190,255,.3)');
- g.fillStyle=lg(g,0,h*.73,0,h,[[0,'#1c3d6c'],[.2,'#12294f'],[1,'#030812']]);g.fillRect(0,h*.73,w,h*.27);
- // soft drifts on the snowfield
- for(let i=0;i<14;i++){const x=R()*w,y=h*(.76+R()*.2),rx=w*(.15+R()*.25),ry=h*(.012+R()*.02);g.fillStyle='rgba(190,225,255,'+(.04+R()*.05)+')';g.beginPath();g.ellipse(x,y,rx,ry,0,0,7);g.fill()}
- STARS=[];for(let i=0;i<110;i++)STARS.push([R()*w,R()*h*.55,.5+R()*1.1,R()*6.28,.4+R()*1.2]);
+ g.fillStyle='#000';g.fillRect(0,0,w,h);
+ const hy=h*.6;
+ g.fillStyle=rg(g,w/2,hy,0,w/2,hy,Math.max(w,h)*.8,[[0,'rgba(56,216,255,.2)'],[.35,'rgba(42,108,255,.08)'],[1,'rgba(0,0,0,0)']]);g.fillRect(0,0,w,h);
+ // the floor: lines running to the vanishing point
+ g.strokeStyle='rgba(42,108,255,.4)';g.lineWidth=1;
+ for(let i=-24;i<=24;i++){g.globalAlpha=.25+.5*(1-Math.abs(i)/24);g.beginPath();g.moveTo(w/2+i*w*.035,hy);g.lineTo(w/2+i*w*.42,h);g.stroke()}
+ g.globalAlpha=1;g.fillStyle=lg(g,0,hy-h*.02,0,hy+h*.06,[[0,'rgba(0,0,0,0)'],[.4,'rgba(0,0,0,.65)'],[1,'rgba(0,0,0,0)']]);g.fillRect(0,hy-h*.02,w,h*.08);
+ const R=mulberry32(4242);STARS=[];for(let i=0;i<70;i++)STARS.push([R()*w,R()*hy*.95,.4+R()*.9,R()*6.28,.4+R()*1.2]);
  return c}
-function bootAurora(g,w,h,s){g.save();g.globalCompositeOperation='lighter';
- const bands=[['60,255,176',.9,.0021,.7,h*.25],['70,200,255',.7,.0027,1.1,h*.31],['170,115,255',.55,.0019,1.6,h*.22]];
- bands.forEach((b,k)=>{const col=b[0],al=b[1],fq=b[2],sp=b[3],base=b[4];
-  for(let x=0;x<=w;x+=8){const ph=x*fq*6.28,top=base+Math.sin(ph+s*sp*.6+k)*h*.05+Math.sin(ph*2.3-s*sp*.4)*h*.03,len=h*(.17+.1*Math.sin(ph*1.7+s*sp+k*2)),br=.5+.5*Math.sin(ph*3.1+s*.8+k);
-   const gr=g.createLinearGradient(0,top,0,top+len);gr.addColorStop(0,'rgba('+col+',0)');gr.addColorStop(.35,'rgba('+col+','+(al*.24*br).toFixed(3)+')');gr.addColorStop(1,'rgba('+col+',0)');g.fillStyle=gr;g.fillRect(x,top,8.5,len)}});
+// the rows of the floor slide toward you, and the horizon breathes
+function bootFloor(g,w,h,s){const hy=h*.6;g.save();g.globalCompositeOperation='lighter';
+ for(let k=0;k<16;k++){const u=((k+s*.9)%16)/16,t=u*u,y=hy+(h-hy)*t;g.strokeStyle='rgba(42,108,255,'+(.08+.5*t).toFixed(3)+')';g.lineWidth=1+t;g.beginPath();g.moveTo(0,y);g.lineTo(w,y);g.stroke()}
+ const pul=.75+.25*Math.sin(s*1.6);g.strokeStyle='rgba(110,230,255,'+(.75*pul).toFixed(3)+')';g.lineWidth=1.6;g.shadowColor='#38d8ff';g.shadowBlur=14*pul;g.beginPath();g.moveTo(0,hy);g.lineTo(w,hy);g.stroke();
  g.restore()}
 function bootDraw(t){const c=$('bl');if(!c||$('boot').className==='h'){return}
  const dp=Math.min(devicePixelRatio||1,2),w=innerWidth,h=innerHeight;if(c.width!==Math.round(w*dp)||c.height!==Math.round(h*dp)){c.width=Math.round(w*dp);c.height=Math.round(h*dp)}
  const g=c.getContext('2d');g.setTransform(dp,0,0,dp,0,0);
  const bk=w+'x'+h+'@'+dp;if(!BGC||BGK!==bk){BGC=bootStatic(w,h,dp);BGK=bk}
  const s=t/1000;g.drawImage(BGC,0,0,w,h);
- for(const st of STARS){g.globalAlpha=.25+.55*(.5+.5*Math.sin(s*st[4]+st[3]));g.fillStyle='#dbe9ff';g.beginPath();g.arc(st[0],st[1],st[2],0,7);g.fill()}g.globalAlpha=1;
- bootAurora(g,w,h,s);
- // snow drifting across
- g.fillStyle='#ffffff';for(let i=0;i<54;i++){const hh=((i*73856093)^(i*19349663))>>>0,sp=.25+(hh%100)/160,x=((hh%997)/997*w+s*(14+sp*20)+Math.sin(s*.6+i)*14)%w,y=(((hh>>8)%991)/991*h+s*(26+sp*40))%h,r=.8+(hh%7)*.38;g.globalAlpha=.22+(hh%5)*.1;g.beginPath();g.arc(x,y,r,0,7);g.fill()}
- g.globalAlpha=1;
- const vg=g.createRadialGradient(w/2,h*.4,Math.min(w,h)*.14,w/2,h*.45,Math.max(w,h)*.74);vg.addColorStop(0,'rgba(2,4,10,.2)');vg.addColorStop(.55,'rgba(2,4,10,.08)');vg.addColorStop(1,'rgba(1,2,6,.7)');g.fillStyle=vg;g.fillRect(0,0,w,h);
- g.fillStyle=lg(g,0,h*.62,0,h,[[0,'rgba(2,4,10,0)'],[1,'rgba(2,4,10,.78)']]);g.fillRect(0,h*.62,w,h*.38);
+ for(const st of STARS){g.globalAlpha=.15+.45*(.5+.5*Math.sin(s*st[4]+st[3]));g.fillStyle='#9fd8ff';g.beginPath();g.arc(st[0],st[1],st[2],0,7);g.fill()}g.globalAlpha=1;
+ bootFloor(g,w,h,s);
+ const vg=g.createRadialGradient(w/2,h*.4,Math.min(w,h)*.14,w/2,h*.45,Math.max(w,h)*.74);vg.addColorStop(0,'rgba(0,0,0,.1)');vg.addColorStop(.55,'rgba(0,0,0,.05)');vg.addColorStop(1,'rgba(0,0,0,.7)');g.fillStyle=vg;g.fillRect(0,0,w,h);
+ g.fillStyle=lg(g,0,h*.66,0,h,[[0,'rgba(0,0,0,0)'],[1,'rgba(0,0,0,.72)']]);g.fillRect(0,h*.66,w,h*.34);
  // emblem: the loop starts and ends at the home square
  const R=Math.min(w*.8,h*.5)*.27,cx=w/2,cy=h*.3,per=4.6,k=Math.floor(s/per),ph=(s%per)/per,col=COLS[k%5+1],run=Math.min(1,ph/.62);
  const rp=u=>{const a=1.5708+u*6.2832,rx=R*(1+.12*Math.sin(a*3+1)*Math.sin(u*3.1416)),ry=R*(1+.1*Math.cos(a*2)*Math.sin(u*3.1416));return[cx+Math.cos(a)*rx,cy+Math.sin(a)*ry]};

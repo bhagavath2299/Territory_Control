@@ -251,47 +251,18 @@ function ncTrail(p){if(p.id!==1||!MP||!NC.alive)return p.tr;if(PC.q.length)retur
 // World units map to the scene as x -> x, y -> z (north is -z), height -> y. The camera looks down from the south with north at the top of the screen.
 const GLOW=1;   // layer number of objects that also draw into the glow pass
 const GFX={ok:0,R:null,S:null,cam:null,w:0,h:0,pr:1,scale:1,time:0,theme:null,thIdx:0,mode:'world',stats:{calls:0,tris:0,ms:0,fps:0},hdr:0,
- U:{time:{value:0},sunDir:{value:null},sunCol:{value:null},fogCol:{value:null},fogNear:{value:60},fogFar:{value:240},camPos:{value:null},
+ U:{time:{value:0},glowPass:{value:0},sunDir:{value:null},sunCol:{value:null},fogCol:{value:null},fogNear:{value:60},fogFar:{value:240},camPos:{value:null},
   skyTop:{value:null},skyHor:{value:null},cloud:{value:null}}};
-// ---------- looks. Each is a complete place: its ground materials and where they lie, its light, its air and its finishing ----------
-// az / el: where the sun is (degrees; az 225 = from the north-west). All colours are sRGB hex.
-// lay: the four ground materials [name, size of one repeat in units, size of the second (turned) copy, how much of the second copy, strength of the fine relief, roughness, tint].
-//      Number 0 is the base. 1 and 2 lie on top where their rule says so. 3 is the rock of the cliffs.
-// msk: the rule of materials 1..3: weights for [slope, height, huge patches, large patches, small patches, hollows, rim of the plateau, cliff], then [offset, from, to, edge].
-//      The rule adds up the weighted inputs; the material shows between "from" and "to". edge > 0: it comes through at its own high points first; edge < 0: it fills the hollows of what is below.
-// rel: the shape of the land (big hills, ridges, dunes, depth of the cliffs). ter: how owned land is painted. mist: the valley round the plateau. trk: tyre tracks.
-const TERDEF={solid:.92,tex:.14,slab:.55,rim:.2,emis:.05,rough:.62,det:.22,bevel:.9,hill:.5};
-// ways to draw owned land that the player can choose between (set over the look's own values)
-const TERSTY=[{},{slab:0,rim:.34,tex:0,det:0,hill:.12,bevel:.4},{slab:1.15,rim:.1,hill:.4}];
-let TERSEL=0;
+// ---------- the look: a neon arena floating in a black void ----------
+// One look for every match (v19). az / el: where the key light comes from (degrees). All colours are sRGB hex.
+// The floor is drawn by its own shader (see gwVoidMat): a black floor with a faint grid, a glowing rim round the arena, land in the owners' colours with bright edges.
+// night: car lamps on. glow: strength of the bloom. env: how much the studio reflections show on the cars.
 const GTH=[
- {n:'Glacier Plateau',key:'glacier',az:166,el:33,sun:'#fff2e0',sunI:4.7,sky:'#9cc2ff',gnd:'#c6d6ee',hemiI:.66,fog:'#cddff4',fogN:90,fogF:320,
-  top:'#3a76dc',hor:'#cfe2f8',expo:.84,sat:1.06,con:1.08,vig:.16,glow:.26,tint:[1.01,1,.99],env:.55,night:0,
-  lay:[['snow',13,41,.5,1.0,.78,[1.03,1.03,1.03]],['ice',21,49,.45,.8,.2,[.92,1.0,1.08]],['gravel',10,27,.5,1.2,.9,[.42,.44,.5]],['rock',13,13,0,1,.88,[.56,.6,.7]]],
-  msk:[null,[-.9,-.5,1.0,.35, .15,.9,0,-3, 0,1.3,1.62,-.25],[1.3,0,0,.2, .25,0,.5,0, 0,.8,1.05,.15],[1.5,0,0,0, .12,0,0,.22, 0,.72,1.1,.1]],
-  rel:{big:4.8,rid:1.0,dn:.3,df:.085,dw:3.4,ds:.62,cliff:13},relK:1.5,macro:.07,cav:.3,spark:1,wrap:1,cloud:.2,bnc:[.13,.17,.25],
-  mist:{c:'#a9c2e6',s:'#7f9fcf',i:.95,y:-15.5,d:11,k:.62,n:0},trk:{c:[.74,.82,.95],k:.6,n:1.1},tread:[.13,.2,.34],dust:'#eef4ff',snowfall:.5,cap:['#f2f6fc',1],mini:[226,234,246],ter:{}},
- {n:'Highland Meadow',key:'highland',az:168,el:38,sun:'#fff1d8',sunI:4.6,sky:'#a4c4f0',gnd:'#8d9a70',hemiI:.86,fog:'#cfdcec',fogN:90,fogF:320,
-  top:'#3f7fd8',hor:'#d6e6f6',expo:1.24,sat:1.06,con:1.05,vig:.16,glow:.22,tint:[1.01,1,.98],env:.5,night:0,
-  lay:[['grass',9,31,.55,1.0,.86,[1,1,1]],['gravel',9,23,.5,1.1,.9,[1,.98,.95]],['mossrock',24,24,0,1.3,.86,[1,1,1]],['rock',13,13,0,1,.88,[.82,.8,.76]]],
-  msk:[null,[0,0,.45,.9, .3,0,.4,0, 0,1.08,1.26,-.2],[1.7,.45,.35,0, .1,0,0,0, 0,.82,1.2,.3],[1.25,0,0,0, .12,0,0,.42, 0,.86,1.25,.1]],
-  rel:{big:5.6,rid:1.4,dn:.12,cliff:13},relK:1.5,macro:.34,cav:.2,spark:0,wrap:0,cloud:.3,bnc:[.15,.17,.12],
-  mist:{c:'#eef4fb',s:'#a3b7d4',i:1.0,y:-10,d:6.5,k:1,n:2.4},trk:{c:[.66,.62,.54],k:.5,n:.8},tread:[.11,.09,.06],dust:'#b9a888',snowfall:0,cap:null,mini:[132,152,92],ter:{}},
- {n:'Red Mesa',key:'mesa',az:170,el:32,sun:'#ffe2b8',sunI:5.0,sky:'#a9c4ee',gnd:'#c98f6a',hemiI:.72,fog:'#ecd2b6',fogN:90,fogF:320,
-  top:'#4a7fd0',hor:'#f0d6b4',expo:1.04,sat:1.05,con:1.06,vig:.18,glow:.24,tint:[1.02,1,.97],env:.5,night:.05,
-  lay:[['cracked',13,37,.5,1.1,.84,[1,1,1]],['sand',12,31,.5,.9,.9,[1.0,.8,.7]],['gravel',9,23,.5,1.1,.9,[1.1,.8,.62]],['rock',13,13,0,1,.88,[1.25,.78,.55]]],
-  msk:[null,[-.7,-1.0,.8,.35, .06,.3,0,0, 1.0,1.42,1.7,-.25],[1.4,0,0,.25, .3,0,.4,0, 0,.8,1.05,.15],[1.5,0,0,0, .12,0,0,.22, 0,.72,1.1,.1]],
-  rel:{big:4.6,rid:1.7,dn:.15,cliff:14},relK:1.5,macro:.16,cav:.2,spark:0,wrap:0,cloud:.22,bnc:[.24,.17,.12],
-  mist:{c:'#e9cdb0',s:'#dcbf9f',i:.9,y:-16.5,d:11,k:.55,n:0},trk:{c:[.8,.74,.68],k:.5,n:.8},tread:[.2,.1,.06],dust:'#d9a67a',snowfall:0,cap:null,mini:[206,160,122],ter:{}},
- {n:'Dune Sea',key:'dunes',az:172,el:33,sun:'#ffe9c4',sunI:5.0,sky:'#a8c8f0',gnd:'#d8c09a',hemiI:.7,fog:'#eedcbc',fogN:90,fogF:320,
-  top:'#4a82d6',hor:'#f2deb8',expo:.98,sat:1.04,con:1.06,vig:.18,glow:.24,tint:[1.02,1,.97],env:.5,night:.08,
-  lay:[['sand',15,43,.55,.85,.92,[1,1,1]],['gravel',9,23,.5,1.0,.9,[1.25,1.12,.92]],['cracked',12,30,.5,1.0,.86,[.98,.95,.86]],['rock',13,13,0,1,.88,[1.15,.98,.76]]],
-  msk:[null,[0,-.9,.5,.3, .1,0,0,0, .9,1.2,1.4,.15],[-1,0,.3,1.0, 0,.5,0,0, 0,1.14,1.26,-.15],[1.0,0,0,0, .1,0,0,.62, 0,1.02,1.4,.1]],
-  rel:{big:3.2,rid:.2,dn:1.9,df:.06,dw:4.2,ds:.72,dk:1,cliff:12},relK:1.6,macro:.1,cav:.14,spark:0,wrap:0,cloud:.2,bnc:[.25,.21,.14],
-  mist:{c:'#ecd9b8',s:'#e2cda8',i:.95,y:-14.5,d:10,k:.55,n:0},trk:{c:[.82,.78,.7],k:.5,n:1.0},tread:[.24,.18,.1],dust:'#dcc394',snowfall:0,cap:null,mini:[212,190,150],ter:{}}];
-// which looks the match seed picks from. LOOKSEL >= 0 pins one look (the prototype's look picker).
-let GTHSET=[0,1,2,3],LOOKSEL=-1;
-function gfxThemeFor(seed){if(LOOKSEL>=0&&GTH[LOOKSEL])return LOOKSEL;const k=(seed>>>0)%GTHSET.length;return GTHSET[k]}
+ {n:'Neon Void',key:'void',az:205,el:62,sun:'#c4d2ff',sunI:3.0,sky:'#4a5a8a',gnd:'#05060a',hemiI:.95,fog:'#000000',fogN:120,fogF:330,
+  top:'#020308',hor:'#070a14',expo:1.0,sat:1.12,con:1.06,vig:.36,glow:.82,tint:[1,1,1.02],env:1.0,night:1,
+  edge:'#38d8ff',grid:'#2a6cff',tread:[.05,.12,.25],dust:'#8fe6ff',snowfall:0,mini:[20,30,54]}];
+let LOOKSEL=-1;
+function gfxThemeFor(seed){return 0}
 const sunVec=(az,el)=>{const a=az*Math.PI/180,e=el*Math.PI/180;return new THREE.Vector3(Math.cos(e)*Math.cos(a),Math.sin(e),Math.cos(e)*Math.sin(a))};
 const cLin=h=>{const l=linOf(h);return new THREE.Color().setRGB(l[0],l[1],l[2],THREE.LinearSRGBColorSpace)};
 
@@ -330,56 +301,23 @@ function gfxTextures(){
  T.cloud=T.noise;
  GFX.tex=T}
 
-// ---------- ground materials: scanned textures (colour + height), decoded once at start-up and packed into two texture arrays ----------
-// arrA: colour with the height in alpha. arrN: the fine normal made from the height (x, y), how hollow the spot is (z).
-const LAY={N:0,names:[],arrA:null,arrN:null,ok:0};
-function layImg(src){return new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>rej(new Error('ground texture did not load'));im.src=src})}
-function layArr(data,N,D,srgb){const t=new THREE.Texture();t.isDataArrayTexture=true;t.image={data,width:N,height:N,depth:D};t.format=THREE.RGBAFormat;t.type=THREE.UnsignedByteType;
- t.wrapS=t.wrapT=THREE.RepeatWrapping;t.wrapR=THREE.ClampToEdgeWrapping;t.magFilter=THREE.LinearFilter;t.minFilter=THREE.LinearMipmapLinearFilter;t.generateMipmaps=true;t.flipY=false;t.unpackAlignment=1;
- t.colorSpace=srgb?THREE.SRGBColorSpace:THREE.NoColorSpace;t.anisotropy=Math.min(4,GFX.R.capabilities.getMaxAnisotropy());t.layerUpdates=new Set();t.needsUpdate=true;return t}
-function layPack(A,B,d,N,pa,ph){const o=d*N*N*4,h=new Float32Array(N*N),bl=new Float32Array(N*N),tmp=new Float32Array(N*N),K=6*N/1024,R=Math.max(2,Math.round(N/170));
- for(let i=0;i<N*N;i++){h[i]=ph[i*4]/255;A[o+i*4]=pa[i*4];A[o+i*4+1]=pa[i*4+1];A[o+i*4+2]=pa[i*4+2];A[o+i*4+3]=ph[i*4]}
- // the surroundings of every point (a wrapped box blur, twice), to tell hollows from bumps
- const box=(src,dst,dx,dy)=>{for(let y=0;y<N;y++)for(let x=0;x<N;x++){let c=0;for(let k=-R;k<=R;k++)c+=src[((y+k*dy+N)%N)*N+((x+k*dx+N)%N)];dst[y*N+x]=c/(2*R+1)}};
- box(h,tmp,1,0);box(tmp,bl,0,1);
- for(let y=0;y<N;y++)for(let x=0;x<N;x++){const i=y*N+x,xm=(x+N-1)%N,xp=(x+1)%N,ym=(y+N-1)%N,yp=(y+1)%N,dx=(h[y*N+xp]-h[y*N+xm])*K,dy=(h[yp*N+x]-h[ym*N+x])*K,l=1/Math.sqrt(dx*dx+dy*dy+1),k=o+i*4;
-  B[k]=Math.max(0,Math.min(255,Math.round((-dx*l*.5+.5)*255)));B[k+1]=Math.max(0,Math.min(255,Math.round((-dy*l*.5+.5)*255)));B[k+2]=Math.max(0,Math.min(255,Math.round((.5+(h[i]-bl[i])*2.2)*255)));B[k+3]=255}}
-async function layLoad(onStep){
- if(LAY.ok||!GFX.ok)return;
- const N=TEXSIZE||texSizeAuto(),D=TEXNAMES.length,A=new Uint8Array(N*N*4*D),B=new Uint8Array(N*N*4*D),c=mkc(N,N),g=c.getContext('2d',{willReadFrequently:true});
- for(let d=0;d<D;d++){const n=TEXNAMES[d];
-  // a picture that does not decode must not stop the game: that material becomes plain mid-grey ground, and the miss is counted
-  const pic=async(k,f)=>{g.clearRect(0,0,N,N);try{g.drawImage(await layImg(TEXSRC[k]),0,0,N,N)}catch(e){LAY.miss=(LAY.miss|0)+1;g.fillStyle=f;g.fillRect(0,0,N,N)}return g.getImageData(0,0,N,N).data};
-  const pa=await pic(n+'_a','#8a8680'),ph=await pic(n+'_h','#808080');
-  layPack(A,B,d,N,pa,ph);if(onStep)await onStep(d+1,D)}
- LAY.arrA=layArr(A,N,D,true);LAY.arrN=layArr(B,N,D,false);LAY.N=N;LAY.names=TEXNAMES.slice();LAY.ok=1}
-let TEXSIZE=0;
-// phones: 512 (their screen cannot show more at the sizes the ground is drawn, and it keeps memory low); tablets and computers: 1024. ?tex=1024 forces it.
-function texSizeAuto(){try{const q=new URLSearchParams(location.search).get('tex');if(q==='512'||q==='1024')return +q}catch(e){}
- let phone=false;try{phone=matchMedia('(pointer:coarse)').matches&&Math.max(screen.width,screen.height)<1100}catch(e){}
- return phone||!QL.hi?512:(QL.tex||1024)}
-
-// ---------- sky for reflections: six small gradient pictures made into an environment map ----------
+// ---------- reflections: a dark studio (soft panels of light round a black room), made into an environment map ----------
+// The cars' paint and glass pick up these panels, so they read as glossy shapes against the void.
 function gfxEnv(th){
  const key=th.n;GFX.envs=GFX.envs||{};if(GFX.envs[key])return GFX.envs[key];
- const S=128,faces=[],sv=sunVec(th.az,th.el),top=th.top,hor=th.hor,gnd=th.gnd;
- const mkf=(fn)=>{const c=mkc(S,S),g=c.getContext('2d');fn(g,S);return c};
- const R=mulberry32(4711);
- // sides: deep sky overhead, bright haze at the horizon, a lit snowfield below the horizon, a few clouds and a far ridge
- const side=(g,s,f)=>{g.fillStyle=lg(g,0,0,0,s,[[0,top],[.3,mixHex(top,hor,.5)],[.5,hor],[.5001,mixHex(hor,gnd,.4)],[.62,gnd],[1,mixHex(gnd,'#ffffff',.35)]]);g.fillRect(0,0,s,s);
-  g.globalAlpha=.5;for(let k=0;k<7;k++){const cx=R()*s,cy=s*(.12+R()*.34),rx=s*(.1+R()*.22),ry=s*(.012+R()*.03);g.fillStyle=rg(g,cx,cy,0,cx,cy,rx,[[0,'rgba(255,255,255,.55)'],[1,'rgba(255,255,255,0)']]);g.save();g.translate(cx,cy);g.scale(1,ry/rx);g.translate(-cx,-cy);g.fillRect(cx-rx,cy-rx,rx*2,rx*2);g.restore()}g.globalAlpha=1;
-  g.fillStyle='rgba(60,80,120,.35)';g.beginPath();g.moveTo(0,s*.5);for(let x=0;x<=s;x+=8)g.lineTo(x,s*(.5-.025-.03*Math.abs(Math.sin(x*.07+f*2)+.5*Math.sin(x*.19+f))));g.lineTo(s,s*.5);g.closePath();g.fill()};
- const dirs=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]];
- for(let f=0;f<6;f++){const d=dirs[f];faces.push(mkf((g,s)=>{
-  if(f===2){g.fillStyle=rg(g,s/2,s/2,0,s/2,s/2,s*.75,[[0,top],[1,mixHex(top,hor,.55)]]);g.fillRect(0,0,s,s)}
-  else if(f===3){g.fillStyle=gnd;g.fillRect(0,0,s,s)}
-  else side(g,s,f);
-  const dp=d[0]*sv.x+d[1]*sv.y+d[2]*sv.z;
-  if(dp>.1){ // where on this face is the sun?
-   let u=.5,v=.5;if(f===0){u=.5-sv.z/sv.x*.5;v=.5-sv.y/sv.x*.5}else if(f===1){u=.5+sv.z/-sv.x*.5*-1;v=.5-sv.y/-sv.x*.5}
-   else if(f===4){u=.5+sv.x/sv.z*.5;v=.5-sv.y/sv.z*.5}else if(f===5){u=.5-sv.x/-sv.z*.5;v=.5-sv.y/-sv.z*.5}else if(f===2){u=.5+sv.x/sv.y*.5;v=.5+sv.z/sv.y*.5}
-   g.fillStyle=rg(g,u*s,v*s,0,u*s,v*s,s*.3,[[0,th.sun],[.12,th.sun],[.3,th.sun+'aa'],[.6,th.sun+'30'],[1,th.sun+'00']]);g.globalAlpha=Math.min(1,dp*1.4);g.fillRect(0,0,s,s);g.globalAlpha=1}
- }))}
+ const S=128,faces=[];
+ const mkf=fn=>{const c=mkc(S,S),g=c.getContext('2d');g.fillStyle='#020306';g.fillRect(0,0,S,S);fn(g,S);return c};
+ // a soft rectangle of light
+ const panel=(g,x,y,w,h,col,a)=>{g.save();g.globalAlpha=a;g.filter='blur(3px)';g.fillStyle=col;g.fillRect(x,y,w,h);g.restore()};
+ const strip=(g,s,y,col,a)=>{const gr=g.createLinearGradient(0,y-s*.08,0,y+s*.08);gr.addColorStop(0,col+'00');gr.addColorStop(.5,col);gr.addColorStop(1,col+'00');g.globalAlpha=a;g.fillStyle=gr;g.fillRect(0,y-s*.08,s,s*.16);g.globalAlpha=1};
+ // +x, -x, +y (up), -y (down), +z, -z
+ faces.push(mkf((g,s)=>{strip(g,s,s*.42,'#7fe6ff',.85);panel(g,s*.15,s*.18,s*.7,s*.12,'#ffffff',.35)}));
+ faces.push(mkf((g,s)=>{strip(g,s,s*.42,'#ff6ad5',.75);panel(g,s*.2,s*.2,s*.6,s*.1,'#ffffff',.3)}));
+ faces.push(mkf((g,s)=>{const gr=g.createRadialGradient(s/2,s/2,0,s/2,s/2,s*.7);gr.addColorStop(0,'#c9d8ff');gr.addColorStop(.35,'#4a5a8a');gr.addColorStop(1,'#05070e');g.fillStyle=gr;g.fillRect(0,0,s,s);
+  panel(g,s*.1,s*.44,s*.8,s*.12,'#ffffff',.9)}));
+ faces.push(mkf((g,s)=>{const gr=g.createRadialGradient(s/2,s/2,0,s/2,s/2,s*.7);gr.addColorStop(0,'#0b1430');gr.addColorStop(1,'#010204');g.fillStyle=gr;g.fillRect(0,0,s,s)}));
+ faces.push(mkf((g,s)=>{strip(g,s,s*.44,'#9fb8ff',.7);panel(g,s*.3,s*.12,s*.4,s*.14,'#ffffff',.45)}));
+ faces.push(mkf((g,s)=>{strip(g,s,s*.44,'#5ee1ff',.6);panel(g,s*.25,s*.15,s*.5,s*.1,'#ffffff',.3)}));
  const cube=new THREE.CubeTexture(faces);cube.colorSpace=THREE.SRGBColorSpace;cube.needsUpdate=true;
  const pm=new THREE.PMREMGenerator(GFX.R),rt=pm.fromCubemap(cube);pm.dispose();cube.dispose();
  GFX.envs[key]=rt.texture;return rt.texture}
@@ -390,15 +328,15 @@ function gfxInit(canvas){
  if(GFX.ok)return true;
  let R;try{R=new THREE.WebGLRenderer({canvas,antialias:false,alpha:false,depth:true,stencil:false,powerPreference:'high-performance',preserveDrawingBuffer:false,failIfMajorPerformanceCaveat:false})}catch(e){console.warn('no WebGL2',e);return false}
  if(!R.capabilities.isWebGL2){return false}
- GFX.R=R;R.info.autoReset=false;R.setClearColor(0x0b1630,1);R.outputColorSpace=THREE.SRGBColorSpace;R.toneMapping=THREE.NoToneMapping;R.autoClear=false;
+ GFX.R=R;R.info.autoReset=false;R.setClearColor(0x000000,1);R.outputColorSpace=THREE.SRGBColorSpace;R.toneMapping=THREE.NoToneMapping;R.autoClear=false;
  R.shadowMap.enabled=true;R.shadowMap.type=PHONE?THREE.PCFShadowMap:THREE.PCFSoftShadowMap;R.shadowMap.autoUpdate=true;
  const gl=R.getContext();GFX.hdr=!!(gl.getExtension('EXT_color_buffer_half_float')||gl.getExtension('EXT_color_buffer_float'));
  GFX.S=new THREE.Scene();GFX.cam=new THREE.PerspectiveCamera(58,1,1,600);GFX.cam.up.set(0,0,-1);
  GFX.sun=new THREE.DirectionalLight(0xffffff,3);GFX.sun.castShadow=true;GFX.sun.shadow.mapSize.set(1024,1024);
  const sc=GFX.sun.shadow.camera;sc.near=1;sc.far=260;sc.left=-34;sc.right=34;sc.top=34;sc.bottom=-34;GFX.sun.shadow.bias=-.0004;GFX.sun.shadow.normalBias=.03;GFX.sun.shadow.radius=2.2;
  GFX.S.add(GFX.sun);GFX.S.add(GFX.sun.target);
- GFX.hemi=new THREE.HemisphereLight(0xaaccff,0xdde8f8,1.1);GFX.S.add(GFX.hemi);
- GFX.S.fog=new THREE.Fog(0xcfe2f6,70,260);
+ GFX.hemi=new THREE.HemisphereLight(0x33406a,0x05060a,.6);GFX.S.add(GFX.hemi);
+ GFX.S.fog=new THREE.Fog(0x000000,120,330);
  GFX.U.camPos.value=GFX.cam.position;GFX.U.sunDir.value=new THREE.Vector3(0,1,0);GFX.U.sunCol.value=new THREE.Color(1,1,1);GFX.U.fogCol.value=new THREE.Color(1,1,1);
  for(const k of ['skyTop','skyHor'])GFX.U[k].value=new THREE.Color(1,1,1);
  gfxTextures();GFX.U.cloud.value=GFX.tex.cloud;
@@ -438,7 +376,7 @@ function gfxFit(w,h){
   GFX.rtA.texture.colorSpace=THREE.LinearSRGBColorSpace;
   if(q.glow){const gw=Math.max(8,W>>1),gh=Math.max(8,H>>1),bw=Math.max(8,W>>2),bh=Math.max(8,H>>2),o={type:GFX.hdr?THREE.HalfFloatType:THREE.UnsignedByteType,depthBuffer:false,minFilter:THREE.LinearFilter,magFilter:THREE.LinearFilter};
    GFX.rtG=new THREE.WebGLRenderTarget(gw,gh,Object.assign({},o,{depthBuffer:true}));GFX.rtB1=new THREE.WebGLRenderTarget(bw,bh,o);GFX.rtB2=new THREE.WebGLRenderTarget(bw,bh,o)}}
- const sm=q.shadow||0;GFX.sun.castShadow=sm>0;if(sm>0&&GFX.sun.shadow.mapSize.x!==sm){GFX.sun.shadow.mapSize.set(sm,sm);if(GFX.sun.shadow.map){GFX.sun.shadow.map.dispose();GFX.sun.shadow.map=null}}
+ const sm=q.shadow||0;GFX.sun.castShadow=false;if(sm>0&&GFX.sun.shadow.mapSize.x!==sm){GFX.sun.shadow.mapSize.set(sm,sm);if(GFX.sun.shadow.map){GFX.sun.shadow.map.dispose();GFX.sun.shadow.map=null}}
  GFX.cam.aspect=w/h;GFX.cam.updateProjectionMatrix();GFX.mComp.uniforms.uAsp.value=Math.max(1,h/w)}
 
 // ---------- applying a look ----------
@@ -463,7 +401,7 @@ function gfxRender0(scene,cam){
  const C=GFX.mComp.uniforms;
  if(q.glow&&GFX.rtG){
   const bg=scene.background;scene.background=null;R.shadowMap.autoUpdate=false;
-  cam.layers.set(GLOW);R.setRenderTarget(GFX.rtG);R.setClearColor(0x000000,1);R.clear(true,true,false);R.render(scene,cam);cam.layers.set(0);
+  cam.layers.set(GLOW);GFX.U.glowPass.value=1;R.setRenderTarget(GFX.rtG);R.setClearColor(0x000000,1);R.clear(true,true,false);R.render(scene,cam);cam.layers.set(0);GFX.U.glowPass.value=0;
   R.setClearColor(cLin(GFX.theme.fog),1);scene.background=bg;R.shadowMap.autoUpdate=true;
   const g=GFX.rtG,b1=GFX.rtB1,b2=GFX.rtB2;
   GFX.mCopy.uniforms.t.value=g.texture;GFX.mCopy.uniforms.d.value.set(1/g.width,1/g.height);gfxPass(GFX.mCopy,b1);

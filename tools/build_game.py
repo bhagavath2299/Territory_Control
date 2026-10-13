@@ -17,14 +17,14 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 GAME = ROOT / "game"
 DIST = ROOT / "dist"
 
-# (file, first line, last line) in the page the parts were cut from; the build only uses the order.
+# (file, first line, last line) in the page the parts were cut from (app-test 8861220); the build only uses the order.
+# v19 dropped texdata.js (the ground pictures of the old terrain, lines 7721-7739): the void arena draws its floor in a shader.
 PARTS = [
     ("page_head.html", 1, 223),          # <head>, CSS, the page's HTML, <script>
     ("engine.js", 224, 702),             # match engine, shared with the server
     ("client_marker.js", 703, 703),      # //@@client: the server reads up to here
     ("vendor/three.r180.min.js", 704, 7244),
     ("gfx_core.js", 7245, 7720),         # helpers, online client, 3D renderer part 1
-    ("texdata.js", 7721, 7739),          # embedded ground textures (unused by the void arena)
     ("gfx_world.js", 7740, 9185),        # 3D renderer parts 2-7: arena, cars, trails, effects, camera, garage
     ("ui.js", 9186, 10093),              # HUD, input, loops, events, screens, sound
     ("main.js", 10094, 10271),           # main loop, picture quality, boot
@@ -34,7 +34,7 @@ PARTS = [
 
 def split(page: pathlib.Path) -> None:
     lines = page.read_text(encoding="utf-8").split("\n")
-    if len(lines) != PARTS[-1][2]:
+    if len(lines) != PARTS[-1][2]:  # only for pages of the old layout
         sys.exit(f"stop: {page} has {len(lines)} lines, the part table expects {PARTS[-1][2]}")
     for name, a, b in PARTS:
         out = GAME / name

@@ -99,7 +99,7 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
           d.remove();
           return r;
         }),
-        quality: g(function () { return QNAME; }), scale: g(function () { return GFX.scale; }),
+        quality: g(function () { return QNAME; }), scale: g(function () { return GFX.scale; }), refreshHz: g(function () { return QC.hz; }),
         drawCalls: g(function () { return GFX.stats.calls; }), frames: window.__stFrames,
         fpsText: String(el('fps').textContent || '').slice(0, 200), overlay: el('ov').className || '',
         card: String(el('card').innerText || '').replace(/\s+/g, ' ').slice(0, 200)
@@ -151,6 +151,13 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
         let bootReady = await waitFor(seconds: 180) { await self.bootState() == "rdy" }
         let bootSeconds = Date().timeIntervalSince(started)
         environment = (await jsObject(Self.environmentProbe)) ?? [:]
+        // whether WebKit offered the setting that lifts the 60 frames-a-second hold (see GameViewController.allowFullFrameRate)
+        if let prefs = controller?.webView.configuration.preferences {
+            let has = prefs.responds(to: Selector(("_setPreferPageRenderingUpdatesNear60FPSEnabled:")))
+            environment["near60fpsSettingAvailable"] = has
+            if has { environment["near60fpsSetting"] = prefs.value(forKey: "preferPageRenderingUpdatesNear60FPSEnabled") as? Bool }
+            environment["screenMaxFPS"] = controller?.view.window?.windowScene?.screen.maximumFramesPerSecond
+        }
         // Frame-rate read-out on (it shows in the screenshots); mark this run so the second launch can find it.
         await js("(function(){SET.fps=1;saveSet();fpsShow();localStorage.setItem('st-probe','\(Int(started.timeIntervalSince1970))');return 1})()")
         await mark("01-boot", ["bootReady": bootReady, "bootSeconds": round1(bootSeconds)])

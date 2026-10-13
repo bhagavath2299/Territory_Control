@@ -26,6 +26,7 @@ final class GameViewController: UIViewController {
         config.allowsPictureInPictureMediaPlayback = false
         config.dataDetectorTypes = []
         config.preferences.javaScriptCanOpenWindowsAutomatically = false
+        Self.allowFullFrameRate(config.preferences)
         // Settings, best score and replays are kept between launches.
         config.websiteDataStore = .default()
 
@@ -99,6 +100,17 @@ final class GameViewController: UIViewController {
       if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', watch); else watch();
     })();
     """#
+
+    /// On iPhones with a 120 Hz screen (ProMotion), web pages are held to 60 frames a second unless the page's
+    /// "prefer page rendering updates near 60 fps" setting is off. That setting is not public API, so it is switched
+    /// off only when WebKit has it (on an iOS that does not, nothing happens and the game simply runs at 60).
+    /// Info.plist also sets CADisableMinimumFrameDurationOnPhone, which lets the app's screen run above 60 Hz at all.
+    /// Note for an App Store release: the private setting would need to go (or be replaced by public API, if one appears).
+    static func allowFullFrameRate(_ preferences: WKPreferences) {
+        let setter = Selector(("_setPreferPageRenderingUpdatesNear60FPSEnabled:"))
+        guard preferences.responds(to: setter) else { return }
+        preferences.setValue(false, forKey: "preferPageRenderingUpdatesNear60FPSEnabled")
+    }
 
     override var prefersStatusBarHidden: Bool { true }
     override var prefersHomeIndicatorAutoHidden: Bool { true }
