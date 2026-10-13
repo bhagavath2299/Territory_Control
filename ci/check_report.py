@@ -64,6 +64,10 @@ def main(folder: str) -> int:
               f"{p.get('width')}x{p.get('height')} q={p.get('quality')} hz={p.get('refreshHz')} calls={p.get('drawCalls')} "
               + " ".join(f"{k}={v}" for k, v in s.items() if k not in ("step", "seconds", "page")))
     last = (steps.get("99-done") or steps.get("08-results") or {}).get("page") or {}
+    if last.get("programs") is not None:
+        print("GPU programs built (by what the game was doing), at the paused step:",
+              (steps.get("05-paused-landscape", {}).get("page") or {}).get("programs"),
+              "| at the end (the cost test builds 5 floor variants):", last.get("programs"))
     if last.get("timings"):
         print("time spent in the game's heavy functions (calls, total ms, longest ms):")
         for name, t in sorted(last["timings"].items(), key=lambda kv: -kv[1].get("max", 0)):

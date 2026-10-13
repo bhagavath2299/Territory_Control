@@ -950,18 +950,40 @@ function miniPaint(force){if(!MINID||(!force&&clk-MINIT<.15&&MINIT>=0))return;MI
 function buildIsland(){if(IS_SRV||!LANDI)return;
  LASTRB=-9;LANDV=-1;MINID=1;FLASH=null;CAPW.length=0;RAILV.length=0;FAULTV.length=0;SCORCH.length=0;RINGS.length=0;
  for(let i=1;i<=5;i++){const p=P[i];if(p){p.ghost=null;p.wreck=null}}
- if(GFX.ok){tierApply();gwBuild();try{GFX.R.compile(GFX.S,GFX.cam)}catch(e){}}else fbMap();
+ if(GFX.ok){tierApply();gwBuild();gfxCompile(GFX.S,GFX.cam)}else fbMap();
  MDIRTY=true}
+// compile() builds the shader variant that fits the renderer's state at that moment, and the picture is drawn either straight to the screen with
+// tone mapping (low tier) or into the scene target without it (the others). Set up the same way first, or the variants built are never used.
+function gfxCompile(scene,cam){const R=GFX.R,old=R.getRenderTarget();
+ try{if(QL.post&&GFX.rtA)R.setRenderTarget(GFX.rtA);else{R.setRenderTarget(null);R.toneMapping=THREE.ACESFilmicToneMapping}R.compile(scene,cam)}catch(e){}
+ R.toneMapping=THREE.NoToneMapping;R.setRenderTarget(old)}
 
 // ---------- loading steps for the start screen ----------
 function buildTexSteps(){return[
  ['Starting the 3D engine...',()=>{const ok=gfxInit($('gl'));if(ok){gfxSetTheme(gfxThemeFor(1));fit()}else{$('gl').style.display='none';TEXOK=1}}],
  ['Building the arena...',()=>{if(!GFX.ok)return;genMap(20241008);gwBuild();gfxSetTheme(0)}],
  ['Tuning the engines...',()=>{if(!GFX.ok)return;trInit();ptInit();ringsInit();pjInit();for(let c=0;c<4;c++){const C=carBuild(c,CLS[c].col,'sport',0);C.root.position.set(WW/2+c*3,0,WH/2);GFX.S.add(C.root);CARI[0]=CARI[0]||[];CARI[0].push(C)}
-   // every shader the game uses is built now, behind the loading screen: the scene, the shadow pass, the glow and finishing passes (one real frame does the last ones)
-   camSet(WW/2+4,WH/2);camApply(0);try{GFX.R.compile(GFX.S,GFX.cam);gfxRender(GFX.S,GFX.cam)}catch(e){}
+   // every shader the game uses is built now, behind the loading screen: the scene, the effects, the glow and finishing passes (one real frame does the last ones)
+   camSet(WW/2+4,WH/2);camApply(0);gfxWarm(CARI[0]);
    for(const C of CARI[0]){GFX.S.remove(C.root);carFree(C)}CARI[0]=null;gwDispose();TEXOK=1}]]}
 function buildTexAll(){for(const s of buildTexSteps())s[1]()}
+// compile() only builds shaders for what is visible, and the GPU finishes a shader the first time something is drawn with it. Effects stay hidden
+// until something happens (shells, blades, drones, mines, strikes, beams, wires, cracks, black holes, light spots, the ring under your car, rings,
+// scorch marks, trails, sparks, the cars' class parts), so they are shown for one compile and one picture here, then hidden again.
+// Otherwise each would be built the first time it appears in a match: a hitch of a fraction of a second on a phone, seconds in the simulator.
+function gfxWarm(cars){
+ // drawn even when off screen (so each gets the shader variant the real picture uses: tone mapping and colour output depend on where it is drawn)
+ const shown=[],culled=[],show=o=>{if(!o)return;if(!o.visible){o.visible=true;shown.push(o)}if(o.frustumCulled){o.frustumCulled=false;culled.push(o)}},deep=o=>{if(o)o.traverse(show)};
+ for(const k of ['shell','blade','miss','mine','strike','rail','wire','fault','hole','spot'])deep((PJ[k]||[])[0]);
+ deep(PJ.pilot);deep(RG3.pool[0]);deep(RG3.sc[0]);
+ for(const C of cars||[])deep(C.root);
+ let tm=null;if(TR3.ok){tm=trMesh(0);trBuild(tm,[WW/2,WH/2,WW/2+3,WH/2+1],undefined,undefined,trVis(),.42,.075);tm.sh.visible=false;tm.ln.visible=true;tm.grp.visible=true}
+ if(PT.ok)for(const S of [PT.A,PT.N])S.g.instanceCount=1;
+ if(GW.rtA){GW.maskDirty=1;gwMask()}
+ try{gfxRender(GFX.S,GFX.cam)}catch(e){}
+ for(const o of shown)o.visible=false;for(const o of culled)o.frustumCulled=true;
+ if(tm){tm.g.setDrawRange(0,0);tm.grp.visible=false}
+ if(PT.ok)for(const S of [PT.A,PT.N])S.g.instanceCount=0}
 function camSet(x,y){CAM.x=x;CAM.y=y;CAM.vz=40;const asp=vw/vh,tv=Math.tan(CP.fov*Math.PI/360);CAM.d=asp<1?40/(2*tv*asp):40*Math.sin(CP.pitch)/(2*tv)}
 
 // ---------- the cars: a model per slot, rebuilt when the class, colour or finish changes ----------

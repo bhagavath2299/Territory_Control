@@ -65,6 +65,19 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
           return orig.apply(console, arguments);
         };
       });
+      // GPU programs the page builds, counted by what the game was doing (loading, menu, play, over): after loading there should be none
+      window.__stProg = {};
+      [window.WebGL2RenderingContext, window.WebGLRenderingContext].forEach(function (C) {
+        if (!C || !C.prototype.linkProgram) return;
+        var link = C.prototype.linkProgram;
+        C.prototype.linkProgram = function (p) {
+          try {
+            var s = (typeof BOOTED !== 'undefined' && BOOTED) ? (typeof state !== 'undefined' ? state : '?') : 'loading';
+            window.__stProg[s] = (window.__stProg[s] || 0) + 1;
+          } catch (e) {}
+          return link.call(this, p);
+        };
+      });
       window.__stFrames = 0;
       // the longest gaps between frames (ms), to find stalls
       window.__stGaps = [];
@@ -112,7 +125,7 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
         drawCalls: g(function () { return GFX.stats.calls; }), frames: window.__stFrames,
         fpsText: String(el('fps').textContent || '').slice(0, 200), overlay: el('ov').className || '',
         card: String(el('card').innerText || '').replace(/\s+/g, ' ').slice(0, 200),
-        timings: window.__stT || null, frameGaps: (window.__stGaps || []).slice(-12)
+        timings: window.__stT || null, frameGaps: (window.__stGaps || []).slice(-12), programs: window.__stProg || null
       };
     })()
     """#
@@ -141,7 +154,8 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
     // What the picture costs, measured in the paused match. First real frames per second: as it is, with the trail and
     // spark buffers sent whole every frame, without the HUD layer, without the 3D layer. Then the game loop is stopped
     // and the 3D picture is drawn on demand and waited for (a 1-pixel read), ms per picture, with parts left out or the
-    // floor's shader cut down. Runs in the background; the result lands in window.__stGPU.
+    // floor's shader cut down; also the land picture's update after a capture. Runs in the background; the result
+    // lands in window.__stGPU.
     private static let renderCostScript = #"""
     (function () {
       window.__stGPU = null;
@@ -202,6 +216,13 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
           await step('noSparks', without(sparks));
           await step('floorOnly', without(GFX.S.children.filter(function (o) { return o !== GW.floor; })));
           await step('nothing', without(GFX.S.children.slice()));
+          // the land picture redrawn as after a capture: the land map sent to the GPU and smoothed into coverage (two passes)
+          var mask = (window.__stOrig && window.__stOrig.gwMask) || gwMask;
+          await step('landUpdate', function () {
+            var t = performance.now();
+            for (var i = 0; i < 5; i++) { GW.texOwn.needsUpdate = true; GW.maskDirty = 1; mask(); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); }
+            return Math.round((performance.now() - t) / 5 * 10) / 10;
+          });
           var sc0 = GFX.scale; GFX.scale = .6; fit(); await wait(100);
           await step('allAt60pct', run);
           GFX.scale = sc0; fit(); await wait(100);
