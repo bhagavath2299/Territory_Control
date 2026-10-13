@@ -59,6 +59,11 @@ done
 ST="$DATA/Documents/selftest"
 say "app data: $DATA"
 
+# Is the app still running? Its process is an ordinary process on this Mac, so ask the Mac: asking launchctl inside
+# a busy simulator can take longer than 20 s, and once that made a running app look gone.
+if [ -n "$APP_PID" ]; then alive() { kill -0 "$APP_PID" 2>/dev/null; }
+else alive() { limit 20 xcrun simctl spawn "$UDID" launchctl list 2>/dev/null | grep -q "$BUNDLE"; }; fi
+
 # Take a screenshot each time the app marks a step, then answer so it carries on
 last=""
 gone=0
@@ -78,8 +83,8 @@ while [ $SECONDS -lt $deadline ]; do
       [ "$name" = "99-done" ] && break
     fi
   fi
-  if [ $((tick % 40)) -eq 0 ]; then  # about every 20 s: is the app still running?
-    if limit 20 xcrun simctl spawn "$UDID" launchctl list 2>/dev/null | grep -q "$BUNDLE"; then gone=0; else gone=$((gone + 1)); fi
+  if [ $((tick % 40)) -eq 0 ]; then  # about every 20 s
+    if alive; then gone=0; else gone=$((gone + 1)); fi
     if [ $gone -ge 2 ]; then say "!! the app is no longer running"; break; fi
   fi
   sleep 0.5

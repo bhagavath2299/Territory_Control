@@ -918,8 +918,9 @@ function camStep(dt){const t=camTarget(),fy=CAM.fy===undefined?.5:CAM.fy;
   CAM.x+=(t.rx+CAM.lx-CAM.x)*k;CAM.y+=(t.ry+CAM.ly+(.5-fy)*2*hh0-CAM.y)*k}
  const area=(CN[VS]||0)/(MC*MC),V=(state==='menu'?54:Math.min(58,39+Math.sqrt(area)*.22+(boost&&en>0?3.2:0)))/CAMK;CAM.vz+=(V-CAM.vz)*(1-Math.exp(-dt*2));
  const d=asp<1?CAM.vz/(2*thh):CAM.vz*Math.sin(CP.pitch)/(2*tv);CAM.d=d;CAM.z=Math.min(vw,vh)/CAM.vz;
- const hw=thh*d,hh=tv*d/Math.sin(CP.pitch);
- CAM.x=hw*2>WW+6?WW/2:Math.min(WW+3-hw,Math.max(hw-3,CAM.x));CAM.y=hh*2>WH+6?WH/2:Math.min(WH+3-hh,Math.max(hh-3,CAM.y))}
+ // the picture may run past the rim into the void by half its size, so a car at the rim stays well inside the screen (clear of the clock and the buttons)
+ const hw=thh*d,hh=tv*d/Math.sin(CP.pitch),mx=Math.max(3,hw*.5),my=Math.max(3,hh*.5);
+ CAM.x=hw*2>WW+6?WW/2:Math.min(WW+mx-hw,Math.max(hw-mx,CAM.x));CAM.y=hh*2>WH+6?WH/2:Math.min(WH+my-hh,Math.max(hh-my,CAM.y))}
 const _sd=new THREE.Vector3();
 function camApply(dt){
  const sk=state==='menu'?0:shake,kx=sk>.3?(Math.random()-.5)*sk*.05:0,ky=sk>.3?(Math.random()-.5)*sk*.05:0,d=CAM.d||50,c=GFX.cam,tx=CAM.x+kx,tz=CAM.y+ky;
@@ -1042,7 +1043,7 @@ function frame2d(dt){
  for(const m of MNV){ctx.fillStyle=COLS[m[2]]||'#fff';ctx.beginPath();ctx.arc(m[0],m[1],.5,0,7);ctx.fill()}
  for(let q=1;q<=5;q++){const p=P[q];if(!p||!p.alive)continue;ctx.save();ctx.translate(p.rx,p.ry);ctx.rotate(p.ra);ctx.fillStyle=COLS[q];ctx.strokeStyle='#fff';ctx.lineWidth=.14;ctx.beginPath();ctx.roundRect(-1.2,-.65,2.4,1.3,.4);ctx.fill();ctx.stroke();ctx.fillStyle='#fff';ctx.fillRect(.5,-.4,.5,.8);ctx.restore()}
  ctx.setTransform(dpr,0,0,dpr,0,0)}
-function camStep2d(dt){const t=camTarget();if(t){const k=1-Math.exp(-dt*8);CAM.x+=(t.rx-CAM.x)*k;CAM.y+=(t.ry-CAM.y)*k}const hw=vw/2/CAM.z,hh=vh/2/CAM.z;CAM.x=hw*2>WW+6?WW/2:Math.min(WW+3-hw,Math.max(hw-3,CAM.x));CAM.y=hh*2>WH+6?WH/2:Math.min(WH+3-hh,Math.max(hh-3,CAM.y))}
+function camStep2d(dt){const t=camTarget();if(t){const k=1-Math.exp(-dt*8);CAM.x+=(t.rx-CAM.x)*k;CAM.y+=(t.ry-CAM.y)*k}const hw=vw/2/CAM.z,hh=vh/2/CAM.z,mx=Math.max(3,hw*.5),my=Math.max(3,hh*.5);CAM.x=hw*2>WW+6?WW/2:Math.min(WW+mx-hw,Math.max(hw-mx,CAM.x));CAM.y=hh*2>WH+6?WH/2:Math.min(WH+my-hh,Math.max(hh-my,CAM.y))}
 
 function draw(){
  if(!TEXOK&&!GFX.ok)buildTexAll();

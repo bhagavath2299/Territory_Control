@@ -468,7 +468,7 @@ function classStrip(){const cl=LOAD.cls|0,C=CLS[cl];
 function menu(){const m=ME,nm=esc(myName||m.name||'Player');
  const on=online,cnt=replayCount();
  show('<div class="mm-top"><button class="chip" data-a="garage" aria-label="Garage and profile"><span class="av">'+initial()+'</span><div style="flex:1;min-width:0"><b>'+nm+'</b><span class="sub">'+(on?'Level '+m.lv+' &middot; '+m.coins+' coins':'Tap to set up your car')+'</span>'+(on?'<div class="xp"><i style="width:'+m.pr+'%"></i></div>':'')+'</div></button><button class="ibtn" data-a="settings" aria-label="Settings">'+IC.gear+'</button></div>'
- +'<div class="logo">'+LOGO+'<h1 style="margin:0"><img class="wmi" alt="Territory Control" src="'+wmURL()+'"></h1><p class="tag">Claim the map</p></div>'
+ +'<div class="logo">'+LOGO+'<h1 style="margin:0">'+(wmURL()?'<img class="wmi" alt="Territory Control" src="'+wmURL()+'">':'<span class="wmt">TERRITORY<b>CONTROL</b></span>')+'</h1><p class="tag">Claim the map</p></div>'
  +'<div class="mm-btns">'+classStrip()
  +'<button class="btn play" data-a="quick">'+IC.play+'<span class="tx">PLAY<small>'+(on?'Online match &middot; 2 min':'Offline &middot; vs bots')+'</small></span></button>'
  +'<div class="row">'+(on?'<button class="btn" data-a="bots">'+IC.bots+'<span class="tx">Practice<small>vs bots</small></span></button>':'')

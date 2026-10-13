@@ -41,7 +41,10 @@ function qDown(){
  QC.grace=150}
 // the tier a device starts on: weak phones low, other phones med, computers high. The GPU name is read when the 3D engine is up.
 function tierGuess(){let weak=false;
- try{const m=navigator.deviceMemory,c=navigator.hardwareConcurrency;if((m&&m<=3)||(c&&c<=4))weak=true}catch(e){}
+ // Safari and the iPhone app's web view do not report the real number of cores (the simulator on a 3-core Mac said 4), so on iPhone and iPad
+ // the count says nothing and phones start on the middle tier; one that cannot keep up shrinks the picture, and drops a tier for the next match
+ const ios=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+ try{const m=navigator.deviceMemory,c=navigator.hardwareConcurrency;if((m&&m<=3)||(!ios&&c&&c<=4))weak=true}catch(e){}
  try{const gl=GFX.R&&GFX.R.getContext(),ext=gl&&gl.getExtension('WEBGL_debug_renderer_info'),r=ext?String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)):'';
   if(/Mali-(4|T|G3\d|G5[12]\b|G52|G57 MC[12])|Adreno \(TM\) ([2-5]\d\d|60\d|61\d)|PowerVR|SGX|Intel\(R\) HD Graphics [2-5]/i.test(r))weak=true}catch(e){}
  return weak?'low':PHONE?'med':'high'}
@@ -99,7 +102,9 @@ function bootStart(){if(BOOTED)return;BOOTED=1;au();$('boot').className='h';setT
  musicScene()}
 // the animated logo behind the loading bar: a car drives out of its home, loops around and claims the land
 const WF='system-ui,-apple-system,"Segoe UI",Roboto,sans-serif',WMS={};let WMU='';
-function wmURL(){if(!WMU){try{WMU=bootWM(520,2).c.toDataURL('image/png')}catch(e){WMU=''}}return WMU}
+// the wordmark as a picture for the menu. A canvas the system could not give memory to comes back as "data:," (seen in a loaded simulator):
+// then nothing is kept, the menu shows the name as text, and the next menu tries again.
+function wmURL(){if(!WMU){try{const u=bootWM(520,2).c.toDataURL('image/png');if(u&&u.length>100)WMU=u}catch(e){}}return WMU}
 function bootWM(w,dp){const key=w+'@'+dp;if(WMS[key])return WMS[key];
  const mk2=(W2,H2)=>{const c=document.createElement('canvas');c.width=Math.round(W2*dp);c.height=Math.round(H2*dp);return c};
  const t=document.createElement('canvas').getContext('2d');

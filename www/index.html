@@ -81,6 +81,8 @@ p{margin:6px 0;color:var(--mut)}
 .logo{margin:clamp(6px,2.4vh,22px) 10px 0;padding:12px 10px 10px;border-radius:24px;text-align:center;background:#070c16b8;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:inset 0 0 0 1px var(--line),inset 0 1px 0 #ffffff22,0 16px 40px #0007;animation:rise .7s .05s cubic-bezier(.2,.8,.2,1) both}
 .logo svg{width:46px;height:46px;filter:drop-shadow(0 6px 14px #0008)}
 .wmi{display:block;width:min(88%,360px);height:auto;margin:2px auto 0;filter:drop-shadow(0 6px 16px #000a)}
+.wmt{display:block;margin:4px auto 0;font:italic 900 clamp(30px,10vw,46px)/1 system-ui,-apple-system,sans-serif;color:#fff;text-shadow:0 4px 14px #000a}
+.wmt b{display:block;font-size:1.2em;background:linear-gradient(90deg,#ffbf4a,#ff5d7b,#a56bff);-webkit-background-clip:text;background-clip:text;color:transparent}
 .tag{margin:8px 0 0;font-size:11.5px;font-weight:800;letter-spacing:.34em;color:#cfeaff;text-transform:uppercase;text-shadow:0 2px 8px #000}
 .mm-btns{margin-top:auto;animation:rise .6s .18s cubic-bezier(.2,.8,.2,1) both}
 .mm-foot{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;font-size:12px;color:#b9c6e6;letter-spacing:.04em}
@@ -8670,8 +8672,9 @@ function camStep(dt){const t=camTarget(),fy=CAM.fy===undefined?.5:CAM.fy;
   CAM.x+=(t.rx+CAM.lx-CAM.x)*k;CAM.y+=(t.ry+CAM.ly+(.5-fy)*2*hh0-CAM.y)*k}
  const area=(CN[VS]||0)/(MC*MC),V=(state==='menu'?54:Math.min(58,39+Math.sqrt(area)*.22+(boost&&en>0?3.2:0)))/CAMK;CAM.vz+=(V-CAM.vz)*(1-Math.exp(-dt*2));
  const d=asp<1?CAM.vz/(2*thh):CAM.vz*Math.sin(CP.pitch)/(2*tv);CAM.d=d;CAM.z=Math.min(vw,vh)/CAM.vz;
- const hw=thh*d,hh=tv*d/Math.sin(CP.pitch);
- CAM.x=hw*2>WW+6?WW/2:Math.min(WW+3-hw,Math.max(hw-3,CAM.x));CAM.y=hh*2>WH+6?WH/2:Math.min(WH+3-hh,Math.max(hh-3,CAM.y))}
+ // the picture may run past the rim into the void by half its size, so a car at the rim stays well inside the screen (clear of the clock and the buttons)
+ const hw=thh*d,hh=tv*d/Math.sin(CP.pitch),mx=Math.max(3,hw*.5),my=Math.max(3,hh*.5);
+ CAM.x=hw*2>WW+6?WW/2:Math.min(WW+mx-hw,Math.max(hw-mx,CAM.x));CAM.y=hh*2>WH+6?WH/2:Math.min(WH+my-hh,Math.max(hh-my,CAM.y))}
 const _sd=new THREE.Vector3();
 function camApply(dt){
  const sk=state==='menu'?0:shake,kx=sk>.3?(Math.random()-.5)*sk*.05:0,ky=sk>.3?(Math.random()-.5)*sk*.05:0,d=CAM.d||50,c=GFX.cam,tx=CAM.x+kx,tz=CAM.y+ky;
@@ -8794,7 +8797,7 @@ function frame2d(dt){
  for(const m of MNV){ctx.fillStyle=COLS[m[2]]||'#fff';ctx.beginPath();ctx.arc(m[0],m[1],.5,0,7);ctx.fill()}
  for(let q=1;q<=5;q++){const p=P[q];if(!p||!p.alive)continue;ctx.save();ctx.translate(p.rx,p.ry);ctx.rotate(p.ra);ctx.fillStyle=COLS[q];ctx.strokeStyle='#fff';ctx.lineWidth=.14;ctx.beginPath();ctx.roundRect(-1.2,-.65,2.4,1.3,.4);ctx.fill();ctx.stroke();ctx.fillStyle='#fff';ctx.fillRect(.5,-.4,.5,.8);ctx.restore()}
  ctx.setTransform(dpr,0,0,dpr,0,0)}
-function camStep2d(dt){const t=camTarget();if(t){const k=1-Math.exp(-dt*8);CAM.x+=(t.rx-CAM.x)*k;CAM.y+=(t.ry-CAM.y)*k}const hw=vw/2/CAM.z,hh=vh/2/CAM.z;CAM.x=hw*2>WW+6?WW/2:Math.min(WW+3-hw,Math.max(hw-3,CAM.x));CAM.y=hh*2>WH+6?WH/2:Math.min(WH+3-hh,Math.max(hh-3,CAM.y))}
+function camStep2d(dt){const t=camTarget();if(t){const k=1-Math.exp(-dt*8);CAM.x+=(t.rx-CAM.x)*k;CAM.y+=(t.ry-CAM.y)*k}const hw=vw/2/CAM.z,hh=vh/2/CAM.z,mx=Math.max(3,hw*.5),my=Math.max(3,hh*.5);CAM.x=hw*2>WW+6?WW/2:Math.min(WW+mx-hw,Math.max(hw-mx,CAM.x));CAM.y=hh*2>WH+6?WH/2:Math.min(WH+my-hh,Math.max(hh-my,CAM.y))}
 
 function draw(){
  if(!TEXOK&&!GFX.ok)buildTexAll();
@@ -9376,7 +9379,7 @@ function classStrip(){const cl=LOAD.cls|0,C=CLS[cl];
 function menu(){const m=ME,nm=esc(myName||m.name||'Player');
  const on=online,cnt=replayCount();
  show('<div class="mm-top"><button class="chip" data-a="garage" aria-label="Garage and profile"><span class="av">'+initial()+'</span><div style="flex:1;min-width:0"><b>'+nm+'</b><span class="sub">'+(on?'Level '+m.lv+' &middot; '+m.coins+' coins':'Tap to set up your car')+'</span>'+(on?'<div class="xp"><i style="width:'+m.pr+'%"></i></div>':'')+'</div></button><button class="ibtn" data-a="settings" aria-label="Settings">'+IC.gear+'</button></div>'
- +'<div class="logo">'+LOGO+'<h1 style="margin:0"><img class="wmi" alt="Territory Control" src="'+wmURL()+'"></h1><p class="tag">Claim the map</p></div>'
+ +'<div class="logo">'+LOGO+'<h1 style="margin:0">'+(wmURL()?'<img class="wmi" alt="Territory Control" src="'+wmURL()+'">':'<span class="wmt">TERRITORY<b>CONTROL</b></span>')+'</h1><p class="tag">Claim the map</p></div>'
  +'<div class="mm-btns">'+classStrip()
  +'<button class="btn play" data-a="quick">'+IC.play+'<span class="tx">PLAY<small>'+(on?'Online match &middot; 2 min':'Offline &middot; vs bots')+'</small></span></button>'
  +'<div class="row">'+(on?'<button class="btn" data-a="bots">'+IC.bots+'<span class="tx">Practice<small>vs bots</small></span></button>':'')
@@ -9840,7 +9843,10 @@ function qDown(){
  QC.grace=150}
 // the tier a device starts on: weak phones low, other phones med, computers high. The GPU name is read when the 3D engine is up.
 function tierGuess(){let weak=false;
- try{const m=navigator.deviceMemory,c=navigator.hardwareConcurrency;if((m&&m<=3)||(c&&c<=4))weak=true}catch(e){}
+ // Safari and the iPhone app's web view do not report the real number of cores (the simulator on a 3-core Mac said 4), so on iPhone and iPad
+ // the count says nothing and phones start on the middle tier; one that cannot keep up shrinks the picture, and drops a tier for the next match
+ const ios=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+ try{const m=navigator.deviceMemory,c=navigator.hardwareConcurrency;if((m&&m<=3)||(!ios&&c&&c<=4))weak=true}catch(e){}
  try{const gl=GFX.R&&GFX.R.getContext(),ext=gl&&gl.getExtension('WEBGL_debug_renderer_info'),r=ext?String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)):'';
   if(/Mali-(4|T|G3\d|G5[12]\b|G52|G57 MC[12])|Adreno \(TM\) ([2-5]\d\d|60\d|61\d)|PowerVR|SGX|Intel\(R\) HD Graphics [2-5]/i.test(r))weak=true}catch(e){}
  return weak?'low':PHONE?'med':'high'}
@@ -9898,7 +9904,9 @@ function bootStart(){if(BOOTED)return;BOOTED=1;au();$('boot').className='h';setT
  musicScene()}
 // the animated logo behind the loading bar: a car drives out of its home, loops around and claims the land
 const WF='system-ui,-apple-system,"Segoe UI",Roboto,sans-serif',WMS={};let WMU='';
-function wmURL(){if(!WMU){try{WMU=bootWM(520,2).c.toDataURL('image/png')}catch(e){WMU=''}}return WMU}
+// the wordmark as a picture for the menu. A canvas the system could not give memory to comes back as "data:," (seen in a loaded simulator):
+// then nothing is kept, the menu shows the name as text, and the next menu tries again.
+function wmURL(){if(!WMU){try{const u=bootWM(520,2).c.toDataURL('image/png');if(u&&u.length>100)WMU=u}catch(e){}}return WMU}
 function bootWM(w,dp){const key=w+'@'+dp;if(WMS[key])return WMS[key];
  const mk2=(W2,H2)=>{const c=document.createElement('canvas');c.width=Math.round(W2*dp);c.height=Math.round(H2*dp);return c};
  const t=document.createElement('canvas').getContext('2d');
