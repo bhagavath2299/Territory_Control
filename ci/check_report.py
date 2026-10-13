@@ -46,7 +46,8 @@ def main(folder: str) -> int:
     print("system:", report.get("system"), report.get("screen"))
     print("page:", env.get("href"), "| secure:", env.get("secureContext"), "| storage:", env.get("localStorage"),
           "| haptics bridge:", env.get("vibrateBridge"), "| service worker API:", env.get("serviceWorkerApi"))
-    print("webgl:", env.get("webgl2Renderer"), "| game version:", env.get("gameVersion"), "| web build:", env.get("webSource"))
+    print("webgl:", env.get("webgl2Renderer"), "| game version:", env.get("gameVersion"), "| web build:", env.get("webSource"),
+          "| cores:", env.get("cores"), "| starting tier:", env.get("startTier"))
     print("boot ready after", boot.get("bootSeconds"), "s")
     for s in report.get("steps", []):
         p = s.get("page") or {}

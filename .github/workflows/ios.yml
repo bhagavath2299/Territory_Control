@@ -23,6 +23,7 @@ jobs:
         run: bash ci/build.sh
 
       - name: Play through it in the iPhone simulator
+        timeout-minutes: 30
         run: bash ci/selftest.sh
 
       - name: Save the build to the ios-build branch

@@ -102,6 +102,7 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
         href: location.href, userAgent: navigator.userAgent, secureContext: window.isSecureContext,
         serviceWorkerApi: 'serviceWorker' in navigator, vibrateBridge: typeof navigator.vibrate === 'function',
         wakeLockApi: 'wakeLock' in navigator, webgl2Renderer: gl, localStorage: ls,
+        cores: navigator.hardwareConcurrency || null, startTier: (function () { try { return tierGuess(); } catch (e) { return null; } })(),
         webSource: meta ? meta.content : null, gameVersion: (function () { try { return VER; } catch (e) { return null; } })()
       };
     })()
