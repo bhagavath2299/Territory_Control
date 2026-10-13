@@ -45,8 +45,9 @@ shot() {  # shot <name>: full-screen screenshot; landscape steps are turned upri
   say "screenshot $1 took $((SECONDS - t))s"
 }
 
-limit 60 xcrun simctl launch "$UDID" "$BUNDLE" -selftest
-say "launched"
+LAUNCHED=$(limit 60 xcrun simctl launch "$UDID" "$BUNDLE" -selftest)
+APP_PID=$(echo "$LAUNCHED" | awk -F': ' '/: [0-9]+$/ {print $2}' | tail -1)
+say "launched (pid ${APP_PID:-unknown})"
 DATA=""
 for _ in $(seq 1 60); do
   DATA=$(limit 30 xcrun simctl get_app_container "$UDID" "$BUNDLE" data 2>/dev/null) && [ -n "$DATA" ] && break
@@ -82,17 +83,26 @@ while [ $SECONDS -lt $deadline ]; do
 done
 cp "$ST"/report.json "$OUT/" 2>/dev/null || say "!! no report.json"
 
-# Second launch: are the settings and the replay from the first run still there?
-limit 60 xcrun simctl terminate "$UDID" "$BUNDLE" > /dev/null 2>&1
-sleep 2
-limit 120 xcrun simctl launch --terminate-running-process "$UDID" "$BUNDLE" -selftest-persist > /dev/null
-say "relaunched"
+# Second launch: are the settings and the replay from the first run still there? As on a phone: the game
+# goes to the background (Settings opens), then the system ends it, then it is opened again.
+limit 60 xcrun simctl launch "$UDID" com.apple.Preferences > /dev/null 2>&1 || say "!! could not open Settings"
+sleep 5
+if [ -n "$APP_PID" ]; then
+  kill -9 "$APP_PID" 2>/dev/null
+  for _ in $(seq 1 40); do kill -0 "$APP_PID" 2>/dev/null || break; sleep 0.5; done
+  if kill -0 "$APP_PID" 2>/dev/null; then say "!! app pid $APP_PID still running"; else say "app (pid $APP_PID) ended"; fi
+else
+  limit 60 xcrun simctl terminate "$UDID" "$BUNDLE" > /dev/null 2>&1 || say "!! terminate did not finish"
+fi
+sleep 5
+LAUNCHED=$(limit 120 xcrun simctl launch "$UDID" "$BUNDLE" -selftest-persist)
+say "relaunched: $LAUNCHED"
 for _ in $(seq 1 360); do
   [ -f "$ST/persist.json" ] && break
   sleep 0.5
 done
 sleep 1
-cp "$ST"/persist.json "$OUT/" 2>/dev/null || say "!! no persist.json"
+cp "$ST"/persist.json "$OUT/" 2>/dev/null || { say "!! no persist.json"; ls -la "$ST"; cat "$ST/state.txt" 2>/dev/null; }
 shot "10-relaunch"
 
 # Errors and faults logged by the app and WebKit during the run, and any crash reports
