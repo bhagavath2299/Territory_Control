@@ -34,6 +34,14 @@ def main(folder: str) -> int:
     land = steps.get("04-match-landscape", {}).get("page") or {}
     if land and not land.get("width", 0) > land.get("height", 0):
         problems.append("the screen did not turn to landscape")
+    # The test iPhone has a Dynamic Island and a home bar: the game must keep its controls clear of them
+    # from the first match, not only after the phone has been turned.
+    safe = match.get("safeArea") or {}
+    if not (safe.get("t", 0) >= 40 and safe.get("b", 0) >= 20):
+        problems.append(f"portrait match read the safe areas as {safe} (island and home bar not cleared)")
+    lsafe = land.get("safeArea") or {}
+    if land and not (max(lsafe.get("l", 0), lsafe.get("r", 0)) >= 40):
+        problems.append(f"landscape match read the safe areas as {lsafe}")
     paused = steps.get("05-paused-landscape", {}).get("page") or {}
     if paused and paused.get("paused") != 1:
         problems.append("pause did not pause the match")

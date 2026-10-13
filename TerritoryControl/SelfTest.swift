@@ -207,7 +207,7 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
         writeReport(finished: false)
         let number = stepNumber
         write("state.txt", "\(number) \(name)")
-        let answered = await waitFor(seconds: 150) { self.read("ack.txt") == "\(number)" }
+        let answered = await waitFor(seconds: 300) { self.read("ack.txt") == "\(number)" }
         await js("window.__stRelease()")
         if !answered { note("no screenshot answer for \(name)") }
     }

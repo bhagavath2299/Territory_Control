@@ -13,6 +13,7 @@ final class GameViewController: UIViewController {
     private(set) var webView: WKWebView!
     private let haptics = Haptics()
     private var restarts: [Date] = []
+    private var gameLoaded = false
 
     override func loadView() {
         let config = WKWebViewConfiguration()
@@ -57,10 +58,28 @@ final class GameViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        webView.load(URLRequest(url: Self.startURL))
         #if SELFTEST
         SelfTest.shared.start(controller: self)
         #endif
+    }
+
+    // The game is started once the screen is up, when iOS has said where the notch or Dynamic Island and
+    // the home bar are. Started earlier, the game read them as zero and put its controls under them.
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        guard !gameLoaded else { return }
+        gameLoaded = true
+        webView.load(URLRequest(url: Self.startURL))
+    }
+
+    // The game re-reads the safe areas on a resize event; send one whenever they change.
+    override func viewSafeAreaInsetsDidChange() {
+        super.viewSafeAreaInsetsDidChange()
+        tellPageLayoutChanged()
+    }
+
+    private func tellPageLayoutChanged() {
+        webView?.evaluateJavaScript("window.dispatchEvent(new Event('resize'))", completionHandler: nil)
     }
 
     override var prefersStatusBarHidden: Bool { true }
@@ -93,6 +112,13 @@ extension GameViewController: WKNavigationDelegate, WKUIDelegate {
             UIApplication.shared.open(url)
         }
         return nil
+    }
+
+    // Once the page has loaded, have the game read the screen size and safe areas again (now and a moment
+    // later, whichever side of the game's own first reading this lands on).
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        tellPageLayoutChanged()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in self?.tellPageLayoutChanged() }
     }
 
     // If iOS stops the game's page while the app is in the background (to free memory), start the game
