@@ -4,17 +4,23 @@ on:
   push:
     branches: [ios-app]
   workflow_dispatch:
+    inputs:
+      runner:
+        description: "Mac to build on: macos-26 (Apple silicon), or macos-26-intel when GitHub has no Apple silicon Mac free"
+        type: choice
+        default: macos-26
+        options: [macos-26, macos-26-intel]
 
 permissions:
   contents: write  # to save the build to the ios-build branch
 
 concurrency:
-  group: iphone-app
+  group: iphone-app-${{ inputs.runner || 'macos-26' }}
   cancel-in-progress: true
 
 jobs:
   build-and-test:
-    runs-on: macos-26
+    runs-on: ${{ inputs.runner || 'macos-26' }}
     timeout-minutes: 100
     steps:
       - uses: actions/checkout@v4

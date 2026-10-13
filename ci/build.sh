@@ -40,6 +40,7 @@ run simulator "${COMMON[@]}" -sdk iphonesimulator -destination 'generic/platform
   echo "Territory Control iPhone app, build $BUILD_NUMBER"
   echo "commit: ${GITHUB_SHA:-local}"
   echo "built: $(date -u '+%Y-%m-%d %H:%M UTC') with $(xcodebuild -version | tr '\n' ' ')"
+  echo "on: GitHub's ${ImageOS:-?} runner, ${RUNNER_ARCH:-?} ($(sw_vers -productVersion), $(sysctl -n hw.ncpu) cores)"
   echo
   echo "Info.plist (device build):"
   plutil -p "$APP/Info.plist"

@@ -25,6 +25,8 @@ An iPhone app can only be compiled on a Mac, so GitHub builds it: every push to 
 
 The self-test code (`TerritoryControl/SelfTest.swift`) is compiled only into the simulator copy; the `.ipa` contains none of it.
 
+Pushes build on an Apple silicon Mac (`macos-26`). When GitHub has none free, the run fails after 15 minutes with "The job was not acquired by Runner"; the workflow can then be started by hand on an Intel Mac: Actions > iPhone app > Run workflow > `macos-26-intel` (or `gh workflow run ios.yml --ref ios-app -f runner=macos-26-intel`). `build-info.txt` says which Mac made a build.
+
 ## Installing on an iPhone from a Windows PC (free Apple ID)
 
 1. On the PC, install **iTunes** and **iCloud** from Apple's website (not the Microsoft Store versions; uninstall those first), then install **Sideloadly** from sideloadly.io.
