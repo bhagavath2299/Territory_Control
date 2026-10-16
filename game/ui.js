@@ -36,7 +36,7 @@ function drawPlate(sx,sy,q,fs,lead,w,h){const p=P[q],nm=nmClean(NM[q]),pc=(CN[q]
  if(p&&p.out&&p.tr.length>8){const L=Math.min(1,p.tr.length/160),bw=pwid*.7;g.fillStyle='rgba(255,255,255,.12)';g.fillRect(sx-bw/2,y+ph+3,bw,2);
   g.fillStyle=L>.6?'#ff5a4a':L>.3?'#ffb020':COLS[q];g.fillRect(sx-bw/2,y+ph+3,bw*Math.max(.08,L),2)}}
 // a badge on the screen edge for a rival (or your land) that is off screen, turned toward it
-function drawEdge(x,y,ang,q,al,near,home){const g=ctx,R=cs*1.3,col=home?COLS[VS]:COLS[q];g.save();g.translate(x,y);g.globalAlpha=al;
+function drawEdge(x,y,ang,q,al,near,home){const g=ctx,R=cs*1.08,col=home?COLS[VS]:COLS[q];g.save();g.translate(x,y);g.globalAlpha=al*.88;
  if(near){const k=.5+.5*Math.sin(clk*9);g.strokeStyle='rgba(255,70,80,'+(.25+.45*k)+')';g.lineWidth=3;g.beginPath();g.arc(0,0,R+cs*.55+k*cs*.4,0,7);g.stroke()}
  g.save();g.rotate(ang);g.lineJoin='round';g.fillStyle=col;g.strokeStyle='rgba(255,255,255,.96)';g.lineWidth=1.8;g.beginPath();g.moveTo(R+cs*.95,0);g.lineTo(R*.62,-R*.62);g.lineTo(R*.62,R*.62);g.closePath();g.fill();g.stroke();g.restore();
  g.fillStyle='rgba(12,18,32,.94)';g.beginPath();g.arc(0,0,R,0,7);g.fill();g.lineWidth=2.6;g.strokeStyle=col;g.stroke();
@@ -64,11 +64,15 @@ function drawHUD(w,h){
  // markers: plates over the rivals, pointers to the ones that are off screen
  if(state==='play'||state==='replay'){
   const lead=rkAll.slice().sort((a,b)=>CN[b]-CN[a])[0];
+  // pointers to rivals off screen: only the two nearest, and only those within reach (v20: fewer badges round the edge)
+  const offs=[];
+  for(const q of rkAll){const p=P[q];if(!p||!p.alive||q===VS)continue;const [sx,sy]=S(p.rx,p.ry,1.4);if(!(sx>-8&&sx<w+8&&sy>-8&&sy<h+8))offs.push([me?Math.hypot(p.rx-me.rx,p.ry-me.ry):99,q])}
+  offs.sort((a,b)=>a[0]-b[0]);const showOff=offs.filter(o=>o[0]<70).slice(0,2).map(o=>o[1]);
   for(const q of rkAll){const p=P[q];if(!p||!p.alive||q===VS)continue;
    const [sx,sy]=S(p.rx,p.ry,1.4);
    const inside=sx>-8&&sx<w+8&&sy>-8&&sy<h+8;
    if(inside){const al=Math.min(1,fade(sx-fs*4,sy-cs*4.5-fs,fs*8,fs*2,fs*2));if(al>.03){ctx.globalAlpha=al;drawPlate(sx,sy-cs*4.2,q,fs,q===lead&&CN[q]>0,w,h);ctx.globalAlpha=1}}
-   else{const dx=sx-w/2,dy=sy-h/2,pad=cs*2.1,padT=ST+cs*2.6,t=Math.min((w/2-pad)/Math.abs(dx||1e-3),(h/2-Math.max(pad,padT*.5))/Math.abs(dy||1e-3)),ex=w/2+dx*t,ey=h/2+dy*t,ey2=Math.max(padT,Math.min(h-pad-cs*2,ey));
+   else if(showOff.includes(q)){const dx=sx-w/2,dy=sy-h/2,pad=cs*2.1,padT=ST+cs*2.6,t=Math.min((w/2-pad)/Math.abs(dx||1e-3),(h/2-Math.max(pad,padT*.5))/Math.abs(dy||1e-3)),ex=w/2+dx*t,ey=h/2+dy*t,ey2=Math.max(padT,Math.min(h-pad-cs*2,ey));
     const dist=me?Math.hypot(p.rx-me.rx,p.ry-me.ry):99,near=dist<24&&p.out,al=Math.max(.5,Math.min(1,1.25-dist/90))*Math.min(1,fade(ex-cs*1.3,ey2-cs*1.3,cs*2.6,cs*2.6,cs*1.6));
     if(al>.03)drawEdge(Math.max(pad,Math.min(w-pad,ex)),ey2,Math.atan2(dy,dx),q,al,near,0)}}
   // a way back to your land when you are out in the open and none of it is on screen
@@ -107,7 +111,7 @@ function drawHUD(w,h){
   ctx.fillStyle=COLS[VS];ctx.beginPath();ctx.arc(x0+cs*1.1+tw+cs*.7,y0+ph/2,cs*.2,0,7);ctx.fill();
   ctx.font=HF('800 italic',f2);ctx.fillStyle=tint(COLS[VS],.45);ctx.fillText(pc,x0+cs*1.1+tw+cs*1.4,y0+ph/2+1);
   let fy=y0+ph+cs*.55;ctx.textAlign='center';
-  for(const d of FD){if(!d.me)continue;const age=clk-(d.t0===undefined?clk:d.t0),a=Math.min(1,age*7)*Math.min(1,d.l/.6);if(a<=.01)continue;
+  for(const d of FD.filter(d=>d.me).slice(-2)){const age=clk-(d.t0===undefined?clk:d.t0),a=Math.min(1,age*7)*Math.min(1,d.l/.6);if(a<=.01)continue;
    ctx.globalAlpha=a;ctx.font=HF(800,Math.round(cs*.98));const tw3=ctx.measureText(d.t).width,fh=cs*1.85,fx=w/2-tw3/2-cs*1,sl=(1-Math.min(1,age*7))*-8;
    ctx.fillStyle='rgba(3,5,10,.62)';ctx.beginPath();ctx.roundRect(fx,fy+sl,tw3+cs*2,fh,fh/2);ctx.fill();ctx.fillStyle=d.c;ctx.beginPath();ctx.arc(fx+cs*.75,fy+sl+fh/2,cs*.22,0,7);ctx.fill();
    ctx.fillStyle='#ffffff';ctx.fillText(d.t,w/2+cs*.25,fy+sl+fh/2+1);fy+=fh+cs*.3;ctx.globalAlpha=1}}
@@ -160,8 +164,10 @@ addEventListener('keyup',e=>{if(e.code==='Space'||e.key==='Shift')abUp(4)});
 addEventListener('resize',()=>{if(P){readSafe();fit()}});
 function abDown(s){if(state!=='play'||RPL)return;
  if(s===4){setBoost(1);abFlash(4);return}
- if(MP){if(!ncUse(s))snd('deny');else abFlash(s);return}
- if(IN[1]){if(!ABU(1,s))snd('deny');else abFlash(s)}}
+ if(MP){if(!ncUse(s))abDeny(s);else abFlash(s);return}
+ if(IN[1]){if(!ABU(1,s))abDeny(s);else abFlash(s)}}
+// a press that could not fire (recharging, the ultimate not full, or no target for it): a short shake and a low tone
+function abDeny(s){snd('deny');const b=ABB[s-1];if(!b)return;b.classList.remove('no');void b.offsetWidth;b.classList.add('no');clearTimeout(b._nt);b._nt=setTimeout(()=>b.classList.remove('no'),320)}
 // a quick pop of the button that fired
 function abFlash(s){const b=ABB[s-1];if(!b)return;b.classList.remove('fire');void b.offsetWidth;b.classList.add('fire');clearTimeout(b._ft);b._ft=setTimeout(()=>b.classList.remove('fire'),340)}
 function abUp(s){if(s===4)setBoost(0)}
@@ -313,7 +319,9 @@ function abHud(){
  if(key!==ABK){ABK=key;$('qt').style.display='none';if(!pl){ABB.forEach(b=>b.classList.remove('on'));$('pz').classList.remove('on');pauseSet(0)}else{const C=CLS[CLSI[VS]||0];setAbLabels();ABB.forEach((b,j)=>b.classList.toggle('on',!(j<2&&C.ab[j].off)));$('pz').classList.add('on')}}
  if(!pl)return;
  const C=CLS[CLSI[VS]||0],r=RDY,cds=[C.ab[0].cd,C.ab[1].cd,0,0];
- for(let j=0;j<4;j++){const v=j===3?r[3]:r[j];if(Math.abs(v-ABV[j])>.012||(v>=.999)!==(ABV[j]>=.999)){ABV[j]=v;ABB[j].style.setProperty('--e',v.toFixed(3));ABB[j].classList.toggle('rdy',j<3&&v>=.999)}
+ for(let j=0;j<4;j++){const v=j===3?r[3]:r[j];if(Math.abs(v-ABV[j])>.012||(v>=.999)!==(ABV[j]>=.999)){const was=ABV[j]>=.999,fresh=ABV[j]===-1;ABV[j]=v;ABB[j].style.setProperty('--e',v.toFixed(3));ABB[j].classList.toggle('rdy',j<3&&v>=.999);
+   // a one-off pop when an ability comes back (not a pulse that never stops: calmer, and cheaper for the phone to draw)
+   if(j<3&&v>=.999&&!was&&!fresh){const b=ABB[j];b.classList.remove('rdyin');void b.offsetWidth;b.classList.add('rdyin');clearTimeout(b._rt);b._rt=setTimeout(()=>b.classList.remove('rdyin'),480)}}
   let t='';if(j<2&&v<.999)t=String(Math.ceil((1-v)*cds[j]));else if(j===2){if(MYUT>0)t=MYUT.toFixed(1);else if(v<.999)t=Math.floor(v*100)+'%'}else if(j===3&&v<.2)t='low';
   if(t!==ABT[j]){ABT[j]=t;ABB[j].querySelector('.cd').textContent=t}
   ABB[j].classList.toggle('run',j===2&&MYUT>0)}}

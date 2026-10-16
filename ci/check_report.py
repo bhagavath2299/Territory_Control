@@ -67,7 +67,7 @@ def main(folder: str) -> int:
     if last.get("programs") is not None:
         print("GPU programs built (by what the game was doing), at the paused step:",
               (steps.get("05-paused-landscape", {}).get("page") or {}).get("programs"),
-              "| at the end (the cost test builds 5 floor variants):", last.get("programs"))
+              "| at the end (the cost test builds 4 floor variants):", last.get("programs"))
     if last.get("timings"):
         print("time spent in the game's heavy functions (calls, total ms, longest ms):")
         for name, t in sorted(last["timings"].items(), key=lambda kv: -kv[1].get("max", 0)):

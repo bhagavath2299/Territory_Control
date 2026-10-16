@@ -253,16 +253,29 @@ const GLOW=1;   // layer number of objects that also draw into the glow pass
 const GFX={ok:0,R:null,S:null,cam:null,w:0,h:0,pr:1,scale:1,time:0,theme:null,thIdx:0,mode:'world',stats:{calls:0,tris:0,ms:0,fps:0},hdr:0,
  U:{time:{value:0},glowPass:{value:0},sunDir:{value:null},sunCol:{value:null},fogCol:{value:null},fogNear:{value:60},fogFar:{value:240},camPos:{value:null},
   skyTop:{value:null},skyHor:{value:null},cloud:{value:null}}};
-// ---------- the look: a neon arena floating in a black void ----------
-// One look for every match (v19). az / el: where the key light comes from (degrees). All colours are sRGB hex.
-// The floor is drawn by its own shader (see gwVoidMat): a black floor with a faint grid, a glowing rim round the arena, land in the owners' colours with bright edges.
-// night: car lamps on. glow: strength of the bloom. env: how much the studio reflections show on the cars.
+// ---------- the look ----------
+// One look for every match. az / el: where the key light comes from (degrees). All colours are sRGB hex.
+// night: car lamps on. glow: strength of the bloom. env: how much the reflections show on the cars; envDay: a daylight sky in them instead of a dark studio.
+// v20: the floor is a real surface made from code (gwFloorMat): a ground picture with grain, mottling and little stones, lit by a low sun, and land as
+// raised colour on it with a soft bevel and a shadow. No grid. Floor numbers: base (two ground colours), speck (stones), out (beyond the arena),
+// mat [bump, gloss, shine, stones], land [paint brightness, bevel, edge glow, shadow], land2 [gloss, shine], edgeK / edgeG: the arena's edge line, drawn / glowing.
 const GTH=[
- {n:'Neon Void',key:'void',az:205,el:62,sun:'#c4d2ff',sunI:3.0,sky:'#4a5a8a',gnd:'#05060a',hemiI:.95,fog:'#000000',fogN:120,fogF:330,
-  top:'#020308',hor:'#070a14',expo:1.0,sat:1.12,con:1.06,vig:.36,glow:.82,tint:[1,1,1.02],env:1.0,night:1,
-  edge:'#38d8ff',grid:'#2a6cff',tread:[.05,.12,.25],dust:'#8fe6ff',snowfall:0,mini:[20,30,54]}];
+ {n:'Asphalt',key:'asphalt',az:215,el:36,sun:'#fff1de',sunI:2.7,sky:'#a9bad4',gnd:'#2a2724',hemiI:1.0,fog:'#0b0c0e',fogN:120,fogF:330,
+  top:'#0b0c0e',hor:'#101216',expo:1.04,sat:1.08,con:1.05,vig:.3,glow:.42,tint:[1,1,1],env:.9,night:0,envDay:1,
+  edge:'#e8edf5',dust:'#b8b2a8',snowfall:0,mini:[40,42,46],
+  base:['#2a2b2f','#3a3b40'],speck:'#57544f',out:'#0f1012',mat:[.9,46,.22,.42],land:[.8,1.15,.16,.45],land2:[44,.22],edgeK:.5,edgeG:.15},
+ {n:'Obsidian',key:'obsidian',az:205,el:52,sun:'#d6e0ff',sunI:2.6,sky:'#5a6a9a',gnd:'#05060a',hemiI:.85,fog:'#000000',fogN:120,fogF:330,
+  top:'#020308',hor:'#070a14',expo:1.0,sat:1.12,con:1.06,vig:.36,glow:.78,tint:[1,1,1.02],env:1.0,night:1,envDay:0,
+  edge:'#8fe9ff',dust:'#8fe6ff',snowfall:0,mini:[20,26,40],
+  base:['#07080b','#15171c'],speck:'#1d2331',out:'#000000',mat:[.45,150,.55,.15],land:[.62,1.0,.8,.5],land2:[110,.42],edgeK:.35,edgeG:.9},
+ {n:'Concrete',key:'concrete',az:220,el:44,sun:'#fff6ea',sunI:2.5,sky:'#c3d2e6',gnd:'#6a645c',hemiI:1.1,fog:'#1e1d1b',fogN:120,fogF:330,
+  top:'#1e1d1b',hor:'#262421',expo:.92,sat:1.05,con:1.04,vig:.26,glow:.25,tint:[1,1,1],env:.85,night:0,envDay:1,
+  edge:'#ffffff',dust:'#d8d2c8',snowfall:0,mini:[150,146,140],
+  base:['#9a9792','#b3b0aa'],speck:'#86837e',out:'#383735',mat:[.5,30,.1,.28],land:[1.0,1.3,.0,.4],land2:[40,.18],edgeK:.55,edgeG:0}];
 let LOOKSEL=-1;
-function gfxThemeFor(seed){return 0}
+// the look of every match: one look, picked once (v20 options are 0 Asphalt, 1 Obsidian, 2 Concrete; ?look=N in the address while choosing)
+let LOOK=0;try{const v=+new URLSearchParams(location.search).get('look');if(v>=1&&v<=GTH.length)LOOK=v-1}catch(e){}
+function gfxThemeFor(seed){return LOOK}
 const sunVec=(az,el)=>{const a=az*Math.PI/180,e=el*Math.PI/180;return new THREE.Vector3(Math.cos(e)*Math.cos(a),Math.sin(e),Math.cos(e)*Math.sin(a))};
 const cLin=h=>{const l=linOf(h);return new THREE.Color().setRGB(l[0],l[1],l[2],THREE.LinearSRGBColorSpace)};
 
@@ -299,6 +312,16 @@ function gfxTextures(){
  T.grit=dtex(gr,GN,GN,THREE.RGBAFormat,THREE.UnsignedByteType,{mip:1});
  T.gritN=dtex(heightToNormal(gh,GN,4),GN,GN,THREE.RGBAFormat,THREE.UnsignedByteType,{mip:1});
  T.cloud=T.noise;
+ // the ground's surface (v20): one tiling 512 px picture made here, no image files. r: fine grain, g: mottling, b: little stones (aggregate), a: large patches.
+ // Its height (stones on top of the mottling) becomes a normal map, so the low sun picks out every stone.
+ {const N=512,R2=mulberry32(9157),mott=pfbm(N,6,6,4,.55,R2),macro=pfbm(N,2,2,3,.5,R2),agg=new Float32Array(N*N),px=new Uint8Array(N*N*4),hh=new Float32Array(N*N);
+  // stones: small rounded bumps of random size, wrapping at the edges so the tile joins up
+  for(let k=0;k<5200;k++){const cx=R2()*N,cy=R2()*N,r=.8+Math.pow(R2(),2.2)*3.6,h=.35+R2()*.65,ri=Math.ceil(r);
+   for(let y=-ri;y<=ri;y++)for(let x=-ri;x<=ri;x++){const d2=(x*x+y*y)/(r*r);if(d2>=1)continue;const X=((Math.floor(cx)+x)%N+N)%N,Y=((Math.floor(cy)+y)%N+N)%N,i=Y*N+X,v=h*Math.sqrt(1-d2);if(v>agg[i])agg[i]=v}}
+  for(let i=0;i<N*N;i++){const g=R2();px[i*4]=Math.round(g*255);px[i*4+1]=Math.max(0,Math.min(255,Math.round((mott[i]*.5+.5)*255)));px[i*4+2]=Math.round(agg[i]*255);px[i*4+3]=Math.max(0,Math.min(255,Math.round((macro[i]*.5+.5)*255)));
+   hh[i]=agg[i]*.9+mott[i]*.35+(g-.5)*.08}
+  T.surf=dtex(px,N,N,THREE.RGBAFormat,THREE.UnsignedByteType,{mip:1});
+  T.surfN=dtex(heightToNormal(hh,N,5),N,N,THREE.RGBAFormat,THREE.UnsignedByteType,{mip:1})}
  GFX.tex=T}
 
 // ---------- reflections: a dark studio (soft panels of light round a black room), made into an environment map ----------
@@ -307,6 +330,13 @@ function gfxEnv(th){
  const key=th.n;GFX.envs=GFX.envs||{};if(GFX.envs[key])return GFX.envs[key];
  const S=128,faces=[];
  const mkf=fn=>{const c=mkc(S,S),g=c.getContext('2d');g.fillStyle='#020306';g.fillRect(0,0,S,S);fn(g,S);return c};
+ if(th.envDay){ // daylight: a bright sky above, a soft horizon, the ground below (for the asphalt and concrete looks)
+  const side=c=>mkf((g,s)=>{g.fillStyle=lg(g,0,0,0,s,[[0,'#b9c9e2'],[.46,'#e9eef5'],[.54,'#8d8a84'],[1,'#3a3936']]);g.fillRect(0,0,s,s);g.globalAlpha=.35;g.fillStyle='#ffffff';g.fillRect(s*.2,s*.18,s*.6,s*.1);g.globalAlpha=1});
+  faces.push(side(),side(),mkf((g,s)=>{g.fillStyle=rg(g,s/2,s/2,0,s/2,s/2,s*.75,[[0,'#ffffff'],[.4,'#dbe5f3'],[1,'#a8bad6']]);g.fillRect(0,0,s,s)}),
+   mkf((g,s)=>{g.fillStyle='#45423e';g.fillRect(0,0,s,s)}),side(),side());
+  const cube=new THREE.CubeTexture(faces);cube.colorSpace=THREE.SRGBColorSpace;cube.needsUpdate=true;
+  const pm=new THREE.PMREMGenerator(GFX.R),rt=pm.fromCubemap(cube);pm.dispose();cube.dispose();
+  return GFX.envs[key]=rt.texture}
  // a soft rectangle of light
  const panel=(g,x,y,w,h,col,a)=>{g.save();g.globalAlpha=a;g.filter='blur(3px)';g.fillStyle=col;g.fillRect(x,y,w,h);g.restore()};
  const strip=(g,s,y,col,a)=>{const gr=g.createLinearGradient(0,y-s*.08,0,y+s*.08);gr.addColorStop(0,col+'00');gr.addColorStop(.5,col);gr.addColorStop(1,col+'00');g.globalAlpha=a;g.fillStyle=gr;g.fillRect(0,y-s*.08,s,s*.16);g.globalAlpha=1};
@@ -388,7 +418,7 @@ function gfxSetTheme(idx){
  GFX.S.fog.color.copy(cLin(th.fog));GFX.S.fog.near=th.fogN;GFX.S.fog.far=th.fogF;GFX.R.setClearColor(cLin(th.fog),1);
  GFX.S.environment=gfxEnv(th);GFX.S.environmentIntensity=th.env;
  const c=GFX.mComp.uniforms;c.uExpo.value=th.expo;c.uSat.value=th.sat;c.uCon.value=th.con;c.uVig.value=th.vig;c.uGlow.value=th.glow;c.uTint.value.set(th.tint[0],th.tint[1],th.tint[2]);
- if(GFX.onTheme)GFX.onTheme(th)}
+ if(typeof gwLook==="function")gwLook(th);if(GFX.onTheme)GFX.onTheme(th)}
 
 // ---------- one rendered picture: the scene, the glow of the bright things, then the finishing pass ----------
 function gfxPass(mat,target){GFX.qm.material=mat;GFX.R.setRenderTarget(target);GFX.R.render(GFX.qs,GFX.qc)}

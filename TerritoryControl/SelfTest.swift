@@ -205,11 +205,9 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
           await step('noFloor', without([GW.floor]));
           await step('floorFlat', floorWith('void main(){gl_FragColor=vec4(.003,.004,.01,1.);}', 'floorFlat'));
           await step('floorNoLand', floorWith(src.replace('if(mB.g>.01){', 'if(false){'), 'floorNoLand'));
-          await step('floorNoDeriv', floorWith(src.replace('vec4 dxA=dFdx(mA),dyA=dFdy(mA);vec2 dB=vec2(dFdx(mB.x),dFdy(mB.x));', 'vec4 dxA=vec4(0.),dyA=vec4(0.);vec2 dB=vec2(0.);')
-            .replace('float dOwn=(c-.5)/max(length(gc),1e-5)*pxu;', 'float dOwn=(c-.5)*1.33;'), 'floorNoDeriv'));
-          await step('floorNoMath', floorWith(src.replace('float sweep=pow(.5+.5*sin((wp.x*.55+wp.y*.35)*.3-uTime*1.4),24.);', 'float sweep=0.;')
-            .replace('inner=exp(-max(dOwn,0.)*1.1)*own;', 'inner=0.;'), 'floorNoMath'));
-          await step('floorNoGrid', floorWith(src.replace('float gMaj=gridL(wp,4.,.6),gMin=gridL(wp,1.,.45)*clamp(1.5-pxu*7.,0.,1.);', 'float gMaj=0.,gMin=0.;'), 'floorNoGrid'));
+          await step('floorNoSurface', floorWith(src.replace('vec4 s1=texture2D(uSurf,u1),s2=texture2D(uSurf,u2);', 'vec4 s1=vec4(.5),s2=vec4(.5);')
+            .replace('vec2 n2=texture2D(uSurfN,u2).xy*2.-1.,n1=uQ>.5?texture2D(uSurfN,u1).xy*2.-1.:vec2(0.);', 'vec2 n2=vec2(0.),n1=vec2(0.);'), 'floorNoSurface'));
+          await step('floorNoShadow', floorWith(src.replace('col*=1.-smoothstep(.3,.75,texture2D(uMB,(wp+so)/uWorld).g)*uLand.w;', ''), 'floorNoShadow'));
           await step('noPads', without(GW.pads));
           await step('noCars', without(cars));
           await step('noTrails', without(trails));

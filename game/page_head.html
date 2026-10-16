@@ -151,24 +151,33 @@ input[type=range]::-moz-range-thumb{width:24px;height:24px;border:0;border-radiu
 .res-p.w{background:linear-gradient(180deg,#fff7c4,#ffb020 70%);-webkit-background-clip:text;background-clip:text}
 .res-p sup{font-size:.4em;vertical-align:.9em}
 #rw{min-height:20px}
-/* ---------- in-game buttons ---------- */
-.gb{position:fixed;display:none;margin:0;padding:0;border-radius:50%;border:0;color:#fff;font-weight:800;font-size:8px;letter-spacing:.14em;text-transform:uppercase;text-shadow:0 1px 3px #000c;background:radial-gradient(circle,#05080fe6 64%,#0000 65.5%),conic-gradient(var(--pc,#ffb020) calc(var(--e,1)*360deg),#ffffff17 0);box-shadow:0 0 0 1px #ffffff0d,0 8px 20px #0008;flex-direction:column;align-items:center;justify-content:center;gap:1px;z-index:4;overflow:visible;touch-action:none;transition:transform .09s ease,box-shadow .25s ease,filter .25s ease}
-.gb svg{width:38%;height:38%;filter:drop-shadow(0 0 6px color-mix(in srgb,var(--pc,#fff) 60%,transparent));transition:opacity .2s ease,transform .2s ease}.gb.on{display:flex}.gb:active{transform:scale(.9)}
-.gb span{max-width:86%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.1;opacity:.62;margin-top:1px}
-.gb .cd{position:absolute;inset:0;display:grid;place-items:center;font-size:17px;font-weight:900;font-style:normal;text-shadow:0 2px 6px #000;pointer-events:none;letter-spacing:0;text-transform:none}
-.gb .cd:empty{display:none}.gb .cd:not(:empty)~span{opacity:0}
+/* ---------- in-game buttons (v20: icons only, a thin ring that fills as the ability recharges, a steady glow when it is ready) ---------- */
+.gb{position:fixed;display:none;margin:0;padding:0;border-radius:50%;border:0;color:#fff;font-weight:800;font-size:8px;letter-spacing:.12em;text-transform:uppercase;text-shadow:0 1px 3px #000c;
+ background:radial-gradient(circle closest-side,#0a0d14e8 calc(100% - 4px),#0000 calc(100% - 3.5px)),conic-gradient(var(--pc,#ffb020) calc(var(--e,1)*360deg),#ffffff1f 0);
+ box-shadow:0 6px 18px #0008;flex-direction:column;align-items:center;justify-content:center;gap:1px;z-index:4;overflow:visible;touch-action:none;transition:transform .09s ease,box-shadow .25s ease}
+.gb svg{width:40%;height:40%;transition:opacity .2s ease,transform .2s ease}.gb.on{display:flex}.gb:active{transform:scale(.9)}
+.gb span{display:none}
+.gb .cd{position:absolute;inset:0;display:grid;place-items:center;font-size:16px;font-weight:900;font-style:normal;text-shadow:0 2px 6px #000;pointer-events:none;letter-spacing:0;text-transform:none}
+.gb .cd:empty{display:none}
 .gb .kb{position:absolute;top:-4px;left:-2px;min-width:18px;height:18px;border-radius:6px;background:#000a;font-style:normal;font-size:10px;line-height:18px;text-align:center;padding:0 4px;box-shadow:inset 0 0 0 1px #ffffff33;text-transform:none;letter-spacing:0}
 @media (hover:none){.gb .kb{display:none}}
-.gb[data-cl]:not(.rdy):not(#spr) svg{opacity:.32;transform:scale(.9)}
-.gb.rdy{animation:rdy 1.6s ease-in-out infinite}
-.gb.run{background:radial-gradient(circle,color-mix(in srgb,var(--pc) 40%,#05080f) 64%,#0000 65.5%),conic-gradient(var(--pc) 360deg,#ffffff17 0);animation:rdy .5s ease-in-out infinite}
+.gb[data-cl]:not(.rdy):not(#spr):not(.run) svg{opacity:.22;transform:scale(.88)}
+.gb.rdy{box-shadow:0 0 0 1px color-mix(in srgb,var(--pc) 55%,transparent),0 0 18px color-mix(in srgb,var(--pc) 50%,transparent),0 6px 18px #0008}
+.gb.rdy svg{filter:drop-shadow(0 0 5px color-mix(in srgb,var(--pc) 70%,transparent))}
+.gb.rdyin{animation:rdyin .45s cubic-bezier(.2,.9,.3,1)}
+@keyframes rdyin{0%{transform:scale(1)}40%{transform:scale(1.13)}100%{transform:scale(1)}}
+.gb.run{background:radial-gradient(circle closest-side,color-mix(in srgb,var(--pc) 34%,#0a0d14) calc(100% - 4px),#0000 calc(100% - 3.5px)),conic-gradient(var(--pc) 360deg,#ffffff1f 0);box-shadow:0 0 22px color-mix(in srgb,var(--pc) 60%,transparent),0 6px 18px #0008}
 .gb.fire{animation:fire .32s cubic-bezier(.2,.9,.3,1)}
 @keyframes fire{0%{transform:scale(.86);filter:brightness(2.2)}55%{transform:scale(1.08);filter:brightness(1.4)}100%{transform:scale(1);filter:none}}
+/* pressed when not ready: a short shake */
+.gb.no{animation:no .3s ease}
+@keyframes no{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
 /* the buttons sit in an arc around Boost, under the right thumb; the same in portrait and landscape */
 #spr{right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));width:76px;height:76px;font-size:8.5px}
 #ab2{right:calc(108px + env(safe-area-inset-right,0px));bottom:calc(22px + env(safe-area-inset-bottom,0px));width:58px;height:58px}
 #ab1{right:calc(100px + env(safe-area-inset-right,0px));bottom:calc(96px + env(safe-area-inset-bottom,0px));width:54px;height:54px}
 #ab3{right:calc(24px + env(safe-area-inset-right,0px));bottom:calc(108px + env(safe-area-inset-bottom,0px));width:64px;height:64px}
+#ab3 .cd{font-size:13px;place-items:end center;padding-bottom:9px}
 #pwd{position:fixed;right:calc(31px + env(safe-area-inset-right,0px));bottom:calc(186px + env(safe-area-inset-bottom,0px));display:none;flex-direction:column-reverse;gap:10px;align-items:center;z-index:4}
 @media (orientation:landscape) and (max-height:520px){#pwd{flex-direction:row-reverse;right:calc(182px + env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px))}}
 #pz{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));right:calc(10px + env(safe-area-inset-right,0px));width:36px;height:36px;border-radius:11px;display:none;place-items:center;background:#05080fb3;box-shadow:inset 0 0 0 1px #9fd8ff24;z-index:4}#pz.on{display:grid}#pz:active{transform:scale(.92)}#pz i{display:flex;gap:4px}#pz i:before,#pz i:after{content:'';width:3px;height:12px;border-radius:2px;background:#fff;opacity:.9}

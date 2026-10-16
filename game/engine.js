@@ -1,7 +1,7 @@
 if(!CanvasRenderingContext2D.prototype.roundRect)CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h){this.rect(x,y,w,h)};
 document.addEventListener('gesturestart',e=>e.preventDefault());
 const $=id=>document.getElementById(id),cv=$('cv'),ctx=cv.getContext('2d');
-const IS_SRV=typeof SRV!=='undefined',VER='19';
+const IS_SRV=typeof SRV!=='undefined',VER='20';
 const GOAL=35,COLS=['','#2f6bff','#ff4d5e','#1fbf75','#ffb020','#9b5cff'],DIRS=[[1,0],[0,1],[-1,0],[0,-1]];
 // size of the arena and how the cars handle. v19: twice the area of v18 (each side 1.42x) and cars 20% quicker; the turning circle stays tight (SPD/TURN = 1.6 units).
 const WW=143,WH=250,MC=3,MW=WW*MC,MH=WH*MC,HR=.9,SPD=31,TURN=19.4,TSP=.7,SPRM=1.4,SPRD=.42,SPRR=.26,NITM=1.15,SLWM=.55;
@@ -19,14 +19,14 @@ const CLS=[
       {id:'storm',n:'Blade Cyclone',ut:5,d:'A wide ring of blades for 5 seconds. It shreds enemy land as you drive and cuts down everything outside its own land.'}]},
  {id:'titan',n:'Titan',role:'Tank',spd:.92,trn:.88,um:1.1,col:'#ffb020',st:[2,5,3,4],
   d:'Slow and heavy with regenerating armour. Breaks land wide open.',
-  ab:[{id:'fault',n:'Fault Line',cd:7,d:'Slam the ground: a crack races 14 units ahead, splitting enemy land and taking out exposed rivals on it.'},
+  ab:[{id:'fault',n:'Fault Line',cd:7,d:'Slam the ground: a crack races 18 units ahead, splitting enemy land and taking out exposed rivals on it.'},
       {id:'shock',n:'Shockwave',cd:9.5,d:'A wide burst that slows rivals, tears up their land and crushes anyone close who is off their own land.'},
       {id:'fort',n:'Juggernaut',ut:5,d:'For 5 seconds nothing can kill you. Pulses wreck a wide ring of land and slow rivals around you.'}]},
  {id:'gunner',n:'Gunner',role:'Artillery',spd:.97,trn:1,um:1,col:'#2f6bff',st:[3,2,5,4],
   d:'Long range. A railgun that pierces everything in line, cluster mortars and strikes from orbit.',
   ab:[{id:'rail',n:'Railgun',cd:4.5,d:'An instant beam 32 units long. It pierces every exposed rival and trail on the line and burns a strip of enemy land.'},
       {id:'mortar',n:'Cluster Mortar',cd:8.5,d:'Six shells rain on the ground ahead of you, each blowing a wide crater.'},
-      {id:'orbital',n:'Orbital Barrage',ut:0,d:'Twelve strikes from orbit on the land of the player who holds the most.'}]},
+      {id:'orbital',n:'Orbital Barrage',ut:0,d:'Twelve strikes from orbit on rival land around you. With none near, they fall on the leader\'s land.'}]},
  {id:'sapper',n:'Sapper',role:'Trapper',spd:1.03,trn:1.06,um:1,col:'#1fbf75',st:[4,3,3,5],
   d:'Plasma mines, a drone swarm and a black hole. Deadly to anyone who follows you.',
   ab:[{id:'mine',n:'Plasma Mines',cd:3.4,d:'Drop a plasma mine behind you (up to 6). When one goes off it takes out the rival and blasts the land around it.'},
@@ -34,10 +34,10 @@ const CLS=[
       {id:'hole',n:'Black Hole',ut:0,d:'Open a black hole ahead of you for 4 seconds. It drags exposed rivals in, swallows enemy land and destroys anything outside its own land at its core.'}]}];
 // numbers that decide how strong the abilities are. v19: every blast clears twice the land of v18 (radius x1.42), the cannon flies 50% further, the airstrike drops 6 bombs
 // instead of 3, and land destroyed by any weapon stays scorched for scarT seconds (see SCAR).
-const BAL={ucs:1.6,ucLand:1.2,ucKill:24,shellV:60,shellR:30,shellBlast:3.0,bladeV:52,bladeR:28,missV:36,missT:3.8,missTurn:5.5,missBlast:2.7,
+const BAL={ucs:2.0,ucLand:1.4,ucKill:24,uc0:20,shellV:60,shellR:30,shellBlast:3.0,bladeV:38,bladeR:34,missV:36,missT:3.8,missTurn:5.5,missBlast:2.7,
  stormR:4.2,stormCarve:2.4,shockR:9.3,shockBlast:4.8,shockKill:3.7,fortR:3.7,fortPulse:1,plateRegen:20,
  mortarR:3.25,mortarN:6,orbitalR:4.5,orbitalN:12,mineMax:6,mineBlast:2.4,strikeR:3.7,strikeN:6,
- railL:32,railW:.8,railCarve:.85,wireL:9,wireT:6,faultL:14,faultV:45,faultW:.9,holeD:7.5,holeT:4,holeR:5.2,holePull:10,holeCore:1.7,scarT:15};
+ railL:32,railW:.9,railCarve:.85,wireL:12,wireT:6,faultL:18,faultV:42,faultW:1.0,holeD:7.5,holeT:4,holeR:5.2,holePull:10,holeCore:1.7,scarT:15};
 // MP: 1 while an online match is shown (the server decides). VS: the player whose view this is (1 in play, any slot in a replay). FF: 1 while a replay is being fast-forwarded (no sound or effects).
 let MP=0,VS=1,FF=0,PAUSED=0;
 let FX=[],PO=[],shake=0,score=0,kills=0,streak=0,streakT=0,en=1,boost=0,tl=120,CN=[0,0,0,0,0,0],FD=[],NM=['','You','Blaze','Mira','Kabir','Nova'],W=WW,H=WH,cs=10,dpr=1,own=new Uint8Array(MW*MH),P=[null],me=null,state='menu',T={},ptr={type:(()=>{try{return matchMedia('(pointer:coarse)').matches?'touch':'mouse'}catch(e){return'mouse'}})(),x:0,y:0,px:0,py:0,ax:0,ay:0,down:0,id:null},tg={x:0,y:0,a:0},last=0,hudT=0,fr=0,best=0,MDIRTY=true,clk=0;
@@ -109,7 +109,7 @@ function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a
 // ---------- deterministic helpers: the same numbers on every device, so a recorded match replays exactly ----------
 // The match uses its own seeded random numbers (GR) and arithmetic-only trig (dsin, dcos, dat2, dhyp). Browsers differ in the
 // last digits of Math.sin, Math.cos, Math.atan2 and Math.hypot; those tiny differences could otherwise split a replay from the real match.
-const STEP=1/30,EVER=19,CAPT=[];let GRS=1,TK=0,REC=null;
+const STEP=1/30,EVER=20,CAPT=[];let GRS=1,TK=0,REC=null;
 function GR(){GRS=GRS+0x6D2B79F5|0;let t=Math.imul(GRS^GRS>>>15,1|GRS);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}
 function ksin(r){const z=r*r;return r*(1+z*(-1/6+z*(1/120+z*(-1/5040+z*(1/362880+z*(-1/39916800+z*(1/6227020800+z*(-1/1307674368000))))))))}
 function kcos(r){const z=r*r;return 1+z*(-1/2+z*(1/24+z*(-1/720+z*(1/40320+z*(-1/3628800+z*(1/479001600+z*(-1/87178291200+z*(1/20922789888000))))))))}
@@ -143,6 +143,17 @@ function zoneTick(dt){ZT-=dt;if(ZT>0)return;ZT=.2;HOLD.fill(0);
   if(o!==z.own){EV.push(['zone',zi,o,z.own]);z.own=o}if(o)HOLD[o]|=ZBIT[z.t]}}
 // the rival with the most land (not counting i), or 0
 function bigRival(i){let tg=0;for(let q=1;q<=5;q++)if(q!==i&&P[q].alive&&CNI[q]>0&&(!tg||CNI[q]>CNI[tg]))tg=q;return tg}
+// v20: a barrage you call falls on rival land near you, where you can see it (within R of x,y; spots at least gap apart). Only when there is
+// too little rival land near do the strikes go to the leader's land instead.
+function nearSpots(i,x,y,R,n,gap){const pts=[],x0=gx(x-R),x1=gx(x+R),y0=gy(y-R),y1=gy(y+R),w=x1-x0+1,h=y1-y0+1;
+ for(let a=0,hit=0;a<n*500&&hit<n*10&&pts.length<n;a++){const cx=x0+((GR()*w)|0),cy=y0+((GR()*h)|0),o=own[cy*MW+cx];if(!o||o===i||PROT[o]>0)continue;
+  const px=(cx+.5)/MC,py=(cy+.5)/MC;if(dhyp(px-x,py-y)>R)continue;hit++;if(!pts.some(v=>dhyp(v[0]-px,v[1]-py)<gap))pts.push([px,py])}
+ return pts}
+// the rival whose land most of these spots are on (for the message)
+function spotOwner(pts){const c=[0,0,0,0,0,0];for(const v of pts)c[own[gy(v[1])*MW+gx(v[0])]]++;let b=0;for(let q=1;q<=5;q++)if(c[q]>c[b])b=q;return b}
+// a barrage of n strikes for player i at (x,y): near rival land first, else the leader's land. Returns [spots, target] or null.
+function barrage(i,x,y,n,gap){let pts=nearSpots(i,x,y,30,n,gap);if(pts.length>=Math.min(4,n))return[pts,spotOwner(pts)];
+ const tg=bigRival(i);if(!tg)return null;pts=landSpots(tg,n,gap);return pts.length?[pts,tg]:null}
 // n separated spots on the land of player tg
 function landSpots(tg,n,gap){const k=tg*4,x0=BBX[k],y0=BBX[k+1],w=BBX[k+2]-x0+1,h=BBX[k+3]-y0+1,pts=[];if(w<=0||h<=0||!CNI[tg])return pts;
  // random cells of the box until n spots on tg's land are found (at least gap apart)
@@ -152,8 +163,8 @@ function landSpots(tg,n,gap){const k=tg*4,x0=BBX[k],y0=BBX[k+1],w=BBX[k+2]-x0+1,
 function POW(i,k){const p=P[i],j=PK.indexOf(k);if(!p||!p.alive||j<0||!(HOLD[i]&ZBIT[k])||PWC[i][j]>0)return false;
  if(k==='cannon'){const c=dcos(p.a),s=dsin(p.a);SHL.push({x:p.x+c*1.4,y:p.y+s*1.4,vx:c*BAL.shellV,vy:s*BAL.shellV,o:i,d:0});EV.push(['fire',i,+p.x.toFixed(1),+p.y.toFixed(1)])}
  else if(k==='fort'){PROT[i]=8;EV.push(['fort',i,+p.x.toFixed(1),+p.y.toFixed(1)])}
- else{const tg=bigRival(i);if(!tg)return false;
-  landSpots(tg,BAL.strikeN,4.2).forEach((v,n)=>STR.push({x:v[0],y:v[1],t:1.2+n*.12,o:i,r:BAL.strikeR}));EV.push(['strike',i,tg,0])}
+ else{const b=barrage(i,p.x,p.y,BAL.strikeN,4.2);if(!b)return false;
+  b[0].forEach((v,n)=>STR.push({x:v[0],y:v[1],t:1.2+n*.12,o:i,r:BAL.strikeR}));EV.push(['strike',i,b[1],0])}
  PWC[i][j]=ZCD[k];return true}
 
 // ---------- hitting things ----------
@@ -444,7 +455,7 @@ function botAbil(p,t,dt){
 // classes: humans pick theirs (CLSI), bots get a spread of the four decided by the seed
 function assignClasses(n,fc){const R=mulberry32((SEED^0xC1A55)>>>0),perm=[0,1,2,3];for(let k=3;k>0;k--){const j=(R()*(k+1))|0,tm=perm[k];perm[k]=perm[j];perm[j]=tm}
  for(let i=1;i<=5;i++){const v=CLSI[i];CLSI[i]=(fc&&fc[i]>=0&&fc[i]<=3)?fc[i]:(i<=n&&v>=0&&v<=3&&v===(v|0))?v:perm[i&3]}}
-function newIN(i){return{a:P[i].a,b:0,en:1,cd:[0,0],uc:0,mv:0,mk:0,ut:0,pt:0}}
+function newIN(i){return{a:P[i].a,b:0,en:1,cd:[0,0],uc:BAL.uc0,mv:0,mk:0,ut:0,pt:0}}
 let NBOT;
 function MPS(n,bots,nb,seed,fc){NBOT=nb;genMap(seed===undefined?(Math.random()*1e9|0):seed);GRS=(SEED^0x9E3779B9)|0;TK=0;REC=null;MINES.length=0;SLOW.fill(0);SHL.length=0;STR.length=0;BLD.length=0;MSL.length=0;WIRES.length=0;FAULTS.length=0;HOLES.length=0;SCAR.fill(0);SCO.fill(0);SCARMAX=0;LH.fill(0);LHT.fill(0);PROT.fill(0);HOLD.fill(0);INV.fill(0);PLT.fill(0);PLR.fill(0);for(let i=1;i<=5;i++)PWC[i]=[0,0,0];ZT=0;
  IN.length=0;assignClasses(n,fc);newGame();state='play';tl=TL;HN=n;BOTS=!!bots;KL.fill(0);DE.fill(0);EV.length=0;
@@ -473,8 +484,8 @@ function USE(i,s){const t=IN[i],p=P[i];if(!t||!p||!p.alive||s<1||s>3)return fals
    for(let d=1.2,n=0;d<=L+1.2;d+=st,n++){const x=X+c*d,y=Y+sn*d;carHit(x,y,BAL.railW,i,'rail',false);trailHit(x,y,.55,i,'rail');if(n%2===0)carve(x,y,BAL.railCarve,i)}
    EV.push(['rail',i,+X.toFixed(1),+Y.toFixed(1),+(X+c*(L+1.2)).toFixed(1),+(Y+sn*(L+1.2)).toFixed(1)]);break}
   case 'mortar':for(let k=0;k<BAL.mortarN;k++){const d=7+(k>>1)*4.6,lat=(k&1?1:-1)*rr(1,2.6);STR.push({x:clampX(X+c*d-sn*lat),y:clampY(Y+sn*d+c*lat),t:.8+k*.16,o:i,r:BAL.mortarR})}ev('mortar');break;
-  case 'orbital':{const tg=bigRival(i);if(!tg)return false;const pts=landSpots(tg,BAL.orbitalN,4.4);if(!pts.length)return false;
-   pts.forEach((v,k)=>STR.push({x:v[0],y:v[1],t:.9+k*.22,o:i,r:BAL.orbitalR}));EV.push(['orbital',i,tg,0]);break}
+  case 'orbital':{const b=barrage(i,X,Y,BAL.orbitalN,4.4);if(!b)return false;
+   b[0].forEach((v,k)=>STR.push({x:v[0],y:v[1],t:.9+k*.16,o:i,r:BAL.orbitalR}));EV.push(['orbital',i,b[1],0]);break}
   case 'mine':{const mx=X-c*1.5,my=Y-sn*1.5;MINES.push({x:mx,y:my,o:i,t:18,arm:.6,k:0});const ms=MINES.filter(m=>m.o===i&&!m.k);if(ms.length>BAL.mineMax)MINES.splice(MINES.indexOf(ms[0]),1);EV.push(['mine',i,+mx.toFixed(1),+my.toFixed(1)]);break}
   case 'drone':{const tg=[];for(let j=1;j<=5;j++){const q=P[j];if(j===i||!q.alive||!exposed(q))continue;const d=dhyp(q.x-X,q.y-Y);if(d<22)tg.push([d,j])}tg.sort((a,b)=>a[0]-b[0]);
    for(let k=0;k<3;k++)MSL.push({x:X+c*1.4,y:Y+sn*1.4,a:p.a+(k-1)*.4,o:i,t:BAL.missT,tg:tg.length?tg[k%tg.length][1]:0});ev('drone');break}

@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <meta charset="utf-8">
-<meta name="tc-native-source" content="game/ build">
+<meta name="tc-native-source" content="v20 asphalt">
 <meta name="application-name" content="Territory">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
@@ -150,24 +150,33 @@ input[type=range]::-moz-range-thumb{width:24px;height:24px;border:0;border-radiu
 .res-p.w{background:linear-gradient(180deg,#fff7c4,#ffb020 70%);-webkit-background-clip:text;background-clip:text}
 .res-p sup{font-size:.4em;vertical-align:.9em}
 #rw{min-height:20px}
-/* ---------- in-game buttons ---------- */
-.gb{position:fixed;display:none;margin:0;padding:0;border-radius:50%;border:0;color:#fff;font-weight:800;font-size:8px;letter-spacing:.14em;text-transform:uppercase;text-shadow:0 1px 3px #000c;background:radial-gradient(circle,#05080fe6 64%,#0000 65.5%),conic-gradient(var(--pc,#ffb020) calc(var(--e,1)*360deg),#ffffff17 0);box-shadow:0 0 0 1px #ffffff0d,0 8px 20px #0008;flex-direction:column;align-items:center;justify-content:center;gap:1px;z-index:4;overflow:visible;touch-action:none;transition:transform .09s ease,box-shadow .25s ease,filter .25s ease}
-.gb svg{width:38%;height:38%;filter:drop-shadow(0 0 6px color-mix(in srgb,var(--pc,#fff) 60%,transparent));transition:opacity .2s ease,transform .2s ease}.gb.on{display:flex}.gb:active{transform:scale(.9)}
-.gb span{max-width:86%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.1;opacity:.62;margin-top:1px}
-.gb .cd{position:absolute;inset:0;display:grid;place-items:center;font-size:17px;font-weight:900;font-style:normal;text-shadow:0 2px 6px #000;pointer-events:none;letter-spacing:0;text-transform:none}
-.gb .cd:empty{display:none}.gb .cd:not(:empty)~span{opacity:0}
+/* ---------- in-game buttons (v20: icons only, a thin ring that fills as the ability recharges, a steady glow when it is ready) ---------- */
+.gb{position:fixed;display:none;margin:0;padding:0;border-radius:50%;border:0;color:#fff;font-weight:800;font-size:8px;letter-spacing:.12em;text-transform:uppercase;text-shadow:0 1px 3px #000c;
+ background:radial-gradient(circle closest-side,#0a0d14e8 calc(100% - 4px),#0000 calc(100% - 3.5px)),conic-gradient(var(--pc,#ffb020) calc(var(--e,1)*360deg),#ffffff1f 0);
+ box-shadow:0 6px 18px #0008;flex-direction:column;align-items:center;justify-content:center;gap:1px;z-index:4;overflow:visible;touch-action:none;transition:transform .09s ease,box-shadow .25s ease}
+.gb svg{width:40%;height:40%;transition:opacity .2s ease,transform .2s ease}.gb.on{display:flex}.gb:active{transform:scale(.9)}
+.gb span{display:none}
+.gb .cd{position:absolute;inset:0;display:grid;place-items:center;font-size:16px;font-weight:900;font-style:normal;text-shadow:0 2px 6px #000;pointer-events:none;letter-spacing:0;text-transform:none}
+.gb .cd:empty{display:none}
 .gb .kb{position:absolute;top:-4px;left:-2px;min-width:18px;height:18px;border-radius:6px;background:#000a;font-style:normal;font-size:10px;line-height:18px;text-align:center;padding:0 4px;box-shadow:inset 0 0 0 1px #ffffff33;text-transform:none;letter-spacing:0}
 @media (hover:none){.gb .kb{display:none}}
-.gb[data-cl]:not(.rdy):not(#spr) svg{opacity:.32;transform:scale(.9)}
-.gb.rdy{animation:rdy 1.6s ease-in-out infinite}
-.gb.run{background:radial-gradient(circle,color-mix(in srgb,var(--pc) 40%,#05080f) 64%,#0000 65.5%),conic-gradient(var(--pc) 360deg,#ffffff17 0);animation:rdy .5s ease-in-out infinite}
+.gb[data-cl]:not(.rdy):not(#spr):not(.run) svg{opacity:.22;transform:scale(.88)}
+.gb.rdy{box-shadow:0 0 0 1px color-mix(in srgb,var(--pc) 55%,transparent),0 0 18px color-mix(in srgb,var(--pc) 50%,transparent),0 6px 18px #0008}
+.gb.rdy svg{filter:drop-shadow(0 0 5px color-mix(in srgb,var(--pc) 70%,transparent))}
+.gb.rdyin{animation:rdyin .45s cubic-bezier(.2,.9,.3,1)}
+@keyframes rdyin{0%{transform:scale(1)}40%{transform:scale(1.13)}100%{transform:scale(1)}}
+.gb.run{background:radial-gradient(circle closest-side,color-mix(in srgb,var(--pc) 34%,#0a0d14) calc(100% - 4px),#0000 calc(100% - 3.5px)),conic-gradient(var(--pc) 360deg,#ffffff1f 0);box-shadow:0 0 22px color-mix(in srgb,var(--pc) 60%,transparent),0 6px 18px #0008}
 .gb.fire{animation:fire .32s cubic-bezier(.2,.9,.3,1)}
 @keyframes fire{0%{transform:scale(.86);filter:brightness(2.2)}55%{transform:scale(1.08);filter:brightness(1.4)}100%{transform:scale(1);filter:none}}
+/* pressed when not ready: a short shake */
+.gb.no{animation:no .3s ease}
+@keyframes no{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
 /* the buttons sit in an arc around Boost, under the right thumb; the same in portrait and landscape */
 #spr{right:calc(18px + env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));width:76px;height:76px;font-size:8.5px}
 #ab2{right:calc(108px + env(safe-area-inset-right,0px));bottom:calc(22px + env(safe-area-inset-bottom,0px));width:58px;height:58px}
 #ab1{right:calc(100px + env(safe-area-inset-right,0px));bottom:calc(96px + env(safe-area-inset-bottom,0px));width:54px;height:54px}
 #ab3{right:calc(24px + env(safe-area-inset-right,0px));bottom:calc(108px + env(safe-area-inset-bottom,0px));width:64px;height:64px}
+#ab3 .cd{font-size:13px;place-items:end center;padding-bottom:9px}
 #pwd{position:fixed;right:calc(31px + env(safe-area-inset-right,0px));bottom:calc(186px + env(safe-area-inset-bottom,0px));display:none;flex-direction:column-reverse;gap:10px;align-items:center;z-index:4}
 @media (orientation:landscape) and (max-height:520px){#pwd{flex-direction:row-reverse;right:calc(182px + env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px))}}
 #pz{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));right:calc(10px + env(safe-area-inset-right,0px));width:36px;height:36px;border-radius:11px;display:none;place-items:center;background:#05080fb3;box-shadow:inset 0 0 0 1px #9fd8ff24;z-index:4}#pz.on{display:grid}#pz:active{transform:scale(.92)}#pz i{display:flex;gap:4px}#pz i:before,#pz i:after{content:'';width:3px;height:12px;border-radius:2px;background:#fff;opacity:.9}
@@ -227,7 +236,7 @@ input[type=range]::-moz-range-thumb{width:24px;height:24px;border:0;border-radiu
 if(!CanvasRenderingContext2D.prototype.roundRect)CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h){this.rect(x,y,w,h)};
 document.addEventListener('gesturestart',e=>e.preventDefault());
 const $=id=>document.getElementById(id),cv=$('cv'),ctx=cv.getContext('2d');
-const IS_SRV=typeof SRV!=='undefined',VER='19';
+const IS_SRV=typeof SRV!=='undefined',VER='20';
 const GOAL=35,COLS=['','#2f6bff','#ff4d5e','#1fbf75','#ffb020','#9b5cff'],DIRS=[[1,0],[0,1],[-1,0],[0,-1]];
 // size of the arena and how the cars handle. v19: twice the area of v18 (each side 1.42x) and cars 20% quicker; the turning circle stays tight (SPD/TURN = 1.6 units).
 const WW=143,WH=250,MC=3,MW=WW*MC,MH=WH*MC,HR=.9,SPD=31,TURN=19.4,TSP=.7,SPRM=1.4,SPRD=.42,SPRR=.26,NITM=1.15,SLWM=.55;
@@ -245,14 +254,14 @@ const CLS=[
       {id:'storm',n:'Blade Cyclone',ut:5,d:'A wide ring of blades for 5 seconds. It shreds enemy land as you drive and cuts down everything outside its own land.'}]},
  {id:'titan',n:'Titan',role:'Tank',spd:.92,trn:.88,um:1.1,col:'#ffb020',st:[2,5,3,4],
   d:'Slow and heavy with regenerating armour. Breaks land wide open.',
-  ab:[{id:'fault',n:'Fault Line',cd:7,d:'Slam the ground: a crack races 14 units ahead, splitting enemy land and taking out exposed rivals on it.'},
+  ab:[{id:'fault',n:'Fault Line',cd:7,d:'Slam the ground: a crack races 18 units ahead, splitting enemy land and taking out exposed rivals on it.'},
       {id:'shock',n:'Shockwave',cd:9.5,d:'A wide burst that slows rivals, tears up their land and crushes anyone close who is off their own land.'},
       {id:'fort',n:'Juggernaut',ut:5,d:'For 5 seconds nothing can kill you. Pulses wreck a wide ring of land and slow rivals around you.'}]},
  {id:'gunner',n:'Gunner',role:'Artillery',spd:.97,trn:1,um:1,col:'#2f6bff',st:[3,2,5,4],
   d:'Long range. A railgun that pierces everything in line, cluster mortars and strikes from orbit.',
   ab:[{id:'rail',n:'Railgun',cd:4.5,d:'An instant beam 32 units long. It pierces every exposed rival and trail on the line and burns a strip of enemy land.'},
       {id:'mortar',n:'Cluster Mortar',cd:8.5,d:'Six shells rain on the ground ahead of you, each blowing a wide crater.'},
-      {id:'orbital',n:'Orbital Barrage',ut:0,d:'Twelve strikes from orbit on the land of the player who holds the most.'}]},
+      {id:'orbital',n:'Orbital Barrage',ut:0,d:'Twelve strikes from orbit on rival land around you. With none near, they fall on the leader\'s land.'}]},
  {id:'sapper',n:'Sapper',role:'Trapper',spd:1.03,trn:1.06,um:1,col:'#1fbf75',st:[4,3,3,5],
   d:'Plasma mines, a drone swarm and a black hole. Deadly to anyone who follows you.',
   ab:[{id:'mine',n:'Plasma Mines',cd:3.4,d:'Drop a plasma mine behind you (up to 6). When one goes off it takes out the rival and blasts the land around it.'},
@@ -260,10 +269,10 @@ const CLS=[
       {id:'hole',n:'Black Hole',ut:0,d:'Open a black hole ahead of you for 4 seconds. It drags exposed rivals in, swallows enemy land and destroys anything outside its own land at its core.'}]}];
 // numbers that decide how strong the abilities are. v19: every blast clears twice the land of v18 (radius x1.42), the cannon flies 50% further, the airstrike drops 6 bombs
 // instead of 3, and land destroyed by any weapon stays scorched for scarT seconds (see SCAR).
-const BAL={ucs:1.6,ucLand:1.2,ucKill:24,shellV:60,shellR:30,shellBlast:3.0,bladeV:52,bladeR:28,missV:36,missT:3.8,missTurn:5.5,missBlast:2.7,
+const BAL={ucs:2.0,ucLand:1.4,ucKill:24,uc0:20,shellV:60,shellR:30,shellBlast:3.0,bladeV:38,bladeR:34,missV:36,missT:3.8,missTurn:5.5,missBlast:2.7,
  stormR:4.2,stormCarve:2.4,shockR:9.3,shockBlast:4.8,shockKill:3.7,fortR:3.7,fortPulse:1,plateRegen:20,
  mortarR:3.25,mortarN:6,orbitalR:4.5,orbitalN:12,mineMax:6,mineBlast:2.4,strikeR:3.7,strikeN:6,
- railL:32,railW:.8,railCarve:.85,wireL:9,wireT:6,faultL:14,faultV:45,faultW:.9,holeD:7.5,holeT:4,holeR:5.2,holePull:10,holeCore:1.7,scarT:15};
+ railL:32,railW:.9,railCarve:.85,wireL:12,wireT:6,faultL:18,faultV:42,faultW:1.0,holeD:7.5,holeT:4,holeR:5.2,holePull:10,holeCore:1.7,scarT:15};
 // MP: 1 while an online match is shown (the server decides). VS: the player whose view this is (1 in play, any slot in a replay). FF: 1 while a replay is being fast-forwarded (no sound or effects).
 let MP=0,VS=1,FF=0,PAUSED=0;
 let FX=[],PO=[],shake=0,score=0,kills=0,streak=0,streakT=0,en=1,boost=0,tl=120,CN=[0,0,0,0,0,0],FD=[],NM=['','You','Blaze','Mira','Kabir','Nova'],W=WW,H=WH,cs=10,dpr=1,own=new Uint8Array(MW*MH),P=[null],me=null,state='menu',T={},ptr={type:(()=>{try{return matchMedia('(pointer:coarse)').matches?'touch':'mouse'}catch(e){return'mouse'}})(),x:0,y:0,px:0,py:0,ax:0,ay:0,down:0,id:null},tg={x:0,y:0,a:0},last=0,hudT=0,fr=0,best=0,MDIRTY=true,clk=0;
@@ -335,7 +344,7 @@ function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a
 // ---------- deterministic helpers: the same numbers on every device, so a recorded match replays exactly ----------
 // The match uses its own seeded random numbers (GR) and arithmetic-only trig (dsin, dcos, dat2, dhyp). Browsers differ in the
 // last digits of Math.sin, Math.cos, Math.atan2 and Math.hypot; those tiny differences could otherwise split a replay from the real match.
-const STEP=1/30,EVER=19,CAPT=[];let GRS=1,TK=0,REC=null;
+const STEP=1/30,EVER=20,CAPT=[];let GRS=1,TK=0,REC=null;
 function GR(){GRS=GRS+0x6D2B79F5|0;let t=Math.imul(GRS^GRS>>>15,1|GRS);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}
 function ksin(r){const z=r*r;return r*(1+z*(-1/6+z*(1/120+z*(-1/5040+z*(1/362880+z*(-1/39916800+z*(1/6227020800+z*(-1/1307674368000))))))))}
 function kcos(r){const z=r*r;return 1+z*(-1/2+z*(1/24+z*(-1/720+z*(1/40320+z*(-1/3628800+z*(1/479001600+z*(-1/87178291200+z*(1/20922789888000))))))))}
@@ -369,6 +378,17 @@ function zoneTick(dt){ZT-=dt;if(ZT>0)return;ZT=.2;HOLD.fill(0);
   if(o!==z.own){EV.push(['zone',zi,o,z.own]);z.own=o}if(o)HOLD[o]|=ZBIT[z.t]}}
 // the rival with the most land (not counting i), or 0
 function bigRival(i){let tg=0;for(let q=1;q<=5;q++)if(q!==i&&P[q].alive&&CNI[q]>0&&(!tg||CNI[q]>CNI[tg]))tg=q;return tg}
+// v20: a barrage you call falls on rival land near you, where you can see it (within R of x,y; spots at least gap apart). Only when there is
+// too little rival land near do the strikes go to the leader's land instead.
+function nearSpots(i,x,y,R,n,gap){const pts=[],x0=gx(x-R),x1=gx(x+R),y0=gy(y-R),y1=gy(y+R),w=x1-x0+1,h=y1-y0+1;
+ for(let a=0,hit=0;a<n*500&&hit<n*10&&pts.length<n;a++){const cx=x0+((GR()*w)|0),cy=y0+((GR()*h)|0),o=own[cy*MW+cx];if(!o||o===i||PROT[o]>0)continue;
+  const px=(cx+.5)/MC,py=(cy+.5)/MC;if(dhyp(px-x,py-y)>R)continue;hit++;if(!pts.some(v=>dhyp(v[0]-px,v[1]-py)<gap))pts.push([px,py])}
+ return pts}
+// the rival whose land most of these spots are on (for the message)
+function spotOwner(pts){const c=[0,0,0,0,0,0];for(const v of pts)c[own[gy(v[1])*MW+gx(v[0])]]++;let b=0;for(let q=1;q<=5;q++)if(c[q]>c[b])b=q;return b}
+// a barrage of n strikes for player i at (x,y): near rival land first, else the leader's land. Returns [spots, target] or null.
+function barrage(i,x,y,n,gap){let pts=nearSpots(i,x,y,30,n,gap);if(pts.length>=Math.min(4,n))return[pts,spotOwner(pts)];
+ const tg=bigRival(i);if(!tg)return null;pts=landSpots(tg,n,gap);return pts.length?[pts,tg]:null}
 // n separated spots on the land of player tg
 function landSpots(tg,n,gap){const k=tg*4,x0=BBX[k],y0=BBX[k+1],w=BBX[k+2]-x0+1,h=BBX[k+3]-y0+1,pts=[];if(w<=0||h<=0||!CNI[tg])return pts;
  // random cells of the box until n spots on tg's land are found (at least gap apart)
@@ -378,8 +398,8 @@ function landSpots(tg,n,gap){const k=tg*4,x0=BBX[k],y0=BBX[k+1],w=BBX[k+2]-x0+1,
 function POW(i,k){const p=P[i],j=PK.indexOf(k);if(!p||!p.alive||j<0||!(HOLD[i]&ZBIT[k])||PWC[i][j]>0)return false;
  if(k==='cannon'){const c=dcos(p.a),s=dsin(p.a);SHL.push({x:p.x+c*1.4,y:p.y+s*1.4,vx:c*BAL.shellV,vy:s*BAL.shellV,o:i,d:0});EV.push(['fire',i,+p.x.toFixed(1),+p.y.toFixed(1)])}
  else if(k==='fort'){PROT[i]=8;EV.push(['fort',i,+p.x.toFixed(1),+p.y.toFixed(1)])}
- else{const tg=bigRival(i);if(!tg)return false;
-  landSpots(tg,BAL.strikeN,4.2).forEach((v,n)=>STR.push({x:v[0],y:v[1],t:1.2+n*.12,o:i,r:BAL.strikeR}));EV.push(['strike',i,tg,0])}
+ else{const b=barrage(i,p.x,p.y,BAL.strikeN,4.2);if(!b)return false;
+  b[0].forEach((v,n)=>STR.push({x:v[0],y:v[1],t:1.2+n*.12,o:i,r:BAL.strikeR}));EV.push(['strike',i,b[1],0])}
  PWC[i][j]=ZCD[k];return true}
 
 // ---------- hitting things ----------
@@ -670,7 +690,7 @@ function botAbil(p,t,dt){
 // classes: humans pick theirs (CLSI), bots get a spread of the four decided by the seed
 function assignClasses(n,fc){const R=mulberry32((SEED^0xC1A55)>>>0),perm=[0,1,2,3];for(let k=3;k>0;k--){const j=(R()*(k+1))|0,tm=perm[k];perm[k]=perm[j];perm[j]=tm}
  for(let i=1;i<=5;i++){const v=CLSI[i];CLSI[i]=(fc&&fc[i]>=0&&fc[i]<=3)?fc[i]:(i<=n&&v>=0&&v<=3&&v===(v|0))?v:perm[i&3]}}
-function newIN(i){return{a:P[i].a,b:0,en:1,cd:[0,0],uc:0,mv:0,mk:0,ut:0,pt:0}}
+function newIN(i){return{a:P[i].a,b:0,en:1,cd:[0,0],uc:BAL.uc0,mv:0,mk:0,ut:0,pt:0}}
 let NBOT;
 function MPS(n,bots,nb,seed,fc){NBOT=nb;genMap(seed===undefined?(Math.random()*1e9|0):seed);GRS=(SEED^0x9E3779B9)|0;TK=0;REC=null;MINES.length=0;SLOW.fill(0);SHL.length=0;STR.length=0;BLD.length=0;MSL.length=0;WIRES.length=0;FAULTS.length=0;HOLES.length=0;SCAR.fill(0);SCO.fill(0);SCARMAX=0;LH.fill(0);LHT.fill(0);PROT.fill(0);HOLD.fill(0);INV.fill(0);PLT.fill(0);PLR.fill(0);for(let i=1;i<=5;i++)PWC[i]=[0,0,0];ZT=0;
  IN.length=0;assignClasses(n,fc);newGame();state='play';tl=TL;HN=n;BOTS=!!bots;KL.fill(0);DE.fill(0);EV.length=0;
@@ -699,8 +719,8 @@ function USE(i,s){const t=IN[i],p=P[i];if(!t||!p||!p.alive||s<1||s>3)return fals
    for(let d=1.2,n=0;d<=L+1.2;d+=st,n++){const x=X+c*d,y=Y+sn*d;carHit(x,y,BAL.railW,i,'rail',false);trailHit(x,y,.55,i,'rail');if(n%2===0)carve(x,y,BAL.railCarve,i)}
    EV.push(['rail',i,+X.toFixed(1),+Y.toFixed(1),+(X+c*(L+1.2)).toFixed(1),+(Y+sn*(L+1.2)).toFixed(1)]);break}
   case 'mortar':for(let k=0;k<BAL.mortarN;k++){const d=7+(k>>1)*4.6,lat=(k&1?1:-1)*rr(1,2.6);STR.push({x:clampX(X+c*d-sn*lat),y:clampY(Y+sn*d+c*lat),t:.8+k*.16,o:i,r:BAL.mortarR})}ev('mortar');break;
-  case 'orbital':{const tg=bigRival(i);if(!tg)return false;const pts=landSpots(tg,BAL.orbitalN,4.4);if(!pts.length)return false;
-   pts.forEach((v,k)=>STR.push({x:v[0],y:v[1],t:.9+k*.22,o:i,r:BAL.orbitalR}));EV.push(['orbital',i,tg,0]);break}
+  case 'orbital':{const b=barrage(i,X,Y,BAL.orbitalN,4.4);if(!b)return false;
+   b[0].forEach((v,k)=>STR.push({x:v[0],y:v[1],t:.9+k*.16,o:i,r:BAL.orbitalR}));EV.push(['orbital',i,b[1],0]);break}
   case 'mine':{const mx=X-c*1.5,my=Y-sn*1.5;MINES.push({x:mx,y:my,o:i,t:18,arm:.6,k:0});const ms=MINES.filter(m=>m.o===i&&!m.k);if(ms.length>BAL.mineMax)MINES.splice(MINES.indexOf(ms[0]),1);EV.push(['mine',i,+mx.toFixed(1),+my.toFixed(1)]);break}
   case 'drone':{const tg=[];for(let j=1;j<=5;j++){const q=P[j];if(j===i||!q.alive||!exposed(q))continue;const d=dhyp(q.x-X,q.y-Y);if(d<22)tg.push([d,j])}tg.sort((a,b)=>a[0]-b[0]);
    for(let k=0;k<3;k++)MSL.push({x:X+c*1.4,y:Y+sn*1.4,a:p.a+(k-1)*.4,o:i,t:BAL.missT,tg:tg.length?tg[k%tg.length][1]:0});ev('drone');break}
@@ -7593,16 +7613,29 @@ const GLOW=1;   // layer number of objects that also draw into the glow pass
 const GFX={ok:0,R:null,S:null,cam:null,w:0,h:0,pr:1,scale:1,time:0,theme:null,thIdx:0,mode:'world',stats:{calls:0,tris:0,ms:0,fps:0},hdr:0,
  U:{time:{value:0},glowPass:{value:0},sunDir:{value:null},sunCol:{value:null},fogCol:{value:null},fogNear:{value:60},fogFar:{value:240},camPos:{value:null},
   skyTop:{value:null},skyHor:{value:null},cloud:{value:null}}};
-// ---------- the look: a neon arena floating in a black void ----------
-// One look for every match (v19). az / el: where the key light comes from (degrees). All colours are sRGB hex.
-// The floor is drawn by its own shader (see gwVoidMat): a black floor with a faint grid, a glowing rim round the arena, land in the owners' colours with bright edges.
-// night: car lamps on. glow: strength of the bloom. env: how much the studio reflections show on the cars.
+// ---------- the look ----------
+// One look for every match. az / el: where the key light comes from (degrees). All colours are sRGB hex.
+// night: car lamps on. glow: strength of the bloom. env: how much the reflections show on the cars; envDay: a daylight sky in them instead of a dark studio.
+// v20: the floor is a real surface made from code (gwFloorMat): a ground picture with grain, mottling and little stones, lit by a low sun, and land as
+// raised colour on it with a soft bevel and a shadow. No grid. Floor numbers: base (two ground colours), speck (stones), out (beyond the arena),
+// mat [bump, gloss, shine, stones], land [paint brightness, bevel, edge glow, shadow], land2 [gloss, shine], edgeK / edgeG: the arena's edge line, drawn / glowing.
 const GTH=[
- {n:'Neon Void',key:'void',az:205,el:62,sun:'#c4d2ff',sunI:3.0,sky:'#4a5a8a',gnd:'#05060a',hemiI:.95,fog:'#000000',fogN:120,fogF:330,
-  top:'#020308',hor:'#070a14',expo:1.0,sat:1.12,con:1.06,vig:.36,glow:.82,tint:[1,1,1.02],env:1.0,night:1,
-  edge:'#38d8ff',grid:'#2a6cff',tread:[.05,.12,.25],dust:'#8fe6ff',snowfall:0,mini:[20,30,54]}];
+ {n:'Asphalt',key:'asphalt',az:215,el:36,sun:'#fff1de',sunI:2.7,sky:'#a9bad4',gnd:'#2a2724',hemiI:1.0,fog:'#0b0c0e',fogN:120,fogF:330,
+  top:'#0b0c0e',hor:'#101216',expo:1.04,sat:1.08,con:1.05,vig:.3,glow:.42,tint:[1,1,1],env:.9,night:0,envDay:1,
+  edge:'#e8edf5',dust:'#b8b2a8',snowfall:0,mini:[40,42,46],
+  base:['#2a2b2f','#3a3b40'],speck:'#57544f',out:'#0f1012',mat:[.9,46,.22,.42],land:[.8,1.15,.16,.45],land2:[44,.22],edgeK:.5,edgeG:.15},
+ {n:'Obsidian',key:'obsidian',az:205,el:52,sun:'#d6e0ff',sunI:2.6,sky:'#5a6a9a',gnd:'#05060a',hemiI:.85,fog:'#000000',fogN:120,fogF:330,
+  top:'#020308',hor:'#070a14',expo:1.0,sat:1.12,con:1.06,vig:.36,glow:.78,tint:[1,1,1.02],env:1.0,night:1,envDay:0,
+  edge:'#8fe9ff',dust:'#8fe6ff',snowfall:0,mini:[20,26,40],
+  base:['#07080b','#15171c'],speck:'#1d2331',out:'#000000',mat:[.45,150,.55,.15],land:[.62,1.0,.8,.5],land2:[110,.42],edgeK:.35,edgeG:.9},
+ {n:'Concrete',key:'concrete',az:220,el:44,sun:'#fff6ea',sunI:2.5,sky:'#c3d2e6',gnd:'#6a645c',hemiI:1.1,fog:'#1e1d1b',fogN:120,fogF:330,
+  top:'#1e1d1b',hor:'#262421',expo:.92,sat:1.05,con:1.04,vig:.26,glow:.25,tint:[1,1,1],env:.85,night:0,envDay:1,
+  edge:'#ffffff',dust:'#d8d2c8',snowfall:0,mini:[150,146,140],
+  base:['#9a9792','#b3b0aa'],speck:'#86837e',out:'#383735',mat:[.5,30,.1,.28],land:[1.0,1.3,.0,.4],land2:[40,.18],edgeK:.55,edgeG:0}];
 let LOOKSEL=-1;
-function gfxThemeFor(seed){return 0}
+// the look of every match: one look, picked once (v20 options are 0 Asphalt, 1 Obsidian, 2 Concrete; ?look=N in the address while choosing)
+let LOOK=0;try{const v=+new URLSearchParams(location.search).get('look');if(v>=1&&v<=GTH.length)LOOK=v-1}catch(e){}
+function gfxThemeFor(seed){return LOOK}
 const sunVec=(az,el)=>{const a=az*Math.PI/180,e=el*Math.PI/180;return new THREE.Vector3(Math.cos(e)*Math.cos(a),Math.sin(e),Math.cos(e)*Math.sin(a))};
 const cLin=h=>{const l=linOf(h);return new THREE.Color().setRGB(l[0],l[1],l[2],THREE.LinearSRGBColorSpace)};
 
@@ -7639,6 +7672,16 @@ function gfxTextures(){
  T.grit=dtex(gr,GN,GN,THREE.RGBAFormat,THREE.UnsignedByteType,{mip:1});
  T.gritN=dtex(heightToNormal(gh,GN,4),GN,GN,THREE.RGBAFormat,THREE.UnsignedByteType,{mip:1});
  T.cloud=T.noise;
+ // the ground's surface (v20): one tiling 512 px picture made here, no image files. r: fine grain, g: mottling, b: little stones (aggregate), a: large patches.
+ // Its height (stones on top of the mottling) becomes a normal map, so the low sun picks out every stone.
+ {const N=512,R2=mulberry32(9157),mott=pfbm(N,6,6,4,.55,R2),macro=pfbm(N,2,2,3,.5,R2),agg=new Float32Array(N*N),px=new Uint8Array(N*N*4),hh=new Float32Array(N*N);
+  // stones: small rounded bumps of random size, wrapping at the edges so the tile joins up
+  for(let k=0;k<5200;k++){const cx=R2()*N,cy=R2()*N,r=.8+Math.pow(R2(),2.2)*3.6,h=.35+R2()*.65,ri=Math.ceil(r);
+   for(let y=-ri;y<=ri;y++)for(let x=-ri;x<=ri;x++){const d2=(x*x+y*y)/(r*r);if(d2>=1)continue;const X=((Math.floor(cx)+x)%N+N)%N,Y=((Math.floor(cy)+y)%N+N)%N,i=Y*N+X,v=h*Math.sqrt(1-d2);if(v>agg[i])agg[i]=v}}
+  for(let i=0;i<N*N;i++){const g=R2();px[i*4]=Math.round(g*255);px[i*4+1]=Math.max(0,Math.min(255,Math.round((mott[i]*.5+.5)*255)));px[i*4+2]=Math.round(agg[i]*255);px[i*4+3]=Math.max(0,Math.min(255,Math.round((macro[i]*.5+.5)*255)));
+   hh[i]=agg[i]*.9+mott[i]*.35+(g-.5)*.08}
+  T.surf=dtex(px,N,N,THREE.RGBAFormat,THREE.UnsignedByteType,{mip:1});
+  T.surfN=dtex(heightToNormal(hh,N,5),N,N,THREE.RGBAFormat,THREE.UnsignedByteType,{mip:1})}
  GFX.tex=T}
 
 // ---------- reflections: a dark studio (soft panels of light round a black room), made into an environment map ----------
@@ -7647,6 +7690,13 @@ function gfxEnv(th){
  const key=th.n;GFX.envs=GFX.envs||{};if(GFX.envs[key])return GFX.envs[key];
  const S=128,faces=[];
  const mkf=fn=>{const c=mkc(S,S),g=c.getContext('2d');g.fillStyle='#020306';g.fillRect(0,0,S,S);fn(g,S);return c};
+ if(th.envDay){ // daylight: a bright sky above, a soft horizon, the ground below (for the asphalt and concrete looks)
+  const side=c=>mkf((g,s)=>{g.fillStyle=lg(g,0,0,0,s,[[0,'#b9c9e2'],[.46,'#e9eef5'],[.54,'#8d8a84'],[1,'#3a3936']]);g.fillRect(0,0,s,s);g.globalAlpha=.35;g.fillStyle='#ffffff';g.fillRect(s*.2,s*.18,s*.6,s*.1);g.globalAlpha=1});
+  faces.push(side(),side(),mkf((g,s)=>{g.fillStyle=rg(g,s/2,s/2,0,s/2,s/2,s*.75,[[0,'#ffffff'],[.4,'#dbe5f3'],[1,'#a8bad6']]);g.fillRect(0,0,s,s)}),
+   mkf((g,s)=>{g.fillStyle='#45423e';g.fillRect(0,0,s,s)}),side(),side());
+  const cube=new THREE.CubeTexture(faces);cube.colorSpace=THREE.SRGBColorSpace;cube.needsUpdate=true;
+  const pm=new THREE.PMREMGenerator(GFX.R),rt=pm.fromCubemap(cube);pm.dispose();cube.dispose();
+  return GFX.envs[key]=rt.texture}
  // a soft rectangle of light
  const panel=(g,x,y,w,h,col,a)=>{g.save();g.globalAlpha=a;g.filter='blur(3px)';g.fillStyle=col;g.fillRect(x,y,w,h);g.restore()};
  const strip=(g,s,y,col,a)=>{const gr=g.createLinearGradient(0,y-s*.08,0,y+s*.08);gr.addColorStop(0,col+'00');gr.addColorStop(.5,col);gr.addColorStop(1,col+'00');g.globalAlpha=a;g.fillStyle=gr;g.fillRect(0,y-s*.08,s,s*.16);g.globalAlpha=1};
@@ -7728,7 +7778,7 @@ function gfxSetTheme(idx){
  GFX.S.fog.color.copy(cLin(th.fog));GFX.S.fog.near=th.fogN;GFX.S.fog.far=th.fogF;GFX.R.setClearColor(cLin(th.fog),1);
  GFX.S.environment=gfxEnv(th);GFX.S.environmentIntensity=th.env;
  const c=GFX.mComp.uniforms;c.uExpo.value=th.expo;c.uSat.value=th.sat;c.uCon.value=th.con;c.uVig.value=th.vig;c.uGlow.value=th.glow;c.uTint.value.set(th.tint[0],th.tint[1],th.tint[2]);
- if(GFX.onTheme)GFX.onTheme(th)}
+ if(typeof gwLook==="function")gwLook(th);if(GFX.onTheme)GFX.onTheme(th)}
 
 // ---------- one rendered picture: the scene, the glow of the bright things, then the finishing pass ----------
 function gfxPass(mat,target){GFX.qm.material=mat;GFX.R.setRenderTarget(target);GFX.R.render(GFX.qs,GFX.qc)}
@@ -7774,37 +7824,55 @@ function blurSep(a,w,h,sig){const R=Math.ceil(sig*2.5),k=new Float32Array(R*2+1)
 // the floor is flat: everything stands at height 0
 function gfxH(x,y){return 0}
 
-// ---- the floor ----
+// ---- the floor (v20): a real surface made from code. No grid: a ground picture (grain, mottling, little stones) lit by a low sun, land as raised
+// colour on it with a soft bevel and a shadow, a crisp edge to the arena and a darker surround beyond it. The look's numbers come from GTH (gwLook). ----
+const V3=h=>new THREE.Vector3(...linOf(h));
 function gwUniforms(){
- const U=GFX.U,th=GTH[0];
- GW.u={uMA:{value:null},uMB:{value:null},uEdge:{value:null},uScar:{value:null},
+ const U=GFX.U;
+ GW.u={uMA:{value:null},uMB:{value:null},uEdge:{value:null},uScar:{value:null},uSurf:{value:null},uSurfN:{value:null},
   uOwnSize:{value:new THREE.Vector2(MW,MH)},uWorld:{value:new THREE.Vector2(WW,WH)},
   uCol:{value:COLLIN.map(c=>new THREE.Vector3(c[0],c[1],c[2]))},uFlash:{value:[0,1,2,3].map(()=>new THREE.Vector4(0,0,1,0))},
-  uEdgeC:{value:new THREE.Vector3(...linOf(th.edge))},uGridC:{value:new THREE.Vector3(...linOf(th.grid))},
-  uTime:U.time,uGlowPass:U.glowPass,uFogN:U.fogNear,uFogF:U.fogFar,uQ:{value:1}}}
-function gwVoidMat(){
+  uEdgeC:{value:new THREE.Vector3()},uSunDir:U.sunDir,uSunC:{value:new THREE.Vector3()},uAmbC:{value:new THREE.Vector3()},uSkyC:{value:new THREE.Vector3()},
+  uBaseA:{value:new THREE.Vector3()},uBaseB:{value:new THREE.Vector3()},uSpeck:{value:new THREE.Vector3()},uOut:{value:new THREE.Vector3()},uFogC:{value:new THREE.Vector3()},
+  uMat:{value:new THREE.Vector4()},uLand:{value:new THREE.Vector4()},uLand2:{value:new THREE.Vector2()},uEdgeK:{value:new THREE.Vector2()},
+  uTime:U.time,uGlowPass:U.glowPass,uFogN:U.fogNear,uFogF:U.fogFar,uQ:{value:1}};
+ gwLook(GTH[LOOK])}
+// the look's floor numbers into the floor's uniforms (light colours are scaled by their strength, as three.js does for its own lights)
+function gwLook(th){if(!GW.u||!th||!th.base)return;const u=GW.u,s=(h,k)=>{const c=linOf(h);return new THREE.Vector3(c[0]*k,c[1]*k,c[2]*k)};
+ u.uEdgeC.value.copy(V3(th.edge));u.uSunC.value.copy(s(th.sun,th.sunI*.62));u.uAmbC.value.copy(s(th.sky,th.hemiI*.5).add(s(th.gnd,th.hemiI*.25)));u.uSkyC.value.copy(s(th.sky,1));
+ u.uBaseA.value.copy(V3(th.base[0]));u.uBaseB.value.copy(V3(th.base[1]));u.uSpeck.value.copy(V3(th.speck));u.uOut.value.copy(V3(th.out));u.uFogC.value.copy(V3(th.fog));
+ u.uMat.value.set(...th.mat);u.uLand.value.set(...th.land);u.uLand2.value.set(...th.land2);u.uEdgeK.value.set(th.edgeK,th.edgeG);
+ if(GFX.tex){u.uSurf.value=GFX.tex.surf;u.uSurfN.value=GFX.tex.surfN}}
+function gwFloorMat(){
  return new THREE.ShaderMaterial({uniforms:GW.u,extensions:{derivatives:true},
   vertexShader:'varying vec3 vWP;void main(){vec4 w=modelMatrix*vec4(position,1.);vWP=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}',
-  fragmentShader:`uniform sampler2D uMA,uMB,uEdge,uScar;uniform vec2 uOwnSize,uWorld;uniform vec3 uCol[6],uEdgeC,uGridC;uniform vec4 uFlash[4];
-  uniform float uTime,uGlowPass,uFogN,uFogF;varying vec3 vWP;
+  fragmentShader:`uniform sampler2D uMA,uMB,uEdge,uScar,uSurf,uSurfN;uniform vec2 uOwnSize,uWorld,uLand2,uEdgeK;uniform vec3 uCol[6],uEdgeC,uSunDir,uSunC,uAmbC,uSkyC,uBaseA,uBaseB,uSpeck,uOut,uFogC;
+  uniform vec4 uFlash[4],uMat,uLand;uniform float uTime,uGlowPass,uFogN,uFogF,uQ;varying vec3 vWP;
   float h21(vec2 p){p=fract(p*vec2(.1031,.1030));p+=dot(p,p.yx+33.33);return fract((p.x+p.y)*p.x);}
   float vn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h21(i),h21(i+vec2(1.,0.)),f.x),mix(h21(i+vec2(0.,1.)),h21(i+vec2(1.,1.)),f.x),f.y);}
-  // 1 on the lines of a grid with cells of size s (w: half the line width in pixels)
-  float gridL(vec2 p,float s,float w){vec2 q=p/s,d=abs(fract(q-.5)-.5)/max(fwidth(q),vec2(1e-4));return 1.-smoothstep(w-.5,w+.5,min(d.x,d.y));}
   void main(){
    vec2 wp=vWP.xz,ouv=wp/uWorld,px=fwidth(wp);float pxu=max(max(px.x,px.y),1e-4);
    // where the arena ends: distance in units (+ inside), carried on outward beyond the map
    float sd=(texture2D(uEdge,clamp(ouv,0.,1.)).r-.5)*12.;vec2 ob=max(max(-wp,wp-uWorld),0.);float outD=length(ob);if(outD>0.)sd=min(sd,0.)-outD;
    float inA=smoothstep(-pxu,pxu,sd);
-   vec3 base=vec3(.003,.0045,.01)*inA,emis=vec3(0.);
-   // the grid: 4-unit cells, and 1-unit cells that fade away as the camera pulls back; it carries on faintly a little way past the rim
-   float gMaj=gridL(wp,4.,.6),gMin=gridL(wp,1.,.45)*clamp(1.5-pxu*7.,0.,1.);
-   vec2 cr=abs(fract(wp/4.-.5)-.5)*4.;float dot0=(1.-smoothstep(.06,.06+pxu*1.5,length(cr)))*inA;
-   float gk=inA+(1.-inA)*.35*smoothstep(-8.,0.,sd);
-   vec3 grid=uGridC*(gMaj*.085+gMin*.026)*gk+uGridC*dot0*.35;
+   // the ground: the surface picture twice, a large tile and a small turned one, so it never visibly repeats
+   vec2 u1=wp*.0422,u2=mat2(.8,-.6,.6,.8)*wp*.145+.37;
+   vec4 s1=texture2D(uSurf,u1),s2=texture2D(uSurf,u2);
+   vec2 n2=texture2D(uSurfN,u2).xy*2.-1.,n1=uQ>.5?texture2D(uSurfN,u1).xy*2.-1.:vec2(0.);
+   float mott=s1.g*.55+s2.g*.45;
+   vec3 alb=mix(uBaseA,uBaseB,smoothstep(.2,.8,mott*.75+s1.a*.5-.12));
+   alb=mix(alb,uSpeck,smoothstep(.42,.78,s2.b)*uMat.w);
+   alb*=.9+.2*s2.r;
+   vec2 nb=(n1*.45+n2)*uMat.x;
+   vec3 N=normalize(vec3(nb.x,1.,nb.y)),L=normalize(uSunDir),V=normalize(cameraPosition-vWP),H=normalize(L+V);
+   float ndl=max(dot(N,L),0.),sp=pow(max(dot(N,H),0.),uMat.y)*uMat.z,fr=.04+.96*pow(1.-max(dot(N,V),0.),5.);
+   vec3 col=alb*(uAmbC+uSunC*ndl)+uSunC*sp+uSkyC*fr*uMat.z*.12,emis=vec3(0.);
    // land: coverage of the five players (smooth), the owner is the one with the most
    vec4 mA=texture2D(uMA,ouv),mB=texture2D(uMB,ouv);
    vec4 dxA=dFdx(mA),dyA=dFdy(mA);vec2 dB=vec2(dFdx(mB.x),dFdy(mB.x));
+   // raised land throws a soft shadow away from the sun
+   vec2 so=L.xz/max(L.y,.35)*.6;
+   col*=1.-smoothstep(.3,.75,texture2D(uMB,(wp+so)/uWorld).g)*uLand.w;
    float own=0.;
    if(mB.g>.01){
     float c=mA.x;vec2 gc=vec2(dxA.x,dyA.x);int cid=1;
@@ -7812,28 +7880,34 @@ function gwVoidMat(){
     vec3 oc=uCol[cid];
     float dOwn=(c-.5)/max(length(gc),1e-5)*pxu;   // units to the edge of this owner's land (+ inside)
     own=smoothstep(-pxu*.8,pxu*.8,dOwn);
-    float rimW=max(.17,pxu*1.3),rim=(1.-smoothstep(rimW-pxu,rimW+pxu,dOwn))*own,inner=exp(-max(dOwn,0.)*1.1)*own;
-    // inside: a deep tint of the colour with the grid lit in it, a fine weave and a slow sweep of light
-    float weave=smoothstep(.86,.9,fract((wp.x-wp.y)*.9))*.5;
-    float sweep=pow(.5+.5*sin((wp.x*.55+wp.y*.35)*.3-uTime*1.4),24.);
-    base=mix(base,oc*(.06+weave*.025),own);
-    grid=mix(grid,oc*(gMaj*.5+gMin*.12+dot0*.8),own);
-    emis+=oc*(rim*2.1+inner*.3+sweep*.1*own);
+    // the slope of all land together on the ground tilts the land's edge into a rounded bevel. Taken a cell either side (not from the change on
+    // screen, which steps from cell to cell), so the bevel's light runs smoothly along the edge.
+    vec2 e=1./uOwnSize;
+    vec2 gw=vec2(texture2D(uMB,ouv+vec2(e.x,0.)).g-texture2D(uMB,ouv-vec2(e.x,0.)).g,texture2D(uMB,ouv+vec2(0.,e.y)).g-texture2D(uMB,ouv-vec2(0.,e.y)).g)*uOwnSize.x/uWorld.x*.5;
+    vec3 Nl=normalize(vec3(-gw.x*uLand.y+nb.x*.2,1.,-gw.y*uLand.y+nb.y*.2));
+    float ndl2=max(dot(Nl,L),0.),sp2=pow(max(dot(Nl,normalize(L+V)),0.),uLand2.x)*uLand2.y;
+    vec3 la=oc*uLand.x*(.94+.12*s2.r);
+    vec3 land=la*(uAmbC+uSunC*ndl2)+uSunC*sp2;
+    col=mix(col,land,own);
+    float rimW=max(.12,pxu*1.2),rim=(1.-smoothstep(rimW-pxu,rimW+pxu,dOwn))*own;
+    emis+=oc*rim*uLand.z;
     // a capture: a wave of light runs out from where the loop closed
-    for(int fi=0;fi<4;fi++){vec4 fl=uFlash[fi];if(fl.z<1.){float dd=length(wp-fl.xy),rr=fl.z*32.;emis+=uCol[int(fl.w+.5)]*exp(-pow((dd-rr)/1.6,2.))*(1.-fl.z)*1.1*own;}}
+    for(int fi=0;fi<4;fi++){vec4 fl=uFlash[fi];if(fl.z<1.){float dd=length(wp-fl.xy),rr=fl.z*32.;emis+=uCol[int(fl.w+.5)]*exp(-pow((dd-rr)/1.6,2.))*(1.-fl.z)*.9*own;}}
    }
    // scorched land: embers and glowing cracks that cool as the scar wears off
    float sc=texture2D(uScar,ouv).r*(1.-own);
-   if(sc>.004){float n1=vn(wp*1.7+vec2(uTime*.25,0.)),n2=vn(wp*5.3-vec2(0.,uTime*.55)),n3=vn(wp*.6);
-    float crack=1.-smoothstep(.04,.12,abs(n1-.5)),heat=sc*(.5+.5*n2);
+   if(sc>.004){float e1=vn(wp*1.7+vec2(uTime*.25,0.)),e2=vn(wp*5.3-vec2(0.,uTime*.55)),e3=vn(wp*.6);
+    float crack=1.-smoothstep(.04,.12,abs(e1-.5)),heat=sc*(.5+.5*e2);
     vec3 ember=mix(vec3(.45,.04,.0),vec3(1.9,.55,.08),heat);
-    emis+=ember*(crack*.95+.12+n3*.08)*sc;base+=vec3(.03,.005,.0)*sc;}
-   // the rim of the arena: a bright line with a soft glow on both sides
-   float ae=abs(sd);
-   emis+=uEdgeC*((1.-smoothstep(.05,.05+pxu*1.5,ae))*1.7+exp(-ae*.9)*.12+exp(-ae*3.4)*.24)*(.86+.14*sin(uTime*1.8+(wp.x-wp.y)*.12))*(1.-own*.5);
+    emis+=ember*(crack*.95+.12+e3*.08)*sc;col=mix(col,col*.35+vec3(.02,.006,.0),sc*.8);}
+   // the arena's edge: a slight shade just inside, a fine line on the edge, a darker surround beyond that fades away
+   col*=1.-.22*(1.-smoothstep(0.,1.8,sd))*inA;
+   vec3 outc=uOut*(.75+.5*mott)*(1.-.55*smoothstep(0.,26.,-sd));
+   col=mix(outc,col,inA);
+   float line=1.-smoothstep(.035,.035+pxu*1.5,abs(sd));
+   col+=uEdgeC*line*uEdgeK.x;emis+=uEdgeC*(line*1.4+exp(-abs(sd)*2.5)*.15)*uEdgeK.y;
    float fog=smoothstep(uFogN,uFogF,length(vWP-cameraPosition));
-   vec3 col=(uGlowPass>.5?emis:base+grid+emis)*(1.-fog);
-   gl_FragColor=vec4(col,1.);
+   gl_FragColor=vec4(uGlowPass>.5?emis*(1.-fog):mix(col+emis,uFogC,fog),1.);
    #include <tonemapping_fragment>
    #include <colorspace_fragment>
   }`})}
@@ -7875,7 +7949,7 @@ function gwBuild(){
  const t0=performance.now();
  if(!GW.u)gwUniforms();
  gwDispose();
- gfxSetTheme(0);
+ gfxSetTheme(LOOK);
  // where the arena ends (signed distance in units, -6..6, smoothed so the rim is round instead of stepped)
  const inW=new Uint8Array(MW*MH);for(let i=0;i<inW.length;i++)inW[i]=ISL[i]?0:1;
  const dIn=edt2(inW,MW,MH),dOut=edt2(ISL,MW,MH),sdc=new Float32Array(MW*MH);
@@ -7890,7 +7964,7 @@ function gwBuild(){
  if(!GW.texScar){GW.scData=new Uint8Array(MW*MH);GW.texScar=dtex(GW.scData,MW,MH,THREE.RedFormat,THREE.UnsignedByteType,{clamp:1});GW.u.uScar.value=GW.texScar}
  else{GW.scData.fill(0);GW.texScar.needsUpdate=true}GW.scOn=0;
  // the floor: one sheet reaching a little beyond the map (past it the screen is cleared to black anyway)
- const mat=GW.floorMat||(GW.floorMat=gwVoidMat()),PAD=34,g=new THREE.PlaneGeometry(WW+2*PAD,WH+2*PAD,1,1);g.rotateX(-Math.PI/2);g.translate(WW/2,0,WH/2);
+ const mat=GW.floorMat||(GW.floorMat=gwFloorMat()),PAD=34,g=new THREE.PlaneGeometry(WW+2*PAD,WH+2*PAD,1,1);g.rotateX(-Math.PI/2);g.translate(WW/2,0,WH/2);
  GW.floor=new THREE.Mesh(g,mat);GW.floor.frustumCulled=false;GW.floor.renderOrder=-2;GW.floor.layers.enable(GLOW);GFX.S.add(GW.floor);
  gwPads();
  GW.built=1;GW.buildMs=performance.now()-t0}
@@ -8293,7 +8367,7 @@ function carFrame(C,p,dt,tm,night){
  // shield bubble: Titan plate, fortress, spawn protection, armour of a power zone
  let da2=0,col=null;
  if(p.fInv&&p.fUlt){da2=.9;col=[.3,1.1,1.8]}else if(p.fInv){da2=.7;col=[.6,.9,1.8]}else if(p.fPlt){da2=.28;col=[.35,.8,1.5]}else if(p.fSh){da2=.45+.25*Math.sin(tm*18);col=[1.5,1.5,1.5]}else if(p.fPrt){da2=.3;col=[.4,1.1,1.7]}
- C.dome.visible=da2>.01;if(C.dome.visible){const u=C.dome.material.uniforms;u.uA.value=da2;u.uT.value=tm;u.uC.value.setRGB(col[0],col[1],col[2]);const sc=(p.fInv&&p.fUlt)?1.18+.06*Math.sin(tm*8):1;C.dome.scale.set(sc,.55*sc,.8*sc)}}
+ C.dome.visible=da2>.01;if(C.dome.visible){const u=C.dome.material.uniforms;u.uA.value=da2;u.uT.value=tm;u.uC.value.setRGB(col[0],col[1],col[2]);const sc=(p.fInv&&p.fUlt)?1.45+.07*Math.sin(tm*8):1;C.dome.scale.set(sc,.55*sc,.8*sc)}}
 function body0(C,gp,gr,kick,tm){const b=C.body;b.rotation.set(-gr*.9-C.roll,0,gp*.9+Math.sin(tm*17+C.ph)*.004*(C.flame+.3));b.position.y=Math.abs(Math.sin(tm*13+C.ph))*.006;
  if(C.barrel)C.barrel.position.x=-kick*.2}
 // ---------- 3D renderer, part 4: trails, sparks and smoke, rings, ember marks ----------
@@ -8593,7 +8667,7 @@ function pjFrame(dt){
  for(let i=0;i<PJ.shell.length;i++){const g=PJ.shell[i],s=SHV[i];if(!s){g.visible=false;continue}g.visible=true;const x=s[0],y=s[1];g.position.set(x,.75,y);g.rotation.y=-Math.atan2(s[3],s[2]);g.scale.setScalar(1.6);pjSpot(x,y,[1,.55,.2],3,.55);
   if(QL.fx>.3&&!FF)FX.push({x:x-s[2]*.012,y:y-s[3]*.012,h:.75,vh:.2,vx:-s[2]*.02,vy:-s[3]*.02,l:.3,l0:.3,c:'#ff8a20',k:1,s:.8,r:0,vr:0})}
  // blades
- for(let i=0;i<PJ.blade.length;i++){const g=PJ.blade[i],s=BLV[i];if(!s){g.visible=false;continue}g.visible=true;const x=s[0],y=s[1],c=ownerC(s[4]);g.position.set(x,.7,y);g.rotation.y=clk*26+i;g.scale.setScalar(1.45);pjSpot(x,y,c,2.6,.7);
+ for(let i=0;i<PJ.blade.length;i++){const g=PJ.blade[i],s=BLV[i];if(!s){g.visible=false;continue}g.visible=true;const x=s[0],y=s[1],c=ownerC(s[4]);g.position.set(x,.7,y);g.rotation.y=clk*26+i;g.scale.setScalar(1.9);pjSpot(x,y,c,3.6,.8);
   g.userData.m2.material.color.setRGB(c[0]*1.5+.08,c[1]*1.5+.08,c[2]*1.5+.08);g.userData.m1.material.color.setRGB(2,2,2);
   if(QL.fx>.3&&!FF)FX.push({x:x-s[2]*.01,y:y-s[3]*.01,h:.7,vh:0,vx:0,vy:0,l:.3,l0:.3,c:COLS[s[4]]||'#ff4d5e',k:1,s:.8,r:0,vr:0})}
  // drones
@@ -8601,28 +8675,28 @@ function pjFrame(dt){
   g.userData.col.color.setRGB(c[0]*1.6,c[1]*1.6,c[2]*1.6);const f=g.userData.fl;f.scale.set(.8+.5*Math.sin(clk*70+i),1,1);
   if(QL.fx>.3&&!FF)FX.push({x:x-Math.cos(s[2])*.7,y:y-Math.sin(s[2])*.7,h:.75,vh:0,vx:0,vy:0,l:.28,l0:.28,c:COLS[s[3]]||'#ff9a3a',k:1,s:.55,r:0,vr:0})}
  // plasma mines (armed ones pulse fast)
- for(let i=0;i<PJ.mine.length;i++){const g=PJ.mine[i],s=MNV[i];if(!s){g.visible=false;continue}g.visible=true;const x=s[0],y=s[1],c=ownerC(s[2]),k=(s[4]?.8:1)*1.45;g.position.set(x,.02,y);g.scale.setScalar(k);
+ for(let i=0;i<PJ.mine.length;i++){const g=PJ.mine[i],s=MNV[i];if(!s){g.visible=false;continue}g.visible=true;const x=s[0],y=s[1],c=ownerC(s[2]),k=(s[4]?.8:1)*1.85;g.position.set(x,.02,y);g.scale.setScalar(k);
   const pu=s[3]?.7+.6*(.5+.5*Math.sin(clk*12+i)):.45;g.userData.ring.material.color.setRGB(c[0]*1.4+.05,c[1]*1.4+.05,c[2]*1.4+.05);g.userData.orb.material.color.setRGB(c[0]*2.2*pu+.2,c[1]*2.2*pu+.2,c[2]*2.2*pu+.2);
-  g.userData.orb.scale.setScalar(.85+.25*pu);pjSpot(x,y,c,2.2*k,.35*pu)}
+  g.userData.orb.scale.setScalar(.85+.25*pu);pjSpot(x,y,c,2.8*k,.5*pu)}
  // strikes: red for a rival's, your colour for your own
  for(let i=0;i<PJ.strike.length;i++){const g=PJ.strike[i],s=STV[i];if(!s){g.visible=false;continue}g.visible=true;const x=s[0],y=s[1],r=s[4]||2.6,p=Math.max(0,Math.min(1,1-Math.max(0,s[2])/1.4)),c=s[3]===VS&&!RPL?ownerC(VS):STRIKEC;
   g.position.set(x,.09,y);const R=r*2.25;g.userData.m.scale.set(R,1,R);const u=g.userData.m.material.uniforms;u.uC.value.set(c[0],c[1],c[2]);u.uP.value=p;u.uA.value=Math.min(1,p*4+.3);
   const bu=g.userData.beam.material.uniforms;bu.uC.value.set(c[0]*1.2,c[1]*1.2+.1,c[2]*1.2+.1);bu.uP.value=p;g.userData.beam.scale.set(r*.4,1,r*.4)}
- // railgun beams (fired in the last half second)
- {let k=0;for(let i=RAILV.length-1;i>=0;i--){const b=RAILV[i],age=(clk-b.t0)/.5;if(age>=1){RAILV.splice(i,1);continue}if(k>=PJ.rail.length)continue;const m=PJ.rail[k++];m.visible=true;
-   pjBeam(m,b.x0,b.y0,b.x1,b.y1,.7,1.6*(1-age*.6));const u=m.material.uniforms;u.uC.value.set(b.c[0]*1.3,b.c[1]*1.3,b.c[2]*1.3);u.uA.value=Math.pow(1-age,1.5)*1.3;u.uH.value=age<.35?age/.35:-1}
+ // railgun beams (fired in the last three quarters of a second)
+ {let k=0;for(let i=RAILV.length-1;i>=0;i--){const b=RAILV[i],age=(clk-b.t0)/.75;if(age>=1){RAILV.splice(i,1);continue}if(k>=PJ.rail.length)continue;const m=PJ.rail[k++];m.visible=true;
+   pjBeam(m,b.x0,b.y0,b.x1,b.y1,.7,2.4*(1-age*.5));const u=m.material.uniforms;u.uC.value.set(b.c[0]*1.3,b.c[1]*1.3,b.c[2]*1.3);u.uA.value=Math.pow(1-age,1.3)*1.4;u.uH.value=age<.3?age/.3:-1}
   for(;k<PJ.rail.length;k++)PJ.rail[k].visible=false}
  // laser wires
  {let k=0;for(const w of WIRES){if(k>=PJ.wire.length)break;const g=PJ.wire[k++],c=ownerC(w.o),u=g.userData;g.visible=true;g.position.set(0,0,0);
-   pjBeam(u.m,w.x1,w.y1,w.x2,w.y2,.62,1.1);const mu=u.m.material.uniforms,fade=Math.min(1,w.t/.6);mu.uC.value.set(c[0]*1.4,c[1]*1.4,c[2]*1.4);mu.uA.value=fade*(w.t<1.2?(.6+.4*Math.sin(clk*40)):1);
-   u.posts[0].position.set(w.x1,0,w.y1);u.posts[1].position.set(w.x2,0,w.y2);u.capM.color.setRGB(c[0]*2.4+.3,c[1]*2.4+.3,c[2]*2.4+.3);
+   pjBeam(u.m,w.x1,w.y1,w.x2,w.y2,.62,1.8);const mu=u.m.material.uniforms,fade=Math.min(1,w.t/.6);mu.uC.value.set(c[0]*1.8,c[1]*1.8,c[2]*1.8);mu.uA.value=fade*(w.t<1.2?(.6+.4*Math.sin(clk*40)):1);
+   u.posts[0].position.set(w.x1,0,w.y1);u.posts[1].position.set(w.x2,0,w.y2);u.posts[0].scale.setScalar(1.4);u.posts[1].scale.setScalar(1.4);u.capM.color.setRGB(c[0]*2.4+.3,c[1]*2.4+.3,c[2]*2.4+.3);
    pjSpot(w.x1,w.y1,c,2,.5);pjSpot(w.x2,w.y2,c,2,.5)}
   for(;k<PJ.wire.length;k++)PJ.wire[k].visible=false}
  // fault lines: the crack races ahead, then glows for a moment once it stops
  {for(const f of FAULTS){if(!FAULTV.some(v=>v.f===f))FAULTV.push({f,x:f.x,y:f.y,c:f.c,s:f.s,o:f.o,d:f.d,end:0})}
   let k=0;for(let i=FAULTV.length-1;i>=0;i--){const v=FAULTV[i];if(!v.end&&!FAULTS.includes(v.f)){v.end=clk;v.d=Math.max(v.d,v.f.d)}if(!v.end)v.d=v.f.d;
-   const age=v.end?(clk-v.end)/.9:0;if(age>=1){FAULTV.splice(i,1);continue}const dd=Math.min(v.d,v.f.e===undefined?BAL.faultL:v.f.e);if(k>=PJ.fault.length)continue;const m=PJ.fault[k++],L=BAL.faultL,c=ownerC(v.o);m.visible=true;
-   pjBeam(m,v.x,v.y,v.x+v.c*L,v.y+v.s*L,.06,2.2);const u=m.material.uniforms;u.uC.value.set(c[0],c[1],c[2]);u.uD.value=Math.max(.001,dd/L);u.uL.value=L;u.uA.value=Math.pow(1-age,1.3);
+   const age=v.end?(clk-v.end)/1.5:0;if(age>=1){FAULTV.splice(i,1);continue}const dd=Math.min(v.d,v.f.e===undefined?BAL.faultL:v.f.e);if(k>=PJ.fault.length)continue;const m=PJ.fault[k++],L=BAL.faultL,c=ownerC(v.o);m.visible=true;
+   pjBeam(m,v.x,v.y,v.x+v.c*L,v.y+v.s*L,.06,3.0);const u=m.material.uniforms;u.uC.value.set(c[0],c[1],c[2]);u.uD.value=Math.max(.001,dd/L);u.uL.value=L;u.uA.value=Math.pow(1-age,1.3);
    if(!v.end&&!FF&&QL.fx>.3){const fx=v.x+v.c*dd,fy=v.y+v.s*dd;for(let j=0;j<2;j++){const a=Math.random()*6.28;FX.push({x:fx,y:fy,h:.2,vh:2+Math.random()*3,vx:Math.cos(a)*3+v.c*6,vy:Math.sin(a)*3+v.s*6,l:.5,l0:.5,c:j?'#ffd27a':COLS[v.o]||'#ffb020',k:j?4:3,s:j?.18:.16,r:Math.random()*6,vr:8})}}}
   for(;k<PJ.fault.length;k++)PJ.fault[k].visible=false}
  // black holes
@@ -8716,7 +8790,7 @@ function gfxCompile(scene,cam){const R=GFX.R,old=R.getRenderTarget();
 // ---------- loading steps for the start screen ----------
 function buildTexSteps(){return[
  ['Starting the 3D engine...',()=>{const ok=gfxInit($('gl'));if(ok){gfxSetTheme(gfxThemeFor(1));fit()}else{$('gl').style.display='none';TEXOK=1}}],
- ['Building the arena...',()=>{if(!GFX.ok)return;genMap(20241008);gwBuild();gfxSetTheme(0)}],
+ ['Building the arena...',()=>{if(!GFX.ok)return;genMap(20241008);gwBuild();gfxSetTheme(LOOK)}],
  ['Tuning the engines...',()=>{if(!GFX.ok)return;trInit();ptInit();ringsInit();pjInit();for(let c=0;c<4;c++){const C=carBuild(c,CLS[c].col,'sport',0);C.root.position.set(WW/2+c*3,0,WH/2);GFX.S.add(C.root);CARI[0]=CARI[0]||[];CARI[0].push(C)}
    // every shader the game uses is built now, behind the loading screen: the scene, the effects, the glow and finishing passes (one real frame does the last ones)
    camSet(WW/2+4,WH/2);camApply(0);gfxWarm(CARI[0]);
@@ -8833,7 +8907,7 @@ function ggInit(){
  const S=GG.S=new THREE.Scene(),R0=2.75;
  S.background=cLin('#01030a');S.fog=new THREE.Fog(cLin('#01030a'),16,46);
  GG.cam=new THREE.PerspectiveCamera(30,1,.5,90);
- S.environment=gfxEnv(GTH[0]);S.environmentIntensity=.95;
+ S.environment=gfxEnv(GTH.find(t=>!t.envDay)||GTH[0]);S.environmentIntensity=.95;
  // light: a warm key from the front right with shadows, cold and pink edge lights from behind, a soft fill
  const sun=GG.sun=new THREE.DirectionalLight(0xfff0dc,3.4);sun.position.set(4.5,8,5.5);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);
  const sc=sun.shadow.camera;sc.near=2;sc.far=26;sc.left=-4.2;sc.right=4.2;sc.top=4.2;sc.bottom=-4.2;sun.shadow.bias=-.0005;sun.shadow.normalBias=.02;sun.shadow.radius=3;S.add(sun,sun.target);
@@ -8947,7 +9021,7 @@ function drawPlate(sx,sy,q,fs,lead,w,h){const p=P[q],nm=nmClean(NM[q]),pc=(CN[q]
  if(p&&p.out&&p.tr.length>8){const L=Math.min(1,p.tr.length/160),bw=pwid*.7;g.fillStyle='rgba(255,255,255,.12)';g.fillRect(sx-bw/2,y+ph+3,bw,2);
   g.fillStyle=L>.6?'#ff5a4a':L>.3?'#ffb020':COLS[q];g.fillRect(sx-bw/2,y+ph+3,bw*Math.max(.08,L),2)}}
 // a badge on the screen edge for a rival (or your land) that is off screen, turned toward it
-function drawEdge(x,y,ang,q,al,near,home){const g=ctx,R=cs*1.3,col=home?COLS[VS]:COLS[q];g.save();g.translate(x,y);g.globalAlpha=al;
+function drawEdge(x,y,ang,q,al,near,home){const g=ctx,R=cs*1.08,col=home?COLS[VS]:COLS[q];g.save();g.translate(x,y);g.globalAlpha=al*.88;
  if(near){const k=.5+.5*Math.sin(clk*9);g.strokeStyle='rgba(255,70,80,'+(.25+.45*k)+')';g.lineWidth=3;g.beginPath();g.arc(0,0,R+cs*.55+k*cs*.4,0,7);g.stroke()}
  g.save();g.rotate(ang);g.lineJoin='round';g.fillStyle=col;g.strokeStyle='rgba(255,255,255,.96)';g.lineWidth=1.8;g.beginPath();g.moveTo(R+cs*.95,0);g.lineTo(R*.62,-R*.62);g.lineTo(R*.62,R*.62);g.closePath();g.fill();g.stroke();g.restore();
  g.fillStyle='rgba(12,18,32,.94)';g.beginPath();g.arc(0,0,R,0,7);g.fill();g.lineWidth=2.6;g.strokeStyle=col;g.stroke();
@@ -8975,11 +9049,15 @@ function drawHUD(w,h){
  // markers: plates over the rivals, pointers to the ones that are off screen
  if(state==='play'||state==='replay'){
   const lead=rkAll.slice().sort((a,b)=>CN[b]-CN[a])[0];
+  // pointers to rivals off screen: only the two nearest, and only those within reach (v20: fewer badges round the edge)
+  const offs=[];
+  for(const q of rkAll){const p=P[q];if(!p||!p.alive||q===VS)continue;const [sx,sy]=S(p.rx,p.ry,1.4);if(!(sx>-8&&sx<w+8&&sy>-8&&sy<h+8))offs.push([me?Math.hypot(p.rx-me.rx,p.ry-me.ry):99,q])}
+  offs.sort((a,b)=>a[0]-b[0]);const showOff=offs.filter(o=>o[0]<70).slice(0,2).map(o=>o[1]);
   for(const q of rkAll){const p=P[q];if(!p||!p.alive||q===VS)continue;
    const [sx,sy]=S(p.rx,p.ry,1.4);
    const inside=sx>-8&&sx<w+8&&sy>-8&&sy<h+8;
    if(inside){const al=Math.min(1,fade(sx-fs*4,sy-cs*4.5-fs,fs*8,fs*2,fs*2));if(al>.03){ctx.globalAlpha=al;drawPlate(sx,sy-cs*4.2,q,fs,q===lead&&CN[q]>0,w,h);ctx.globalAlpha=1}}
-   else{const dx=sx-w/2,dy=sy-h/2,pad=cs*2.1,padT=ST+cs*2.6,t=Math.min((w/2-pad)/Math.abs(dx||1e-3),(h/2-Math.max(pad,padT*.5))/Math.abs(dy||1e-3)),ex=w/2+dx*t,ey=h/2+dy*t,ey2=Math.max(padT,Math.min(h-pad-cs*2,ey));
+   else if(showOff.includes(q)){const dx=sx-w/2,dy=sy-h/2,pad=cs*2.1,padT=ST+cs*2.6,t=Math.min((w/2-pad)/Math.abs(dx||1e-3),(h/2-Math.max(pad,padT*.5))/Math.abs(dy||1e-3)),ex=w/2+dx*t,ey=h/2+dy*t,ey2=Math.max(padT,Math.min(h-pad-cs*2,ey));
     const dist=me?Math.hypot(p.rx-me.rx,p.ry-me.ry):99,near=dist<24&&p.out,al=Math.max(.5,Math.min(1,1.25-dist/90))*Math.min(1,fade(ex-cs*1.3,ey2-cs*1.3,cs*2.6,cs*2.6,cs*1.6));
     if(al>.03)drawEdge(Math.max(pad,Math.min(w-pad,ex)),ey2,Math.atan2(dy,dx),q,al,near,0)}}
   // a way back to your land when you are out in the open and none of it is on screen
@@ -9018,7 +9096,7 @@ function drawHUD(w,h){
   ctx.fillStyle=COLS[VS];ctx.beginPath();ctx.arc(x0+cs*1.1+tw+cs*.7,y0+ph/2,cs*.2,0,7);ctx.fill();
   ctx.font=HF('800 italic',f2);ctx.fillStyle=tint(COLS[VS],.45);ctx.fillText(pc,x0+cs*1.1+tw+cs*1.4,y0+ph/2+1);
   let fy=y0+ph+cs*.55;ctx.textAlign='center';
-  for(const d of FD){if(!d.me)continue;const age=clk-(d.t0===undefined?clk:d.t0),a=Math.min(1,age*7)*Math.min(1,d.l/.6);if(a<=.01)continue;
+  for(const d of FD.filter(d=>d.me).slice(-2)){const age=clk-(d.t0===undefined?clk:d.t0),a=Math.min(1,age*7)*Math.min(1,d.l/.6);if(a<=.01)continue;
    ctx.globalAlpha=a;ctx.font=HF(800,Math.round(cs*.98));const tw3=ctx.measureText(d.t).width,fh=cs*1.85,fx=w/2-tw3/2-cs*1,sl=(1-Math.min(1,age*7))*-8;
    ctx.fillStyle='rgba(3,5,10,.62)';ctx.beginPath();ctx.roundRect(fx,fy+sl,tw3+cs*2,fh,fh/2);ctx.fill();ctx.fillStyle=d.c;ctx.beginPath();ctx.arc(fx+cs*.75,fy+sl+fh/2,cs*.22,0,7);ctx.fill();
    ctx.fillStyle='#ffffff';ctx.fillText(d.t,w/2+cs*.25,fy+sl+fh/2+1);fy+=fh+cs*.3;ctx.globalAlpha=1}}
@@ -9071,8 +9149,10 @@ addEventListener('keyup',e=>{if(e.code==='Space'||e.key==='Shift')abUp(4)});
 addEventListener('resize',()=>{if(P){readSafe();fit()}});
 function abDown(s){if(state!=='play'||RPL)return;
  if(s===4){setBoost(1);abFlash(4);return}
- if(MP){if(!ncUse(s))snd('deny');else abFlash(s);return}
- if(IN[1]){if(!ABU(1,s))snd('deny');else abFlash(s)}}
+ if(MP){if(!ncUse(s))abDeny(s);else abFlash(s);return}
+ if(IN[1]){if(!ABU(1,s))abDeny(s);else abFlash(s)}}
+// a press that could not fire (recharging, the ultimate not full, or no target for it): a short shake and a low tone
+function abDeny(s){snd('deny');const b=ABB[s-1];if(!b)return;b.classList.remove('no');void b.offsetWidth;b.classList.add('no');clearTimeout(b._nt);b._nt=setTimeout(()=>b.classList.remove('no'),320)}
 // a quick pop of the button that fired
 function abFlash(s){const b=ABB[s-1];if(!b)return;b.classList.remove('fire');void b.offsetWidth;b.classList.add('fire');clearTimeout(b._ft);b._ft=setTimeout(()=>b.classList.remove('fire'),340)}
 function abUp(s){if(s===4)setBoost(0)}
@@ -9224,7 +9304,9 @@ function abHud(){
  if(key!==ABK){ABK=key;$('qt').style.display='none';if(!pl){ABB.forEach(b=>b.classList.remove('on'));$('pz').classList.remove('on');pauseSet(0)}else{const C=CLS[CLSI[VS]||0];setAbLabels();ABB.forEach((b,j)=>b.classList.toggle('on',!(j<2&&C.ab[j].off)));$('pz').classList.add('on')}}
  if(!pl)return;
  const C=CLS[CLSI[VS]||0],r=RDY,cds=[C.ab[0].cd,C.ab[1].cd,0,0];
- for(let j=0;j<4;j++){const v=j===3?r[3]:r[j];if(Math.abs(v-ABV[j])>.012||(v>=.999)!==(ABV[j]>=.999)){ABV[j]=v;ABB[j].style.setProperty('--e',v.toFixed(3));ABB[j].classList.toggle('rdy',j<3&&v>=.999)}
+ for(let j=0;j<4;j++){const v=j===3?r[3]:r[j];if(Math.abs(v-ABV[j])>.012||(v>=.999)!==(ABV[j]>=.999)){const was=ABV[j]>=.999,fresh=ABV[j]===-1;ABV[j]=v;ABB[j].style.setProperty('--e',v.toFixed(3));ABB[j].classList.toggle('rdy',j<3&&v>=.999);
+   // a one-off pop when an ability comes back (not a pulse that never stops: calmer, and cheaper for the phone to draw)
+   if(j<3&&v>=.999&&!was&&!fresh){const b=ABB[j];b.classList.remove('rdyin');void b.offsetWidth;b.classList.add('rdyin');clearTimeout(b._rt);b._rt=setTimeout(()=>b.classList.remove('rdyin'),480)}}
   let t='';if(j<2&&v<.999)t=String(Math.ceil((1-v)*cds[j]));else if(j===2){if(MYUT>0)t=MYUT.toFixed(1);else if(v<.999)t=Math.floor(v*100)+'%'}else if(j===3&&v<.2)t='low';
   if(t!==ABT[j]){ABT[j]=t;ABB[j].querySelector('.cd').textContent=t}
   ABB[j].classList.toggle('run',j===2&&MYUT>0)}}
@@ -9917,23 +9999,19 @@ function bootWM(w,dp){const key=w+'@'+dp;if(WMS[key])return WMS[key];
  g.font='900 italic '+f1+'px '+WF;g.lineWidth=f1*.13;g.strokeStyle='#0a1030';g.strokeText('TERRITORY',0,y1);let gr=g.createLinearGradient(0,y1-f1*.8,0,y1);gr.addColorStop(0,'#ffffff');gr.addColorStop(1,'#a9c6ff');g.fillStyle=gr;g.fillText('TERRITORY',0,y1);
  g.font='900 italic '+f2+'px '+WF;g.lineWidth=f2*.11;g.strokeStyle='#1a0a30';g.strokeText('CONTROL',0,y2);const tw=g.measureText('CONTROL').width;gr=g.createLinearGradient(-tw/2,0,tw/2,0);gr.addColorStop(0,'#ffbf4a');gr.addColorStop(.5,'#ff5d7b');gr.addColorStop(1,'#a56bff');g.fillStyle=gr;g.fillText('CONTROL',0,y2);g.restore();
  const c2=mk2(w,H2);return WMS[key]={w,dp,c,c2,H:H2,f1,f2,y2}}
-// ---------- the loading screen: the void, a neon floor running toward a glowing horizon ----------
+// ---------- the loading screen (v20): dark asphalt under a soft light, no grid ----------
 let BGC=null,BGK='',STARS=null;
 function bootStatic(w,h,dp){const c=mkc(Math.round(w*dp),Math.round(h*dp)),g=c.getContext('2d');g.scale(dp,dp);
- g.fillStyle='#000';g.fillRect(0,0,w,h);
- const hy=h*.6;
- g.fillStyle=rg(g,w/2,hy,0,w/2,hy,Math.max(w,h)*.8,[[0,'rgba(56,216,255,.2)'],[.35,'rgba(42,108,255,.08)'],[1,'rgba(0,0,0,0)']]);g.fillRect(0,0,w,h);
- // the floor: lines running to the vanishing point
- g.strokeStyle='rgba(42,108,255,.4)';g.lineWidth=1;
- for(let i=-24;i<=24;i++){g.globalAlpha=.25+.5*(1-Math.abs(i)/24);g.beginPath();g.moveTo(w/2+i*w*.035,hy);g.lineTo(w/2+i*w*.42,h);g.stroke()}
- g.globalAlpha=1;g.fillStyle=lg(g,0,hy-h*.02,0,hy+h*.06,[[0,'rgba(0,0,0,0)'],[.4,'rgba(0,0,0,.65)'],[1,'rgba(0,0,0,0)']]);g.fillRect(0,hy-h*.02,w,h*.08);
- const R=mulberry32(4242);STARS=[];for(let i=0;i<70;i++)STARS.push([R()*w,R()*hy*.95,.4+R()*.9,R()*6.28,.4+R()*1.2]);
+ g.fillStyle='#0b0c0f';g.fillRect(0,0,w,h);
+ // the ground: fine grain and little stones, lighter where the light falls
+ const R=mulberry32(4242),n=Math.round(w*h/9);
+ for(let i=0;i<n;i++){const x=R()*w,y=R()*h,v=R(),s=.5+R()*1.4;g.fillStyle=v<.5?'rgba(255,255,255,'+(.018+v*.05).toFixed(3)+')':'rgba(0,0,0,'+(.1+v*.12).toFixed(3)+')';g.fillRect(x,y,s,s)}
+ g.fillStyle=rg(g,w/2,h*.36,0,w/2,h*.4,Math.max(w,h)*.75,[[0,'rgba(255,244,228,.16)'],[.4,'rgba(170,190,220,.05)'],[1,'rgba(0,0,0,0)']]);g.fillRect(0,0,w,h);
+ STARS=[];
  return c}
-// the rows of the floor slide toward you, and the horizon breathes
-function bootFloor(g,w,h,s){const hy=h*.6;g.save();g.globalCompositeOperation='lighter';
- for(let k=0;k<16;k++){const u=((k+s*.9)%16)/16,t=u*u,y=hy+(h-hy)*t;g.strokeStyle='rgba(42,108,255,'+(.08+.5*t).toFixed(3)+')';g.lineWidth=1+t;g.beginPath();g.moveTo(0,y);g.lineTo(w,y);g.stroke()}
- const pul=.75+.25*Math.sin(s*1.6);g.strokeStyle='rgba(110,230,255,'+(.75*pul).toFixed(3)+')';g.lineWidth=1.6;g.shadowColor='#38d8ff';g.shadowBlur=14*pul;g.beginPath();g.moveTo(0,hy);g.lineTo(w,hy);g.stroke();
- g.restore()}
+// a slow sweep of light across the ground
+function bootFloor(g,w,h,s){const x=((s*.12)%1.6-.3)*w;g.save();g.globalCompositeOperation='lighter';
+ g.fillStyle=lg(g,x-w*.35,0,x+w*.35,h,[[0,'rgba(255,255,255,0)'],[.5,'rgba(255,248,236,.035)'],[1,'rgba(255,255,255,0)']]);g.fillRect(0,0,w,h);g.restore()}
 function bootDraw(t){const c=$('bl');if(!c||$('boot').className==='h'){return}
  const dp=Math.min(devicePixelRatio||1,2),w=innerWidth,h=innerHeight;if(c.width!==Math.round(w*dp)||c.height!==Math.round(h*dp)){c.width=Math.round(w*dp);c.height=Math.round(h*dp)}
  const g=c.getContext('2d');g.setTransform(dp,0,0,dp,0,0);

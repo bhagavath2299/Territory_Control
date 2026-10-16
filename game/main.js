@@ -115,23 +115,19 @@ function bootWM(w,dp){const key=w+'@'+dp;if(WMS[key])return WMS[key];
  g.font='900 italic '+f1+'px '+WF;g.lineWidth=f1*.13;g.strokeStyle='#0a1030';g.strokeText('TERRITORY',0,y1);let gr=g.createLinearGradient(0,y1-f1*.8,0,y1);gr.addColorStop(0,'#ffffff');gr.addColorStop(1,'#a9c6ff');g.fillStyle=gr;g.fillText('TERRITORY',0,y1);
  g.font='900 italic '+f2+'px '+WF;g.lineWidth=f2*.11;g.strokeStyle='#1a0a30';g.strokeText('CONTROL',0,y2);const tw=g.measureText('CONTROL').width;gr=g.createLinearGradient(-tw/2,0,tw/2,0);gr.addColorStop(0,'#ffbf4a');gr.addColorStop(.5,'#ff5d7b');gr.addColorStop(1,'#a56bff');g.fillStyle=gr;g.fillText('CONTROL',0,y2);g.restore();
  const c2=mk2(w,H2);return WMS[key]={w,dp,c,c2,H:H2,f1,f2,y2}}
-// ---------- the loading screen: the void, a neon floor running toward a glowing horizon ----------
+// ---------- the loading screen (v20): dark asphalt under a soft light, no grid ----------
 let BGC=null,BGK='',STARS=null;
 function bootStatic(w,h,dp){const c=mkc(Math.round(w*dp),Math.round(h*dp)),g=c.getContext('2d');g.scale(dp,dp);
- g.fillStyle='#000';g.fillRect(0,0,w,h);
- const hy=h*.6;
- g.fillStyle=rg(g,w/2,hy,0,w/2,hy,Math.max(w,h)*.8,[[0,'rgba(56,216,255,.2)'],[.35,'rgba(42,108,255,.08)'],[1,'rgba(0,0,0,0)']]);g.fillRect(0,0,w,h);
- // the floor: lines running to the vanishing point
- g.strokeStyle='rgba(42,108,255,.4)';g.lineWidth=1;
- for(let i=-24;i<=24;i++){g.globalAlpha=.25+.5*(1-Math.abs(i)/24);g.beginPath();g.moveTo(w/2+i*w*.035,hy);g.lineTo(w/2+i*w*.42,h);g.stroke()}
- g.globalAlpha=1;g.fillStyle=lg(g,0,hy-h*.02,0,hy+h*.06,[[0,'rgba(0,0,0,0)'],[.4,'rgba(0,0,0,.65)'],[1,'rgba(0,0,0,0)']]);g.fillRect(0,hy-h*.02,w,h*.08);
- const R=mulberry32(4242);STARS=[];for(let i=0;i<70;i++)STARS.push([R()*w,R()*hy*.95,.4+R()*.9,R()*6.28,.4+R()*1.2]);
+ g.fillStyle='#0b0c0f';g.fillRect(0,0,w,h);
+ // the ground: fine grain and little stones, lighter where the light falls
+ const R=mulberry32(4242),n=Math.round(w*h/9);
+ for(let i=0;i<n;i++){const x=R()*w,y=R()*h,v=R(),s=.5+R()*1.4;g.fillStyle=v<.5?'rgba(255,255,255,'+(.018+v*.05).toFixed(3)+')':'rgba(0,0,0,'+(.1+v*.12).toFixed(3)+')';g.fillRect(x,y,s,s)}
+ g.fillStyle=rg(g,w/2,h*.36,0,w/2,h*.4,Math.max(w,h)*.75,[[0,'rgba(255,244,228,.16)'],[.4,'rgba(170,190,220,.05)'],[1,'rgba(0,0,0,0)']]);g.fillRect(0,0,w,h);
+ STARS=[];
  return c}
-// the rows of the floor slide toward you, and the horizon breathes
-function bootFloor(g,w,h,s){const hy=h*.6;g.save();g.globalCompositeOperation='lighter';
- for(let k=0;k<16;k++){const u=((k+s*.9)%16)/16,t=u*u,y=hy+(h-hy)*t;g.strokeStyle='rgba(42,108,255,'+(.08+.5*t).toFixed(3)+')';g.lineWidth=1+t;g.beginPath();g.moveTo(0,y);g.lineTo(w,y);g.stroke()}
- const pul=.75+.25*Math.sin(s*1.6);g.strokeStyle='rgba(110,230,255,'+(.75*pul).toFixed(3)+')';g.lineWidth=1.6;g.shadowColor='#38d8ff';g.shadowBlur=14*pul;g.beginPath();g.moveTo(0,hy);g.lineTo(w,hy);g.stroke();
- g.restore()}
+// a slow sweep of light across the ground
+function bootFloor(g,w,h,s){const x=((s*.12)%1.6-.3)*w;g.save();g.globalCompositeOperation='lighter';
+ g.fillStyle=lg(g,x-w*.35,0,x+w*.35,h,[[0,'rgba(255,255,255,0)'],[.5,'rgba(255,248,236,.035)'],[1,'rgba(255,255,255,0)']]);g.fillRect(0,0,w,h);g.restore()}
 function bootDraw(t){const c=$('bl');if(!c||$('boot').className==='h'){return}
  const dp=Math.min(devicePixelRatio||1,2),w=innerWidth,h=innerHeight;if(c.width!==Math.round(w*dp)||c.height!==Math.round(h*dp)){c.width=Math.round(w*dp);c.height=Math.round(h*dp)}
  const g=c.getContext('2d');g.setTransform(dp,0,0,dp,0,0);

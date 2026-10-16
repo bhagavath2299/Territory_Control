@@ -38,21 +38,23 @@ Pushes build on an Apple silicon Mac (`macos-26`). When GitHub has none free, th
 
 With a free Apple ID the app stops opening after 7 days. Run Sideloadly again (or turn on its automatic refresh) to renew it. A paid Apple Developer account ($99 a year) gives 1-year installs and TestFlight, and is needed for the App Store.
 
-## The game (v19, "neon void")
+## The game (v20, "asphalt")
 
 The game's source is in `game/`, one part per file (the page was split from app-test 8861220 and grown from there):
 
 - `engine.js`: the match itself (fixed 30 steps a second, seeded, so a recorded match replays exactly). Classes and abilities (`CLS`), their numbers (`BAL`), land, scorched land, bots.
-- `gfx_core.js`, `gfx_world.js`: the 3D picture (three.js): the void arena, cars, trails, effects, camera, garage.
+- `gfx_core.js`, `gfx_world.js`: the 3D picture (three.js): the looks (`GTH`), the floor (`gwFloorMat`), cars, trails, effects, camera, garage.
 - `ui.js`: HUD, buttons, menus, kill feed, sound. `main.js`: the frame loop, picture quality, loading screen.
 - `page_head.html`, `page_tail.html`: the page and its styles. `vendor/three.r180.min.js`.
 
 ```
 python3 tools/build_game.py                         # dist/index.html: the web page (as on app-test)
-python3 tools/build_game.py --app --label="v19 ..." # also refreshes www/index.html for the app
+python3 tools/build_game.py --app --label="v20 ..." # also refreshes www/index.html for the app
 ```
 
-v19 in short: the arena is a black void with a neon floor and twice the area; cars are 20% quicker; every weapon clears twice the land; land a weapon destroys stays scorched for 15 seconds (a loop round it does not refill it); new abilities for all four classes; holographic power zones; a cleaner HUD; the camera further back; up to 120 frames a second on ProMotion iPhones.
+v20: the floor is real-looking asphalt made entirely in code (no image files, no asset packs, no grid): a generated surface picture with grain, mottling and little stones, lit by a low sun, with land as raised colour with a soft bevel and a shadow. Every ability is easy to see and does something on screen (barrages land on rival land near you, longer-lived blades, beams, cracks, wires and bigger mines), a press that cannot fire shakes its button, and the ultimate charges faster. Buttons are icons with a thin ring that fills as they recharge. Two other floor looks stay in the code for comparison (`?look=2` Obsidian, `?look=3` Concrete in the page address).
+
+v19 in short: the arena is twice the area; cars are 20% quicker; every weapon clears twice the land; land a weapon destroys stays scorched for 15 seconds (a loop round it does not refill it); new abilities for all four classes; holographic power zones; a cleaner HUD; the camera further back; up to 120 frames a second on ProMotion iPhones.
 
 Frame rate: the app asks iOS for the full rate (`CADisableMinimumFrameDurationOnPhone`) and switches off WebKit's 60 fps hold through WebKit's feature list (`GameViewController.allowFullFrameRate`, a private setting: fine for a sideloaded app, to be revisited before the App Store). Every shader is built behind the loading screen, in the variant the picture uses, so nothing is built during a match (`gfxWarm`, `gfxCompile`). Trails and sparks send only the part of their buffers in use. iPhones and iPads start on the middle quality tier (glow on); a device that cannot keep up shrinks the picture and drops a tier for the next match.
 

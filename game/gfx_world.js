@@ -20,37 +20,55 @@ function blurSep(a,w,h,sig){const R=Math.ceil(sig*2.5),k=new Float32Array(R*2+1)
 // the floor is flat: everything stands at height 0
 function gfxH(x,y){return 0}
 
-// ---- the floor ----
+// ---- the floor (v20): a real surface made from code. No grid: a ground picture (grain, mottling, little stones) lit by a low sun, land as raised
+// colour on it with a soft bevel and a shadow, a crisp edge to the arena and a darker surround beyond it. The look's numbers come from GTH (gwLook). ----
+const V3=h=>new THREE.Vector3(...linOf(h));
 function gwUniforms(){
- const U=GFX.U,th=GTH[0];
- GW.u={uMA:{value:null},uMB:{value:null},uEdge:{value:null},uScar:{value:null},
+ const U=GFX.U;
+ GW.u={uMA:{value:null},uMB:{value:null},uEdge:{value:null},uScar:{value:null},uSurf:{value:null},uSurfN:{value:null},
   uOwnSize:{value:new THREE.Vector2(MW,MH)},uWorld:{value:new THREE.Vector2(WW,WH)},
   uCol:{value:COLLIN.map(c=>new THREE.Vector3(c[0],c[1],c[2]))},uFlash:{value:[0,1,2,3].map(()=>new THREE.Vector4(0,0,1,0))},
-  uEdgeC:{value:new THREE.Vector3(...linOf(th.edge))},uGridC:{value:new THREE.Vector3(...linOf(th.grid))},
-  uTime:U.time,uGlowPass:U.glowPass,uFogN:U.fogNear,uFogF:U.fogFar,uQ:{value:1}}}
-function gwVoidMat(){
+  uEdgeC:{value:new THREE.Vector3()},uSunDir:U.sunDir,uSunC:{value:new THREE.Vector3()},uAmbC:{value:new THREE.Vector3()},uSkyC:{value:new THREE.Vector3()},
+  uBaseA:{value:new THREE.Vector3()},uBaseB:{value:new THREE.Vector3()},uSpeck:{value:new THREE.Vector3()},uOut:{value:new THREE.Vector3()},uFogC:{value:new THREE.Vector3()},
+  uMat:{value:new THREE.Vector4()},uLand:{value:new THREE.Vector4()},uLand2:{value:new THREE.Vector2()},uEdgeK:{value:new THREE.Vector2()},
+  uTime:U.time,uGlowPass:U.glowPass,uFogN:U.fogNear,uFogF:U.fogFar,uQ:{value:1}};
+ gwLook(GTH[LOOK])}
+// the look's floor numbers into the floor's uniforms (light colours are scaled by their strength, as three.js does for its own lights)
+function gwLook(th){if(!GW.u||!th||!th.base)return;const u=GW.u,s=(h,k)=>{const c=linOf(h);return new THREE.Vector3(c[0]*k,c[1]*k,c[2]*k)};
+ u.uEdgeC.value.copy(V3(th.edge));u.uSunC.value.copy(s(th.sun,th.sunI*.62));u.uAmbC.value.copy(s(th.sky,th.hemiI*.5).add(s(th.gnd,th.hemiI*.25)));u.uSkyC.value.copy(s(th.sky,1));
+ u.uBaseA.value.copy(V3(th.base[0]));u.uBaseB.value.copy(V3(th.base[1]));u.uSpeck.value.copy(V3(th.speck));u.uOut.value.copy(V3(th.out));u.uFogC.value.copy(V3(th.fog));
+ u.uMat.value.set(...th.mat);u.uLand.value.set(...th.land);u.uLand2.value.set(...th.land2);u.uEdgeK.value.set(th.edgeK,th.edgeG);
+ if(GFX.tex){u.uSurf.value=GFX.tex.surf;u.uSurfN.value=GFX.tex.surfN}}
+function gwFloorMat(){
  return new THREE.ShaderMaterial({uniforms:GW.u,extensions:{derivatives:true},
   vertexShader:'varying vec3 vWP;void main(){vec4 w=modelMatrix*vec4(position,1.);vWP=w.xyz;gl_Position=projectionMatrix*viewMatrix*w;}',
-  fragmentShader:`uniform sampler2D uMA,uMB,uEdge,uScar;uniform vec2 uOwnSize,uWorld;uniform vec3 uCol[6],uEdgeC,uGridC;uniform vec4 uFlash[4];
-  uniform float uTime,uGlowPass,uFogN,uFogF;varying vec3 vWP;
+  fragmentShader:`uniform sampler2D uMA,uMB,uEdge,uScar,uSurf,uSurfN;uniform vec2 uOwnSize,uWorld,uLand2,uEdgeK;uniform vec3 uCol[6],uEdgeC,uSunDir,uSunC,uAmbC,uSkyC,uBaseA,uBaseB,uSpeck,uOut,uFogC;
+  uniform vec4 uFlash[4],uMat,uLand;uniform float uTime,uGlowPass,uFogN,uFogF,uQ;varying vec3 vWP;
   float h21(vec2 p){p=fract(p*vec2(.1031,.1030));p+=dot(p,p.yx+33.33);return fract((p.x+p.y)*p.x);}
   float vn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h21(i),h21(i+vec2(1.,0.)),f.x),mix(h21(i+vec2(0.,1.)),h21(i+vec2(1.,1.)),f.x),f.y);}
-  // 1 on the lines of a grid with cells of size s (w: half the line width in pixels)
-  float gridL(vec2 p,float s,float w){vec2 q=p/s,d=abs(fract(q-.5)-.5)/max(fwidth(q),vec2(1e-4));return 1.-smoothstep(w-.5,w+.5,min(d.x,d.y));}
   void main(){
    vec2 wp=vWP.xz,ouv=wp/uWorld,px=fwidth(wp);float pxu=max(max(px.x,px.y),1e-4);
    // where the arena ends: distance in units (+ inside), carried on outward beyond the map
    float sd=(texture2D(uEdge,clamp(ouv,0.,1.)).r-.5)*12.;vec2 ob=max(max(-wp,wp-uWorld),0.);float outD=length(ob);if(outD>0.)sd=min(sd,0.)-outD;
    float inA=smoothstep(-pxu,pxu,sd);
-   vec3 base=vec3(.003,.0045,.01)*inA,emis=vec3(0.);
-   // the grid: 4-unit cells, and 1-unit cells that fade away as the camera pulls back; it carries on faintly a little way past the rim
-   float gMaj=gridL(wp,4.,.6),gMin=gridL(wp,1.,.45)*clamp(1.5-pxu*7.,0.,1.);
-   vec2 cr=abs(fract(wp/4.-.5)-.5)*4.;float dot0=(1.-smoothstep(.06,.06+pxu*1.5,length(cr)))*inA;
-   float gk=inA+(1.-inA)*.35*smoothstep(-8.,0.,sd);
-   vec3 grid=uGridC*(gMaj*.085+gMin*.026)*gk+uGridC*dot0*.35;
+   // the ground: the surface picture twice, a large tile and a small turned one, so it never visibly repeats
+   vec2 u1=wp*.0422,u2=mat2(.8,-.6,.6,.8)*wp*.145+.37;
+   vec4 s1=texture2D(uSurf,u1),s2=texture2D(uSurf,u2);
+   vec2 n2=texture2D(uSurfN,u2).xy*2.-1.,n1=uQ>.5?texture2D(uSurfN,u1).xy*2.-1.:vec2(0.);
+   float mott=s1.g*.55+s2.g*.45;
+   vec3 alb=mix(uBaseA,uBaseB,smoothstep(.2,.8,mott*.75+s1.a*.5-.12));
+   alb=mix(alb,uSpeck,smoothstep(.42,.78,s2.b)*uMat.w);
+   alb*=.9+.2*s2.r;
+   vec2 nb=(n1*.45+n2)*uMat.x;
+   vec3 N=normalize(vec3(nb.x,1.,nb.y)),L=normalize(uSunDir),V=normalize(cameraPosition-vWP),H=normalize(L+V);
+   float ndl=max(dot(N,L),0.),sp=pow(max(dot(N,H),0.),uMat.y)*uMat.z,fr=.04+.96*pow(1.-max(dot(N,V),0.),5.);
+   vec3 col=alb*(uAmbC+uSunC*ndl)+uSunC*sp+uSkyC*fr*uMat.z*.12,emis=vec3(0.);
    // land: coverage of the five players (smooth), the owner is the one with the most
    vec4 mA=texture2D(uMA,ouv),mB=texture2D(uMB,ouv);
    vec4 dxA=dFdx(mA),dyA=dFdy(mA);vec2 dB=vec2(dFdx(mB.x),dFdy(mB.x));
+   // raised land throws a soft shadow away from the sun
+   vec2 so=L.xz/max(L.y,.35)*.6;
+   col*=1.-smoothstep(.3,.75,texture2D(uMB,(wp+so)/uWorld).g)*uLand.w;
    float own=0.;
    if(mB.g>.01){
     float c=mA.x;vec2 gc=vec2(dxA.x,dyA.x);int cid=1;
@@ -58,28 +76,34 @@ function gwVoidMat(){
     vec3 oc=uCol[cid];
     float dOwn=(c-.5)/max(length(gc),1e-5)*pxu;   // units to the edge of this owner's land (+ inside)
     own=smoothstep(-pxu*.8,pxu*.8,dOwn);
-    float rimW=max(.17,pxu*1.3),rim=(1.-smoothstep(rimW-pxu,rimW+pxu,dOwn))*own,inner=exp(-max(dOwn,0.)*1.1)*own;
-    // inside: a deep tint of the colour with the grid lit in it, a fine weave and a slow sweep of light
-    float weave=smoothstep(.86,.9,fract((wp.x-wp.y)*.9))*.5;
-    float sweep=pow(.5+.5*sin((wp.x*.55+wp.y*.35)*.3-uTime*1.4),24.);
-    base=mix(base,oc*(.06+weave*.025),own);
-    grid=mix(grid,oc*(gMaj*.5+gMin*.12+dot0*.8),own);
-    emis+=oc*(rim*2.1+inner*.3+sweep*.1*own);
+    // the slope of all land together on the ground tilts the land's edge into a rounded bevel. Taken a cell either side (not from the change on
+    // screen, which steps from cell to cell), so the bevel's light runs smoothly along the edge.
+    vec2 e=1./uOwnSize;
+    vec2 gw=vec2(texture2D(uMB,ouv+vec2(e.x,0.)).g-texture2D(uMB,ouv-vec2(e.x,0.)).g,texture2D(uMB,ouv+vec2(0.,e.y)).g-texture2D(uMB,ouv-vec2(0.,e.y)).g)*uOwnSize.x/uWorld.x*.5;
+    vec3 Nl=normalize(vec3(-gw.x*uLand.y+nb.x*.2,1.,-gw.y*uLand.y+nb.y*.2));
+    float ndl2=max(dot(Nl,L),0.),sp2=pow(max(dot(Nl,normalize(L+V)),0.),uLand2.x)*uLand2.y;
+    vec3 la=oc*uLand.x*(.94+.12*s2.r);
+    vec3 land=la*(uAmbC+uSunC*ndl2)+uSunC*sp2;
+    col=mix(col,land,own);
+    float rimW=max(.12,pxu*1.2),rim=(1.-smoothstep(rimW-pxu,rimW+pxu,dOwn))*own;
+    emis+=oc*rim*uLand.z;
     // a capture: a wave of light runs out from where the loop closed
-    for(int fi=0;fi<4;fi++){vec4 fl=uFlash[fi];if(fl.z<1.){float dd=length(wp-fl.xy),rr=fl.z*32.;emis+=uCol[int(fl.w+.5)]*exp(-pow((dd-rr)/1.6,2.))*(1.-fl.z)*1.1*own;}}
+    for(int fi=0;fi<4;fi++){vec4 fl=uFlash[fi];if(fl.z<1.){float dd=length(wp-fl.xy),rr=fl.z*32.;emis+=uCol[int(fl.w+.5)]*exp(-pow((dd-rr)/1.6,2.))*(1.-fl.z)*.9*own;}}
    }
    // scorched land: embers and glowing cracks that cool as the scar wears off
    float sc=texture2D(uScar,ouv).r*(1.-own);
-   if(sc>.004){float n1=vn(wp*1.7+vec2(uTime*.25,0.)),n2=vn(wp*5.3-vec2(0.,uTime*.55)),n3=vn(wp*.6);
-    float crack=1.-smoothstep(.04,.12,abs(n1-.5)),heat=sc*(.5+.5*n2);
+   if(sc>.004){float e1=vn(wp*1.7+vec2(uTime*.25,0.)),e2=vn(wp*5.3-vec2(0.,uTime*.55)),e3=vn(wp*.6);
+    float crack=1.-smoothstep(.04,.12,abs(e1-.5)),heat=sc*(.5+.5*e2);
     vec3 ember=mix(vec3(.45,.04,.0),vec3(1.9,.55,.08),heat);
-    emis+=ember*(crack*.95+.12+n3*.08)*sc;base+=vec3(.03,.005,.0)*sc;}
-   // the rim of the arena: a bright line with a soft glow on both sides
-   float ae=abs(sd);
-   emis+=uEdgeC*((1.-smoothstep(.05,.05+pxu*1.5,ae))*1.7+exp(-ae*.9)*.12+exp(-ae*3.4)*.24)*(.86+.14*sin(uTime*1.8+(wp.x-wp.y)*.12))*(1.-own*.5);
+    emis+=ember*(crack*.95+.12+e3*.08)*sc;col=mix(col,col*.35+vec3(.02,.006,.0),sc*.8);}
+   // the arena's edge: a slight shade just inside, a fine line on the edge, a darker surround beyond that fades away
+   col*=1.-.22*(1.-smoothstep(0.,1.8,sd))*inA;
+   vec3 outc=uOut*(.75+.5*mott)*(1.-.55*smoothstep(0.,26.,-sd));
+   col=mix(outc,col,inA);
+   float line=1.-smoothstep(.035,.035+pxu*1.5,abs(sd));
+   col+=uEdgeC*line*uEdgeK.x;emis+=uEdgeC*(line*1.4+exp(-abs(sd)*2.5)*.15)*uEdgeK.y;
    float fog=smoothstep(uFogN,uFogF,length(vWP-cameraPosition));
-   vec3 col=(uGlowPass>.5?emis:base+grid+emis)*(1.-fog);
-   gl_FragColor=vec4(col,1.);
+   gl_FragColor=vec4(uGlowPass>.5?emis*(1.-fog):mix(col+emis,uFogC,fog),1.);
    #include <tonemapping_fragment>
    #include <colorspace_fragment>
   }`})}
@@ -121,7 +145,7 @@ function gwBuild(){
  const t0=performance.now();
  if(!GW.u)gwUniforms();
  gwDispose();
- gfxSetTheme(0);
+ gfxSetTheme(LOOK);
  // where the arena ends (signed distance in units, -6..6, smoothed so the rim is round instead of stepped)
  const inW=new Uint8Array(MW*MH);for(let i=0;i<inW.length;i++)inW[i]=ISL[i]?0:1;
  const dIn=edt2(inW,MW,MH),dOut=edt2(ISL,MW,MH),sdc=new Float32Array(MW*MH);
@@ -136,7 +160,7 @@ function gwBuild(){
  if(!GW.texScar){GW.scData=new Uint8Array(MW*MH);GW.texScar=dtex(GW.scData,MW,MH,THREE.RedFormat,THREE.UnsignedByteType,{clamp:1});GW.u.uScar.value=GW.texScar}
  else{GW.scData.fill(0);GW.texScar.needsUpdate=true}GW.scOn=0;
  // the floor: one sheet reaching a little beyond the map (past it the screen is cleared to black anyway)
- const mat=GW.floorMat||(GW.floorMat=gwVoidMat()),PAD=34,g=new THREE.PlaneGeometry(WW+2*PAD,WH+2*PAD,1,1);g.rotateX(-Math.PI/2);g.translate(WW/2,0,WH/2);
+ const mat=GW.floorMat||(GW.floorMat=gwFloorMat()),PAD=34,g=new THREE.PlaneGeometry(WW+2*PAD,WH+2*PAD,1,1);g.rotateX(-Math.PI/2);g.translate(WW/2,0,WH/2);
  GW.floor=new THREE.Mesh(g,mat);GW.floor.frustumCulled=false;GW.floor.renderOrder=-2;GW.floor.layers.enable(GLOW);GFX.S.add(GW.floor);
  gwPads();
  GW.built=1;GW.buildMs=performance.now()-t0}
@@ -539,7 +563,7 @@ function carFrame(C,p,dt,tm,night){
  // shield bubble: Titan plate, fortress, spawn protection, armour of a power zone
  let da2=0,col=null;
  if(p.fInv&&p.fUlt){da2=.9;col=[.3,1.1,1.8]}else if(p.fInv){da2=.7;col=[.6,.9,1.8]}else if(p.fPlt){da2=.28;col=[.35,.8,1.5]}else if(p.fSh){da2=.45+.25*Math.sin(tm*18);col=[1.5,1.5,1.5]}else if(p.fPrt){da2=.3;col=[.4,1.1,1.7]}
- C.dome.visible=da2>.01;if(C.dome.visible){const u=C.dome.material.uniforms;u.uA.value=da2;u.uT.value=tm;u.uC.value.setRGB(col[0],col[1],col[2]);const sc=(p.fInv&&p.fUlt)?1.18+.06*Math.sin(tm*8):1;C.dome.scale.set(sc,.55*sc,.8*sc)}}
+ C.dome.visible=da2>.01;if(C.dome.visible){const u=C.dome.material.uniforms;u.uA.value=da2;u.uT.value=tm;u.uC.value.setRGB(col[0],col[1],col[2]);const sc=(p.fInv&&p.fUlt)?1.45+.07*Math.sin(tm*8):1;C.dome.scale.set(sc,.55*sc,.8*sc)}}
 function body0(C,gp,gr,kick,tm){const b=C.body;b.rotation.set(-gr*.9-C.roll,0,gp*.9+Math.sin(tm*17+C.ph)*.004*(C.flame+.3));b.position.y=Math.abs(Math.sin(tm*13+C.ph))*.006;
  if(C.barrel)C.barrel.position.x=-kick*.2}
 // ---------- 3D renderer, part 4: trails, sparks and smoke, rings, ember marks ----------
@@ -839,7 +863,7 @@ function pjFrame(dt){
  for(let i=0;i<PJ.shell.length;i++){const g=PJ.shell[i],s=SHV[i];if(!s){g.visible=false;continue}g.visible=true;const x=s[0],y=s[1];g.position.set(x,.75,y);g.rotation.y=-Math.atan2(s[3],s[2]);g.scale.setScalar(1.6);pjSpot(x,y,[1,.55,.2],3,.55);
   if(QL.fx>.3&&!FF)FX.push({x:x-s[2]*.012,y:y-s[3]*.012,h:.75,vh:.2,vx:-s[2]*.02,vy:-s[3]*.02,l:.3,l0:.3,c:'#ff8a20',k:1,s:.8,r:0,vr:0})}
  // blades
- for(let i=0;i<PJ.blade.length;i++){const g=PJ.blade[i],s=BLV[i];if(!s){g.visible=false;continue}g.visible=true;const x=s[0],y=s[1],c=ownerC(s[4]);g.position.set(x,.7,y);g.rotation.y=clk*26+i;g.scale.setScalar(1.45);pjSpot(x,y,c,2.6,.7);
+ for(let i=0;i<PJ.blade.length;i++){const g=PJ.blade[i],s=BLV[i];if(!s){g.visible=false;continue}g.visible=true;const x=s[0],y=s[1],c=ownerC(s[4]);g.position.set(x,.7,y);g.rotation.y=clk*26+i;g.scale.setScalar(1.9);pjSpot(x,y,c,3.6,.8);
   g.userData.m2.material.color.setRGB(c[0]*1.5+.08,c[1]*1.5+.08,c[2]*1.5+.08);g.userData.m1.material.color.setRGB(2,2,2);
   if(QL.fx>.3&&!FF)FX.push({x:x-s[2]*.01,y:y-s[3]*.01,h:.7,vh:0,vx:0,vy:0,l:.3,l0:.3,c:COLS[s[4]]||'#ff4d5e',k:1,s:.8,r:0,vr:0})}
  // drones
@@ -847,28 +871,28 @@ function pjFrame(dt){
   g.userData.col.color.setRGB(c[0]*1.6,c[1]*1.6,c[2]*1.6);const f=g.userData.fl;f.scale.set(.8+.5*Math.sin(clk*70+i),1,1);
   if(QL.fx>.3&&!FF)FX.push({x:x-Math.cos(s[2])*.7,y:y-Math.sin(s[2])*.7,h:.75,vh:0,vx:0,vy:0,l:.28,l0:.28,c:COLS[s[3]]||'#ff9a3a',k:1,s:.55,r:0,vr:0})}
  // plasma mines (armed ones pulse fast)
- for(let i=0;i<PJ.mine.length;i++){const g=PJ.mine[i],s=MNV[i];if(!s){g.visible=false;continue}g.visible=true;const x=s[0],y=s[1],c=ownerC(s[2]),k=(s[4]?.8:1)*1.45;g.position.set(x,.02,y);g.scale.setScalar(k);
+ for(let i=0;i<PJ.mine.length;i++){const g=PJ.mine[i],s=MNV[i];if(!s){g.visible=false;continue}g.visible=true;const x=s[0],y=s[1],c=ownerC(s[2]),k=(s[4]?.8:1)*1.85;g.position.set(x,.02,y);g.scale.setScalar(k);
   const pu=s[3]?.7+.6*(.5+.5*Math.sin(clk*12+i)):.45;g.userData.ring.material.color.setRGB(c[0]*1.4+.05,c[1]*1.4+.05,c[2]*1.4+.05);g.userData.orb.material.color.setRGB(c[0]*2.2*pu+.2,c[1]*2.2*pu+.2,c[2]*2.2*pu+.2);
-  g.userData.orb.scale.setScalar(.85+.25*pu);pjSpot(x,y,c,2.2*k,.35*pu)}
+  g.userData.orb.scale.setScalar(.85+.25*pu);pjSpot(x,y,c,2.8*k,.5*pu)}
  // strikes: red for a rival's, your colour for your own
  for(let i=0;i<PJ.strike.length;i++){const g=PJ.strike[i],s=STV[i];if(!s){g.visible=false;continue}g.visible=true;const x=s[0],y=s[1],r=s[4]||2.6,p=Math.max(0,Math.min(1,1-Math.max(0,s[2])/1.4)),c=s[3]===VS&&!RPL?ownerC(VS):STRIKEC;
   g.position.set(x,.09,y);const R=r*2.25;g.userData.m.scale.set(R,1,R);const u=g.userData.m.material.uniforms;u.uC.value.set(c[0],c[1],c[2]);u.uP.value=p;u.uA.value=Math.min(1,p*4+.3);
   const bu=g.userData.beam.material.uniforms;bu.uC.value.set(c[0]*1.2,c[1]*1.2+.1,c[2]*1.2+.1);bu.uP.value=p;g.userData.beam.scale.set(r*.4,1,r*.4)}
- // railgun beams (fired in the last half second)
- {let k=0;for(let i=RAILV.length-1;i>=0;i--){const b=RAILV[i],age=(clk-b.t0)/.5;if(age>=1){RAILV.splice(i,1);continue}if(k>=PJ.rail.length)continue;const m=PJ.rail[k++];m.visible=true;
-   pjBeam(m,b.x0,b.y0,b.x1,b.y1,.7,1.6*(1-age*.6));const u=m.material.uniforms;u.uC.value.set(b.c[0]*1.3,b.c[1]*1.3,b.c[2]*1.3);u.uA.value=Math.pow(1-age,1.5)*1.3;u.uH.value=age<.35?age/.35:-1}
+ // railgun beams (fired in the last three quarters of a second)
+ {let k=0;for(let i=RAILV.length-1;i>=0;i--){const b=RAILV[i],age=(clk-b.t0)/.75;if(age>=1){RAILV.splice(i,1);continue}if(k>=PJ.rail.length)continue;const m=PJ.rail[k++];m.visible=true;
+   pjBeam(m,b.x0,b.y0,b.x1,b.y1,.7,2.4*(1-age*.5));const u=m.material.uniforms;u.uC.value.set(b.c[0]*1.3,b.c[1]*1.3,b.c[2]*1.3);u.uA.value=Math.pow(1-age,1.3)*1.4;u.uH.value=age<.3?age/.3:-1}
   for(;k<PJ.rail.length;k++)PJ.rail[k].visible=false}
  // laser wires
  {let k=0;for(const w of WIRES){if(k>=PJ.wire.length)break;const g=PJ.wire[k++],c=ownerC(w.o),u=g.userData;g.visible=true;g.position.set(0,0,0);
-   pjBeam(u.m,w.x1,w.y1,w.x2,w.y2,.62,1.1);const mu=u.m.material.uniforms,fade=Math.min(1,w.t/.6);mu.uC.value.set(c[0]*1.4,c[1]*1.4,c[2]*1.4);mu.uA.value=fade*(w.t<1.2?(.6+.4*Math.sin(clk*40)):1);
-   u.posts[0].position.set(w.x1,0,w.y1);u.posts[1].position.set(w.x2,0,w.y2);u.capM.color.setRGB(c[0]*2.4+.3,c[1]*2.4+.3,c[2]*2.4+.3);
+   pjBeam(u.m,w.x1,w.y1,w.x2,w.y2,.62,1.8);const mu=u.m.material.uniforms,fade=Math.min(1,w.t/.6);mu.uC.value.set(c[0]*1.8,c[1]*1.8,c[2]*1.8);mu.uA.value=fade*(w.t<1.2?(.6+.4*Math.sin(clk*40)):1);
+   u.posts[0].position.set(w.x1,0,w.y1);u.posts[1].position.set(w.x2,0,w.y2);u.posts[0].scale.setScalar(1.4);u.posts[1].scale.setScalar(1.4);u.capM.color.setRGB(c[0]*2.4+.3,c[1]*2.4+.3,c[2]*2.4+.3);
    pjSpot(w.x1,w.y1,c,2,.5);pjSpot(w.x2,w.y2,c,2,.5)}
   for(;k<PJ.wire.length;k++)PJ.wire[k].visible=false}
  // fault lines: the crack races ahead, then glows for a moment once it stops
  {for(const f of FAULTS){if(!FAULTV.some(v=>v.f===f))FAULTV.push({f,x:f.x,y:f.y,c:f.c,s:f.s,o:f.o,d:f.d,end:0})}
   let k=0;for(let i=FAULTV.length-1;i>=0;i--){const v=FAULTV[i];if(!v.end&&!FAULTS.includes(v.f)){v.end=clk;v.d=Math.max(v.d,v.f.d)}if(!v.end)v.d=v.f.d;
-   const age=v.end?(clk-v.end)/.9:0;if(age>=1){FAULTV.splice(i,1);continue}const dd=Math.min(v.d,v.f.e===undefined?BAL.faultL:v.f.e);if(k>=PJ.fault.length)continue;const m=PJ.fault[k++],L=BAL.faultL,c=ownerC(v.o);m.visible=true;
-   pjBeam(m,v.x,v.y,v.x+v.c*L,v.y+v.s*L,.06,2.2);const u=m.material.uniforms;u.uC.value.set(c[0],c[1],c[2]);u.uD.value=Math.max(.001,dd/L);u.uL.value=L;u.uA.value=Math.pow(1-age,1.3);
+   const age=v.end?(clk-v.end)/1.5:0;if(age>=1){FAULTV.splice(i,1);continue}const dd=Math.min(v.d,v.f.e===undefined?BAL.faultL:v.f.e);if(k>=PJ.fault.length)continue;const m=PJ.fault[k++],L=BAL.faultL,c=ownerC(v.o);m.visible=true;
+   pjBeam(m,v.x,v.y,v.x+v.c*L,v.y+v.s*L,.06,3.0);const u=m.material.uniforms;u.uC.value.set(c[0],c[1],c[2]);u.uD.value=Math.max(.001,dd/L);u.uL.value=L;u.uA.value=Math.pow(1-age,1.3);
    if(!v.end&&!FF&&QL.fx>.3){const fx=v.x+v.c*dd,fy=v.y+v.s*dd;for(let j=0;j<2;j++){const a=Math.random()*6.28;FX.push({x:fx,y:fy,h:.2,vh:2+Math.random()*3,vx:Math.cos(a)*3+v.c*6,vy:Math.sin(a)*3+v.s*6,l:.5,l0:.5,c:j?'#ffd27a':COLS[v.o]||'#ffb020',k:j?4:3,s:j?.18:.16,r:Math.random()*6,vr:8})}}}
   for(;k<PJ.fault.length;k++)PJ.fault[k].visible=false}
  // black holes
@@ -962,7 +986,7 @@ function gfxCompile(scene,cam){const R=GFX.R,old=R.getRenderTarget();
 // ---------- loading steps for the start screen ----------
 function buildTexSteps(){return[
  ['Starting the 3D engine...',()=>{const ok=gfxInit($('gl'));if(ok){gfxSetTheme(gfxThemeFor(1));fit()}else{$('gl').style.display='none';TEXOK=1}}],
- ['Building the arena...',()=>{if(!GFX.ok)return;genMap(20241008);gwBuild();gfxSetTheme(0)}],
+ ['Building the arena...',()=>{if(!GFX.ok)return;genMap(20241008);gwBuild();gfxSetTheme(LOOK)}],
  ['Tuning the engines...',()=>{if(!GFX.ok)return;trInit();ptInit();ringsInit();pjInit();for(let c=0;c<4;c++){const C=carBuild(c,CLS[c].col,'sport',0);C.root.position.set(WW/2+c*3,0,WH/2);GFX.S.add(C.root);CARI[0]=CARI[0]||[];CARI[0].push(C)}
    // every shader the game uses is built now, behind the loading screen: the scene, the effects, the glow and finishing passes (one real frame does the last ones)
    camSet(WW/2+4,WH/2);camApply(0);gfxWarm(CARI[0]);
@@ -1079,7 +1103,7 @@ function ggInit(){
  const S=GG.S=new THREE.Scene(),R0=2.75;
  S.background=cLin('#01030a');S.fog=new THREE.Fog(cLin('#01030a'),16,46);
  GG.cam=new THREE.PerspectiveCamera(30,1,.5,90);
- S.environment=gfxEnv(GTH[0]);S.environmentIntensity=.95;
+ S.environment=gfxEnv(GTH.find(t=>!t.envDay)||GTH[0]);S.environmentIntensity=.95;
  // light: a warm key from the front right with shadows, cold and pink edge lights from behind, a soft fill
  const sun=GG.sun=new THREE.DirectionalLight(0xfff0dc,3.4);sun.position.set(4.5,8,5.5);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);
  const sc=sun.shadow.camera;sc.near=2;sc.far=26;sc.left=-4.2;sc.right=4.2;sc.top=4.2;sc.bottom=-4.2;sun.shadow.bias=-.0005;sun.shadow.normalBias=.02;sun.shadow.radius=3;S.add(sun,sun.target);
