@@ -21,7 +21,9 @@ An iPhone app can only be compiled on a Mac, so GitHub builds it: every push to 
 
 1. `ci/build.sh` builds the app twice with Xcode: an unsigned `.ipa` for the phone, and a simulator copy with the self-test compiled in.
 2. `ci/selftest.sh` plays through the game in the iPhone simulator: boot screen, menu, a match against bots in portrait, landscape, pause and resume, back to portrait, results; then closes and reopens the app to check that saved data is still there. It takes a screenshot at every step. `ci/check_report.py` fails the run if any step is missing, 3D did not start or the page reported errors.
-3. `ci/publish.sh` saves the `.ipa`, screenshots, test report and build logs to the branch `ios-build` (rewritten on each build).
+3. `ci/publish.sh` saves the `.ipa`, screenshots, test report and build logs to the branch `ios-build` (rewritten on each build). It tries the push up to four times and cuts any log over 90 MB (GitHub refuses files over 100 MB).
+
+The test verdict (with the boot time, frame rate and error counts) and whether the build was saved are also left as notes on the run, so they can be read even when the logs cannot: `gh api repos/bhagavath2299/territory_control/check-runs/<job id>/annotations` (the job id is in `gh run view <run id> --json jobs`).
 
 The self-test code (`TerritoryControl/SelfTest.swift`) is compiled only into the simulator copy; the `.ipa` contains none of it.
 

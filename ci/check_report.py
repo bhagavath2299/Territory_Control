@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Read the simulator self-test results, print a short summary, and fail if the app did not play through."""
 import json
+import os
 import pathlib
 import sys
 
@@ -15,6 +16,7 @@ def main(folder: str) -> int:
         report = json.loads((out / "report.json").read_text())
     except (OSError, ValueError) as e:
         print(f"FAIL: no readable report.json ({e})")
+        annotate("error", "Simulator test failed", f"no readable report.json ({e})")
         return 1
     steps = {s["step"]: s for s in report.get("steps", [])}
     for name in STEPS:
@@ -106,11 +108,24 @@ def main(folder: str) -> int:
     except (OSError, ValueError):
         problems.append("no result from the relaunch check")
 
+    # the same verdict as a note on the run page, readable from the API when the logs are not
+    fps = (steps.get("06-match-landscape-later") or {}).get("framesPerSecondOver15s")
+    progs = (steps.get("05-paused-landscape", {}).get("page") or {}).get("programs")
+    summary = (f"boot ready after {boot.get('bootSeconds')} s; landscape match {fps} fps; programs at pause {progs}; "
+               f"page errors {len(report.get('pageErrors') or [])}; console errors {len(report.get('consoleErrors') or [])}")
     if problems:
         print("FAIL:", "; ".join(problems))
+        annotate("error", "Simulator test failed", "; ".join(problems) + " | " + summary)
         return 1
     print("PASS: played through in the simulator")
+    annotate("notice", "Simulator test passed", summary)
     return 0
+
+
+def annotate(level: str, title: str, msg: str) -> None:
+    if os.environ.get("GITHUB_ACTIONS"):
+        msg = msg.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+        print(f"::{level} title={title}::{msg}")
 
 
 if __name__ == "__main__":
