@@ -1,5 +1,5 @@
-// Territory Control offline app: keeps the game on the phone. A new version replaces the old cache (version fd96e25148).
-const V='tc-app-fd96e25148',FILES=["./","./index.html","./manifest.webmanifest","./icons/icon-192.png","./icons/icon-512.png","./icons/icon-maskable-512.png","./icons/apple-touch-icon.png"];
+// Territory Control offline app: keeps the game on the phone. A new version replaces the old cache (version 79a6e04dd0).
+const V='tc-app-79a6e04dd0',FILES=["./","./index.html","./manifest.webmanifest","./icons/icon-192.png","./icons/icon-512.png","./icons/icon-maskable-512.png","./icons/apple-touch-icon.png"];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(V).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==V).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 // the game files come from the phone first; anything else is fetched and kept; with no connection the page itself is served
