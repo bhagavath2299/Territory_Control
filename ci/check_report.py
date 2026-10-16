@@ -49,6 +49,10 @@ def main(folder: str) -> int:
         problems.append("the match did not reach the results screen")
     if report.get("pageErrors"):
         problems.append(f"{len(report['pageErrors'])} page error(s)")
+    # a loading step that failed (the game carries on, but something did not get built)
+    failed = [e for e in report.get("consoleErrors") or [] if "loading step" in e or "reflections not made" in e or "showreel failed" in e]
+    if failed:
+        problems.append(f"{len(failed)} loading step(s) failed")
 
     env = report.get("environment", {})
     print("system:", report.get("system"), report.get("screen"))

@@ -335,8 +335,8 @@ function gfxEnv(th){
   faces.push(side(),side(),mkf((g,s)=>{g.fillStyle=rg(g,s/2,s/2,0,s/2,s/2,s*.75,[[0,'#ffffff'],[.4,'#dbe5f3'],[1,'#a8bad6']]);g.fillRect(0,0,s,s)}),
    mkf((g,s)=>{g.fillStyle='#45423e';g.fillRect(0,0,s,s)}),side(),side());
   const cube=new THREE.CubeTexture(faces);cube.colorSpace=THREE.SRGBColorSpace;cube.needsUpdate=true;
-  const pm=new THREE.PMREMGenerator(GFX.R),rt=pm.fromCubemap(cube);pm.dispose();cube.dispose();
-  return GFX.envs[key]=rt.texture}
+  // if the 3D picture is lost while this runs, carry on without reflections (tried again with the next look change)
+  try{const pm=new THREE.PMREMGenerator(GFX.R),rt=pm.fromCubemap(cube);pm.dispose();cube.dispose();return GFX.envs[key]=rt.texture}catch(e){cube.dispose();console.error('reflections not made: '+(e&&e.message||e));return null}}
  // a soft rectangle of light
  const panel=(g,x,y,w,h,col,a)=>{g.save();g.globalAlpha=a;g.filter='blur(3px)';g.fillStyle=col;g.fillRect(x,y,w,h);g.restore()};
  const strip=(g,s,y,col,a)=>{const gr=g.createLinearGradient(0,y-s*.08,0,y+s*.08);gr.addColorStop(0,col+'00');gr.addColorStop(.5,col);gr.addColorStop(1,col+'00');g.globalAlpha=a;g.fillStyle=gr;g.fillRect(0,y-s*.08,s,s*.16);g.globalAlpha=1};
@@ -349,8 +349,7 @@ function gfxEnv(th){
  faces.push(mkf((g,s)=>{strip(g,s,s*.44,'#9fb8ff',.7);panel(g,s*.3,s*.12,s*.4,s*.14,'#ffffff',.45)}));
  faces.push(mkf((g,s)=>{strip(g,s,s*.44,'#5ee1ff',.6);panel(g,s*.25,s*.15,s*.5,s*.1,'#ffffff',.3)}));
  const cube=new THREE.CubeTexture(faces);cube.colorSpace=THREE.SRGBColorSpace;cube.needsUpdate=true;
- const pm=new THREE.PMREMGenerator(GFX.R),rt=pm.fromCubemap(cube);pm.dispose();cube.dispose();
- GFX.envs[key]=rt.texture;return rt.texture}
+ try{const pm=new THREE.PMREMGenerator(GFX.R),rt=pm.fromCubemap(cube);pm.dispose();cube.dispose();return GFX.envs[key]=rt.texture}catch(e){cube.dispose();console.error('reflections not made: '+(e&&e.message||e));return null}}
 function mixHex(a,b,t){const x=rgbOf(a),y=rgbOf(b),h=v=>('0'+Math.round(v).toString(16)).slice(-2);return'#'+h(x[0]+(y[0]-x[0])*t)+h(x[1]+(y[1]-x[1])*t)+h(x[2]+(y[2]-x[2])*t)}
 
 // ---------- start-up ----------

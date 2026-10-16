@@ -88,9 +88,11 @@ const BSTEP=(p,t)=>{const b=document.querySelector('#bbar i');if(b)b.style.width
 async function bootRun(skip){
  grainCss();BSTEP(6,'Warming up the engines...');await tick();
  fit();readSafe();BSTEP(14,'Starting the 3D engine...');await tick();
- if(typeof buildTexSteps==='function'){const st=buildTexSteps();for(let i=0;i<st.length;i++){BSTEP(14+Math.round(i/st.length*52),st[i][0]);await tick();await st[i][1]()}}
+ // a step that fails (for instance the 3D picture lost while it starts, as once in the simulator) is reported and the next one runs:
+ // the game still starts, and three.js rebuilds the 3D picture when the system gives it back
+ if(typeof buildTexSteps==='function'){const st=buildTexSteps();for(let i=0;i<st.length;i++){BSTEP(14+Math.round(i/st.length*52),st[i][0]);await tick();try{await st[i][1]()}catch(e){console.error('loading step "'+st[i][0]+'" failed: '+(e&&e.message||e))}}}
  BSTEP(72,'Rolling out the map...');await tick();
- bgStart();READY=1;
+ try{bgStart()}catch(e){console.error('menu showreel failed: '+(e&&e.message||e))}READY=1;
  BSTEP(84,'Starting the engine...');await tick();
  if(SERVER!=='none'){BSTEP(88,'Connecting to the server...');const t0=Date.now();
   while(!online&&Date.now()-t0<4500){if(Date.now()-t0>1800)$('bmsg').textContent='Waking the server (first start can take a minute)...';await new Promise(r=>setTimeout(r,120))}}
@@ -117,11 +119,16 @@ function bootWM(w,dp){const key=w+'@'+dp;if(WMS[key])return WMS[key];
  const c2=mk2(w,H2);return WMS[key]={w,dp,c,c2,H:H2,f1,f2,y2}}
 // ---------- the loading screen (v20): dark asphalt under a soft light, no grid ----------
 let BGC=null,BGK='',STARS=null;
+// The grain is one 192 px tile made in memory and laid as a pattern: a single draw. (Thousands of tiny rectangles, as a first v20 build did, flood the
+// phone's drawing process while the 3D engine starts, and in the simulator the 3D picture was lost.)
+let BOOTTILE=null;
+function bootTile(){if(BOOTTILE)return BOOTTILE;const N=192,c=mkc(N,N),g=c.getContext('2d'),im=g.createImageData(N,N),d=im.data,R=mulberry32(4242);
+ for(let i=0;i<N*N;i++){const v=R(),k=i*4;let a=0,l=0;if(v<.06){l=255;a=Math.round((.03+R()*.06)*255)}else if(v>.86){l=0;a=Math.round((.12+R()*.16)*255)}d[k]=d[k+1]=d[k+2]=l;d[k+3]=a}
+ g.putImageData(im,0,0);return BOOTTILE=c}
 function bootStatic(w,h,dp){const c=mkc(Math.round(w*dp),Math.round(h*dp)),g=c.getContext('2d');g.scale(dp,dp);
  g.fillStyle='#0b0c0f';g.fillRect(0,0,w,h);
- // the ground: fine grain and little stones, lighter where the light falls
- const R=mulberry32(4242),n=Math.round(w*h/9);
- for(let i=0;i<n;i++){const x=R()*w,y=R()*h,v=R(),s=.5+R()*1.4;g.fillStyle=v<.5?'rgba(255,255,255,'+(.018+v*.05).toFixed(3)+')':'rgba(0,0,0,'+(.1+v*.12).toFixed(3)+')';g.fillRect(x,y,s,s)}
+ // the ground: fine grain, lighter where the light falls
+ try{const pt=g.createPattern(bootTile(),'repeat');if(pt){g.save();g.scale(1/dp,1/dp);g.fillStyle=pt;g.fillRect(0,0,w*dp,h*dp);g.restore()}}catch(e){}
  g.fillStyle=rg(g,w/2,h*.36,0,w/2,h*.4,Math.max(w,h)*.75,[[0,'rgba(255,244,228,.16)'],[.4,'rgba(170,190,220,.05)'],[1,'rgba(0,0,0,0)']]);g.fillRect(0,0,w,h);
  STARS=[];
  return c}
