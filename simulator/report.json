@@ -1,0 +1,1667 @@
+{
+  "consoleErrors" : [
+
+  ],
+  "consoleWarnings" : [
+
+  ],
+  "environment" : {
+    "cores" : 4,
+    "frameRateSwitch" : "60 fps hold switched off (now off)",
+    "gameVersion" : "20",
+    "href" : "app:\/\/localhost\/index.html",
+    "localStorage" : "ok",
+    "renderCost" : {
+      "canvas" : "1398x643",
+      "fps" : {
+        "fullUploads" : 28.699999999999999,
+        "no3d" : 31,
+        "noHud" : 24.699999999999999,
+        "paused" : 30.699999999999999
+      },
+      "ms" : {
+        "all" : 6,
+        "allAt60pct" : 7.4000000000000004,
+        "floorFlat" : 10.6,
+        "floorNoLand" : 6.7999999999999998,
+        "floorNoShadow" : 9.5999999999999996,
+        "floorNoSurface" : 6.7999999999999998,
+        "floorOnly" : 6,
+        "landUpdate" : 4.4000000000000004,
+        "noCars" : 7.5999999999999996,
+        "noFloor" : 6.4000000000000004,
+        "noPads" : 6.5999999999999996,
+        "noSparks" : 6,
+        "nothing" : 5.2000000000000002,
+        "noTrails" : 7.2000000000000002
+      },
+      "notes" : [
+
+      ],
+      "scale" : 1,
+      "tier" : "med",
+      "trailPoints" : 210
+    },
+    "screenMaxFPS" : 60,
+    "secureContext" : true,
+    "serviceWorkerApi" : false,
+    "startTier" : "med",
+    "userAgent" : "Mozilla\/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Mobile\/15E148",
+    "vibrateBridge" : true,
+    "wakeLockApi" : true,
+    "webgl2Renderer" : "Apple GPU",
+    "webSource" : "v20 asphalt"
+  },
+  "finished" : false,
+  "notes" : [
+    "0.5s self-test started"
+  ],
+  "pageErrors" : [
+
+  ],
+  "resourceErrors" : [
+
+  ],
+  "screen" : "402x874 @3.0x",
+  "steps" : [
+    {
+      "bootReady" : true,
+      "bootSeconds" : 17.600000000000001,
+      "page" : {
+        "card" : "",
+        "drawCalls" : 81,
+        "envSafeArea" : {
+          "b" : 34,
+          "l" : 0,
+          "r" : 0,
+          "t" : 62
+        },
+        "fpsText" : "",
+        "frameGaps" : [
+          [
+            5037,
+            453
+          ],
+          [
+            7077,
+            2000
+          ],
+          [
+            7323,
+            246
+          ],
+          [
+            12543,
+            5220
+          ],
+          [
+            14070,
+            1527
+          ],
+          [
+            14281,
+            211
+          ],
+          [
+            14960,
+            207
+          ]
+        ],
+        "frames" : 23,
+        "height" : 874,
+        "overlay" : "h",
+        "paused" : 0,
+        "phone" : true,
+        "pixelRatio" : 3,
+        "programs" : {
+          "loading" : 34
+        },
+        "quality" : "med",
+        "refreshHz" : 60,
+        "safeArea" : {
+          "b" : 34,
+          "l" : 0,
+          "r" : 0,
+          "t" : 62
+        },
+        "scale" : 1,
+        "screen" : "",
+        "state" : "menu",
+        "timings" : null,
+        "webgl" : true,
+        "width" : 402
+      },
+      "seconds" : 17.600000000000001,
+      "step" : "01-boot"
+    },
+    {
+      "page" : {
+        "card" : " P Player Tap to set up your car CLAIM THE MAP YOUR CLASS · TAP TO CHANGE Striker Assassin PLAY Offline · vs bots Friends Needs server Replays Garage How to play Offline build: practice against bots ",
+        "drawCalls" : 85,
+        "envSafeArea" : {
+          "b" : 34,
+          "l" : 0,
+          "r" : 0,
+          "t" : 62
+        },
+        "fpsText" : "16 fps  64.0 ms  (cpu 8.5)\nmed x1.00  0.90 MP  87 calls  71k tris",
+        "frameGaps" : [
+          [
+            7077,
+            2000
+          ],
+          [
+            7323,
+            246
+          ],
+          [
+            12543,
+            5220
+          ],
+          [
+            14070,
+            1527
+          ],
+          [
+            14281,
+            211
+          ],
+          [
+            14960,
+            207
+          ],
+          [
+            24919,
+            977
+          ],
+          [
+            25374,
+            455
+          ],
+          [
+            25733,
+            359
+          ],
+          [
+            26031,
+            298
+          ],
+          [
+            26326,
+            295
+          ],
+          [
+            26817,
+            159
+          ]
+        ],
+        "frames" : 58,
+        "height" : 874,
+        "overlay" : "mm",
+        "paused" : 0,
+        "phone" : true,
+        "pixelRatio" : 3,
+        "programs" : {
+          "loading" : 34
+        },
+        "quality" : "med",
+        "refreshHz" : 60,
+        "safeArea" : {
+          "b" : 34,
+          "l" : 0,
+          "r" : 0,
+          "t" : 62
+        },
+        "scale" : 1,
+        "screen" : "menu",
+        "state" : "menu",
+        "timings" : {
+          "capture" : {
+            "max" : 1,
+            "ms" : 4,
+            "n" : 12
+          },
+          "carsFrame" : {
+            "max" : 1,
+            "ms" : 4,
+            "n" : 34
+          },
+          "draw" : {
+            "max" : 15,
+            "ms" : 247,
+            "n" : 34
+          },
+          "drawHUD" : {
+            "max" : 1,
+            "ms" : 1,
+            "n" : 34
+          },
+          "frame3d" : {
+            "max" : 15,
+            "ms" : 236,
+            "n" : 34
+          },
+          "gfxRender" : {
+            "max" : 11,
+            "ms" : 190,
+            "n" : 34
+          },
+          "gwFrame" : {
+            "max" : 3,
+            "ms" : 14,
+            "n" : 34
+          },
+          "gwMask" : {
+            "max" : 3,
+            "ms" : 12,
+            "n" : 34
+          },
+          "gwScar" : {
+            "max" : 0,
+            "ms" : 0,
+            "n" : 34
+          },
+          "localFrame" : {
+            "max" : 2,
+            "ms" : 29,
+            "n" : 34
+          },
+          "miniPaint" : {
+            "max" : 1,
+            "ms" : 7,
+            "n" : 44
+          },
+          "particlesFrame" : {
+            "max" : 1,
+            "ms" : 2,
+            "n" : 34
+          },
+          "rebuildLand" : {
+            "max" : 1,
+            "ms" : 4,
+            "n" : 10
+          },
+          "STEPF" : {
+            "max" : 1,
+            "ms" : 22,
+            "n" : 49
+          },
+          "trailsFrame" : {
+            "max" : 2,
+            "ms" : 10,
+            "n" : 34
+          }
+        },
+        "webgl" : true,
+        "width" : 402
+      },
+      "seconds" : 30.800000000000001,
+      "step" : "02-menu"
+    },
+    {
+      "page" : {
+        "card" : "",
+        "drawCalls" : 47,
+        "envSafeArea" : {
+          "b" : 34,
+          "l" : 0,
+          "r" : 0,
+          "t" : 62
+        },
+        "fpsText" : "30 fps  33.3 ms  (cpu 5.3)\nmed x1.00  0.90 MP  45 calls  35k tris",
+        "frameGaps" : [
+          [
+            14070,
+            1527
+          ],
+          [
+            14281,
+            211
+          ],
+          [
+            14960,
+            207
+          ],
+          [
+            24919,
+            977
+          ],
+          [
+            25374,
+            455
+          ],
+          [
+            25733,
+            359
+          ],
+          [
+            26031,
+            298
+          ],
+          [
+            26326,
+            295
+          ],
+          [
+            26817,
+            159
+          ],
+          [
+            62403,
+            874
+          ],
+          [
+            66245,
+            484
+          ],
+          [
+            67563,
+            238
+          ]
+        ],
+        "frames" : 248,
+        "height" : 874,
+        "overlay" : "h",
+        "paused" : 0,
+        "phone" : true,
+        "pixelRatio" : 3,
+        "programs" : {
+          "loading" : 34
+        },
+        "quality" : "med",
+        "refreshHz" : 60,
+        "safeArea" : {
+          "b" : 34,
+          "l" : 0,
+          "r" : 0,
+          "t" : 62
+        },
+        "scale" : 1,
+        "screen" : "play",
+        "state" : "play",
+        "timings" : {
+          "buildIsland" : {
+            "max" : 115,
+            "ms" : 115,
+            "n" : 1
+          },
+          "capture" : {
+            "max" : 1,
+            "ms" : 8,
+            "n" : 45
+          },
+          "carBuild" : {
+            "max" : 19,
+            "ms" : 22,
+            "n" : 3
+          },
+          "carsFrame" : {
+            "max" : 23,
+            "ms" : 39,
+            "n" : 224
+          },
+          "draw" : {
+            "max" : 127,
+            "ms" : 1089,
+            "n" : 224
+          },
+          "drawHUD" : {
+            "max" : 53,
+            "ms" : 207,
+            "n" : 224
+          },
+          "frame3d" : {
+            "max" : 71,
+            "ms" : 818,
+            "n" : 224
+          },
+          "genMap" : {
+            "max" : 177,
+            "ms" : 177,
+            "n" : 1
+          },
+          "gfxRender" : {
+            "max" : 41,
+            "ms" : 653,
+            "n" : 224
+          },
+          "gwBuild" : {
+            "max" : 61,
+            "ms" : 61,
+            "n" : 1
+          },
+          "gwFrame" : {
+            "max" : 3,
+            "ms" : 32,
+            "n" : 224
+          },
+          "gwMask" : {
+            "max" : 3,
+            "ms" : 25,
+            "n" : 224
+          },
+          "gwScar" : {
+            "max" : 0,
+            "ms" : 0,
+            "n" : 224
+          },
+          "localFrame" : {
+            "max" : 5,
+            "ms" : 97,
+            "n" : 224
+          },
+          "localMatch" : {
+            "max" : 310,
+            "ms" : 310,
+            "n" : 1
+          },
+          "miniPaint" : {
+            "max" : 20,
+            "ms" : 49,
+            "n" : 265
+          },
+          "MPS" : {
+            "max" : 180,
+            "ms" : 180,
+            "n" : 1
+          },
+          "particlesFrame" : {
+            "max" : 1,
+            "ms" : 12,
+            "n" : 224
+          },
+          "rebuildLand" : {
+            "max" : 3,
+            "ms" : 21,
+            "n" : 41
+          },
+          "STEPF" : {
+            "max" : 5,
+            "ms" : 69,
+            "n" : 241
+          },
+          "trailsFrame" : {
+            "max" : 2,
+            "ms" : 39,
+            "n" : 224
+          }
+        },
+        "webgl" : true,
+        "width" : 402
+      },
+      "seconds" : 72.099999999999994,
+      "step" : "03-match-portrait"
+    },
+    {
+      "page" : {
+        "card" : "",
+        "drawCalls" : 45,
+        "envSafeArea" : {
+          "b" : 20,
+          "l" : 62,
+          "r" : 62,
+          "t" : 0
+        },
+        "fpsText" : "31 fps  32.2 ms  (cpu 4.6)\nmed x1.00  0.90 MP  47 calls  34k tris",
+        "frameGaps" : [
+          [
+            14960,
+            207
+          ],
+          [
+            24919,
+            977
+          ],
+          [
+            25374,
+            455
+          ],
+          [
+            25733,
+            359
+          ],
+          [
+            26031,
+            298
+          ],
+          [
+            26326,
+            295
+          ],
+          [
+            26817,
+            159
+          ],
+          [
+            62403,
+            874
+          ],
+          [
+            66245,
+            484
+          ],
+          [
+            67563,
+            238
+          ],
+          [
+            85573,
+            2088
+          ],
+          [
+            85697,
+            124
+          ]
+        ],
+        "frames" : 302,
+        "height" : 402,
+        "overlay" : "h",
+        "paused" : 0,
+        "phone" : true,
+        "pixelRatio" : 3,
+        "programs" : {
+          "loading" : 34
+        },
+        "quality" : "med",
+        "refreshHz" : 60,
+        "safeArea" : {
+          "b" : 20,
+          "l" : 62,
+          "r" : 62,
+          "t" : 0
+        },
+        "scale" : 1,
+        "screen" : "play",
+        "state" : "play",
+        "timings" : {
+          "buildIsland" : {
+            "max" : 115,
+            "ms" : 115,
+            "n" : 1
+          },
+          "capture" : {
+            "max" : 1,
+            "ms" : 10,
+            "n" : 56
+          },
+          "carBuild" : {
+            "max" : 19,
+            "ms" : 22,
+            "n" : 3
+          },
+          "carsFrame" : {
+            "max" : 23,
+            "ms" : 50,
+            "n" : 278
+          },
+          "draw" : {
+            "max" : 127,
+            "ms" : 1319,
+            "n" : 278
+          },
+          "drawHUD" : {
+            "max" : 53,
+            "ms" : 270,
+            "n" : 278
+          },
+          "frame3d" : {
+            "max" : 71,
+            "ms" : 975,
+            "n" : 278
+          },
+          "genMap" : {
+            "max" : 177,
+            "ms" : 177,
+            "n" : 1
+          },
+          "gfxRender" : {
+            "max" : 41,
+            "ms" : 776,
+            "n" : 278
+          },
+          "gwBuild" : {
+            "max" : 61,
+            "ms" : 61,
+            "n" : 1
+          },
+          "gwFrame" : {
+            "max" : 3,
+            "ms" : 39,
+            "n" : 278
+          },
+          "gwMask" : {
+            "max" : 3,
+            "ms" : 28,
+            "n" : 278
+          },
+          "gwScar" : {
+            "max" : 0,
+            "ms" : 0,
+            "n" : 278
+          },
+          "localFrame" : {
+            "max" : 5,
+            "ms" : 120,
+            "n" : 278
+          },
+          "localMatch" : {
+            "max" : 310,
+            "ms" : 310,
+            "n" : 1
+          },
+          "miniPaint" : {
+            "max" : 20,
+            "ms" : 55,
+            "n" : 329
+          },
+          "MPS" : {
+            "max" : 180,
+            "ms" : 180,
+            "n" : 1
+          },
+          "particlesFrame" : {
+            "max" : 1,
+            "ms" : 13,
+            "n" : 278
+          },
+          "rebuildLand" : {
+            "max" : 3,
+            "ms" : 25,
+            "n" : 51
+          },
+          "STEPF" : {
+            "max" : 5,
+            "ms" : 83,
+            "n" : 301
+          },
+          "trailsFrame" : {
+            "max" : 2,
+            "ms" : 44,
+            "n" : 278
+          }
+        },
+        "webgl" : true,
+        "width" : 874
+      },
+      "seconds" : 90,
+      "step" : "04-match-landscape"
+    },
+    {
+      "page" : {
+        "card" : "",
+        "drawCalls" : 39,
+        "envSafeArea" : {
+          "b" : 20,
+          "l" : 62,
+          "r" : 62,
+          "t" : 0
+        },
+        "fpsText" : "18 fps  54.9 ms  (cpu 4.6)\nmed x1.00  0.90 MP  39 calls  34k tris",
+        "frameGaps" : [
+          [
+            14960,
+            207
+          ],
+          [
+            24919,
+            977
+          ],
+          [
+            25374,
+            455
+          ],
+          [
+            25733,
+            359
+          ],
+          [
+            26031,
+            298
+          ],
+          [
+            26326,
+            295
+          ],
+          [
+            26817,
+            159
+          ],
+          [
+            62403,
+            874
+          ],
+          [
+            66245,
+            484
+          ],
+          [
+            67563,
+            238
+          ],
+          [
+            85573,
+            2088
+          ],
+          [
+            85697,
+            124
+          ]
+        ],
+        "frames" : 338,
+        "height" : 402,
+        "overlay" : "h",
+        "paused" : 1,
+        "phone" : true,
+        "pixelRatio" : 3,
+        "programs" : {
+          "loading" : 34
+        },
+        "quality" : "med",
+        "refreshHz" : 60,
+        "safeArea" : {
+          "b" : 20,
+          "l" : 62,
+          "r" : 62,
+          "t" : 0
+        },
+        "scale" : 1,
+        "screen" : "play",
+        "state" : "play",
+        "timings" : {
+          "buildIsland" : {
+            "max" : 115,
+            "ms" : 115,
+            "n" : 1
+          },
+          "capture" : {
+            "max" : 1,
+            "ms" : 10,
+            "n" : 56
+          },
+          "carBuild" : {
+            "max" : 19,
+            "ms" : 22,
+            "n" : 3
+          },
+          "carsFrame" : {
+            "max" : 23,
+            "ms" : 60,
+            "n" : 314
+          },
+          "draw" : {
+            "max" : 127,
+            "ms" : 1506,
+            "n" : 314
+          },
+          "drawHUD" : {
+            "max" : 53,
+            "ms" : 316,
+            "n" : 314
+          },
+          "frame3d" : {
+            "max" : 71,
+            "ms" : 1113,
+            "n" : 314
+          },
+          "genMap" : {
+            "max" : 177,
+            "ms" : 177,
+            "n" : 1
+          },
+          "gfxRender" : {
+            "max" : 41,
+            "ms" : 888,
+            "n" : 314
+          },
+          "gwBuild" : {
+            "max" : 61,
+            "ms" : 61,
+            "n" : 1
+          },
+          "gwFrame" : {
+            "max" : 3,
+            "ms" : 41,
+            "n" : 314
+          },
+          "gwMask" : {
+            "max" : 3,
+            "ms" : 28,
+            "n" : 314
+          },
+          "gwScar" : {
+            "max" : 0,
+            "ms" : 0,
+            "n" : 314
+          },
+          "localFrame" : {
+            "max" : 5,
+            "ms" : 120,
+            "n" : 278
+          },
+          "localMatch" : {
+            "max" : 310,
+            "ms" : 310,
+            "n" : 1
+          },
+          "miniPaint" : {
+            "max" : 20,
+            "ms" : 56,
+            "n" : 365
+          },
+          "MPS" : {
+            "max" : 180,
+            "ms" : 180,
+            "n" : 1
+          },
+          "particlesFrame" : {
+            "max" : 1,
+            "ms" : 16,
+            "n" : 314
+          },
+          "rebuildLand" : {
+            "max" : 3,
+            "ms" : 25,
+            "n" : 51
+          },
+          "STEPF" : {
+            "max" : 5,
+            "ms" : 83,
+            "n" : 301
+          },
+          "trailsFrame" : {
+            "max" : 2,
+            "ms" : 47,
+            "n" : 314
+          }
+        },
+        "webgl" : true,
+        "width" : 874
+      },
+      "seconds" : 97.299999999999997,
+      "step" : "05-paused-landscape"
+    },
+    {
+      "framesPerSecondOver15s" : 29.399999999999999,
+      "page" : {
+        "card" : "",
+        "drawCalls" : 44,
+        "envSafeArea" : {
+          "b" : 20,
+          "l" : 62,
+          "r" : 62,
+          "t" : 0
+        },
+        "fpsText" : "29 fps  34.9 ms  (cpu 3.1)\nmed x0.86  0.67 MP  46 calls  34k tris",
+        "frameGaps" : [
+          [
+            62403,
+            874
+          ],
+          [
+            66245,
+            484
+          ],
+          [
+            67563,
+            238
+          ],
+          [
+            85573,
+            2088
+          ],
+          [
+            85697,
+            124
+          ],
+          [
+            107598,
+            136
+          ],
+          [
+            115247,
+            630
+          ],
+          [
+            115758,
+            474
+          ],
+          [
+            116195,
+            411
+          ],
+          [
+            116662,
+            411
+          ],
+          [
+            120140,
+            311
+          ],
+          [
+            120499,
+            359
+          ]
+        ],
+        "frames" : 1217,
+        "height" : 402,
+        "overlay" : "h",
+        "paused" : 0,
+        "phone" : true,
+        "pixelRatio" : 3,
+        "programs" : {
+          "loading" : 34,
+          "play" : 4
+        },
+        "quality" : "med",
+        "refreshHz" : 60,
+        "safeArea" : {
+          "b" : 20,
+          "l" : 62,
+          "r" : 62,
+          "t" : 0
+        },
+        "scale" : 0.85999999999999999,
+        "screen" : "play",
+        "state" : "play",
+        "timings" : {
+          "buildIsland" : {
+            "max" : 115,
+            "ms" : 115,
+            "n" : 1
+          },
+          "capture" : {
+            "max" : 1,
+            "ms" : 19,
+            "n" : 120
+          },
+          "carBuild" : {
+            "max" : 19,
+            "ms" : 22,
+            "n" : 3
+          },
+          "carsFrame" : {
+            "max" : 23,
+            "ms" : 146,
+            "n" : 1132
+          },
+          "draw" : {
+            "max" : 127,
+            "ms" : 4424,
+            "n" : 1132
+          },
+          "drawHUD" : {
+            "max" : 53,
+            "ms" : 1017,
+            "n" : 1132
+          },
+          "frame3d" : {
+            "max" : 71,
+            "ms" : 3207,
+            "n" : 1132
+          },
+          "genMap" : {
+            "max" : 177,
+            "ms" : 177,
+            "n" : 1
+          },
+          "gfxRender" : {
+            "max" : 46,
+            "ms" : 2566,
+            "n" : 1132
+          },
+          "gwBuild" : {
+            "max" : 61,
+            "ms" : 61,
+            "n" : 1
+          },
+          "gwFrame" : {
+            "max" : 5,
+            "ms" : 136,
+            "n" : 1132
+          },
+          "gwMask" : {
+            "max" : 3,
+            "ms" : 51,
+            "n" : 1132
+          },
+          "gwScar" : {
+            "max" : 5,
+            "ms" : 47,
+            "n" : 1132
+          },
+          "localFrame" : {
+            "max" : 19,
+            "ms" : 299,
+            "n" : 720
+          },
+          "localMatch" : {
+            "max" : 310,
+            "ms" : 310,
+            "n" : 1
+          },
+          "miniPaint" : {
+            "max" : 20,
+            "ms" : 101,
+            "n" : 1249
+          },
+          "MPS" : {
+            "max" : 180,
+            "ms" : 180,
+            "n" : 1
+          },
+          "particlesFrame" : {
+            "max" : 10,
+            "ms" : 47,
+            "n" : 1132
+          },
+          "rebuildLand" : {
+            "max" : 8,
+            "ms" : 64,
+            "n" : 117
+          },
+          "STEPF" : {
+            "max" : 19,
+            "ms" : 216,
+            "n" : 751
+          },
+          "trailsFrame" : {
+            "max" : 10,
+            "ms" : 125,
+            "n" : 1132
+          }
+        },
+        "webgl" : true,
+        "width" : 874
+      },
+      "seconds" : 136.69999999999999,
+      "step" : "06-match-landscape-later"
+    },
+    {
+      "page" : {
+        "card" : "",
+        "drawCalls" : 66,
+        "envSafeArea" : {
+          "b" : 34,
+          "l" : 0,
+          "r" : 0,
+          "t" : 62
+        },
+        "fpsText" : "28 fps  35.7 ms  (cpu 6.1)\nmed x0.86  0.67 MP  65 calls  72k tris",
+        "frameGaps" : [
+          [
+            67563,
+            238
+          ],
+          [
+            85573,
+            2088
+          ],
+          [
+            85697,
+            124
+          ],
+          [
+            107598,
+            136
+          ],
+          [
+            115247,
+            630
+          ],
+          [
+            115758,
+            474
+          ],
+          [
+            116195,
+            411
+          ],
+          [
+            116662,
+            411
+          ],
+          [
+            120140,
+            311
+          ],
+          [
+            120499,
+            359
+          ],
+          [
+            144253,
+            123
+          ],
+          [
+            144488,
+            121
+          ]
+        ],
+        "frames" : 1314,
+        "height" : 874,
+        "overlay" : "h",
+        "paused" : 0,
+        "phone" : true,
+        "pixelRatio" : 3,
+        "programs" : {
+          "loading" : 34,
+          "play" : 4
+        },
+        "quality" : "med",
+        "refreshHz" : 60,
+        "safeArea" : {
+          "b" : 34,
+          "l" : 0,
+          "r" : 0,
+          "t" : 62
+        },
+        "scale" : 0.71999999999999997,
+        "screen" : "play",
+        "state" : "play",
+        "timings" : {
+          "buildIsland" : {
+            "max" : 115,
+            "ms" : 115,
+            "n" : 1
+          },
+          "capture" : {
+            "max" : 5,
+            "ms" : 27,
+            "n" : 131
+          },
+          "carBuild" : {
+            "max" : 19,
+            "ms" : 22,
+            "n" : 3
+          },
+          "carsFrame" : {
+            "max" : 23,
+            "ms" : 154,
+            "n" : 1229
+          },
+          "draw" : {
+            "max" : 127,
+            "ms" : 4930,
+            "n" : 1229
+          },
+          "drawHUD" : {
+            "max" : 53,
+            "ms" : 1129,
+            "n" : 1229
+          },
+          "frame3d" : {
+            "max" : 71,
+            "ms" : 3576,
+            "n" : 1229
+          },
+          "genMap" : {
+            "max" : 177,
+            "ms" : 177,
+            "n" : 1
+          },
+          "gfxRender" : {
+            "max" : 46,
+            "ms" : 2872,
+            "n" : 1229
+          },
+          "gwBuild" : {
+            "max" : 61,
+            "ms" : 61,
+            "n" : 1
+          },
+          "gwFrame" : {
+            "max" : 5,
+            "ms" : 159,
+            "n" : 1229
+          },
+          "gwMask" : {
+            "max" : 3,
+            "ms" : 60,
+            "n" : 1229
+          },
+          "gwScar" : {
+            "max" : 5,
+            "ms" : 58,
+            "n" : 1229
+          },
+          "localFrame" : {
+            "max" : 19,
+            "ms" : 353,
+            "n" : 817
+          },
+          "localMatch" : {
+            "max" : 310,
+            "ms" : 310,
+            "n" : 1
+          },
+          "miniPaint" : {
+            "max" : 20,
+            "ms" : 112,
+            "n" : 1358
+          },
+          "MPS" : {
+            "max" : 180,
+            "ms" : 180,
+            "n" : 1
+          },
+          "particlesFrame" : {
+            "max" : 10,
+            "ms" : 53,
+            "n" : 1229
+          },
+          "rebuildLand" : {
+            "max" : 8,
+            "ms" : 71,
+            "n" : 129
+          },
+          "STEPF" : {
+            "max" : 19,
+            "ms" : 250,
+            "n" : 859
+          },
+          "trailsFrame" : {
+            "max" : 10,
+            "ms" : 132,
+            "n" : 1229
+          }
+        },
+        "webgl" : true,
+        "width" : 402
+      },
+      "seconds" : 150.69999999999999,
+      "step" : "07-match-portrait-again"
+    },
+    {
+      "matchEnded" : true,
+      "page" : {
+        "card" : "5th You held 0.1% of the map 1 🤖 Blaze 14% 2 🤖 Nova 5% 3 🤖 Mira 4% 4 🤖 Kabir 3% 5 You 0% Watch replay Saved for 7 days Play again Change class Menu ",
+        "drawCalls" : 35,
+        "envSafeArea" : {
+          "b" : 34,
+          "l" : 0,
+          "r" : 0,
+          "t" : 62
+        },
+        "fpsText" : "32 fps  31.5 ms  (cpu 1.7)\nmed x0.60  0.32 MP  35 calls  35k tris",
+        "frameGaps" : [
+          [
+            107598,
+            136
+          ],
+          [
+            115247,
+            630
+          ],
+          [
+            115758,
+            474
+          ],
+          [
+            116195,
+            411
+          ],
+          [
+            116662,
+            411
+          ],
+          [
+            120140,
+            311
+          ],
+          [
+            120499,
+            359
+          ],
+          [
+            144253,
+            123
+          ],
+          [
+            144488,
+            121
+          ],
+          [
+            154656,
+            228
+          ],
+          [
+            244905,
+            140
+          ],
+          [
+            249190,
+            176
+          ]
+        ],
+        "frames" : 4227,
+        "height" : 874,
+        "overlay" : "pn",
+        "paused" : 0,
+        "phone" : true,
+        "pixelRatio" : 3,
+        "programs" : {
+          "loading" : 34,
+          "play" : 4
+        },
+        "quality" : "med",
+        "refreshHz" : 60,
+        "safeArea" : {
+          "b" : 34,
+          "l" : 0,
+          "r" : 0,
+          "t" : 62
+        },
+        "scale" : 0.59999999999999998,
+        "screen" : "result",
+        "state" : "over",
+        "timings" : {
+          "buildIsland" : {
+            "max" : 115,
+            "ms" : 115,
+            "n" : 1
+          },
+          "capture" : {
+            "max" : 5,
+            "ms" : 184,
+            "n" : 549
+          },
+          "carBuild" : {
+            "max" : 19,
+            "ms" : 22,
+            "n" : 3
+          },
+          "carsFrame" : {
+            "max" : 23,
+            "ms" : 356,
+            "n" : 4142
+          },
+          "draw" : {
+            "max" : 179,
+            "ms" : 14496,
+            "n" : 4142
+          },
+          "drawHUD" : {
+            "max" : 172,
+            "ms" : 3773,
+            "n" : 4142
+          },
+          "frame3d" : {
+            "max" : 71,
+            "ms" : 9975,
+            "n" : 4142
+          },
+          "genMap" : {
+            "max" : 177,
+            "ms" : 177,
+            "n" : 1
+          },
+          "gfxRender" : {
+            "max" : 46,
+            "ms" : 8157,
+            "n" : 4142
+          },
+          "gwBuild" : {
+            "max" : 61,
+            "ms" : 61,
+            "n" : 1
+          },
+          "gwFrame" : {
+            "max" : 5,
+            "ms" : 589,
+            "n" : 4142
+          },
+          "gwMask" : {
+            "max" : 3,
+            "ms" : 207,
+            "n" : 4142
+          },
+          "gwScar" : {
+            "max" : 5,
+            "ms" : 309,
+            "n" : 4142
+          },
+          "localFrame" : {
+            "max" : 87,
+            "ms" : 1200,
+            "n" : 3730
+          },
+          "localMatch" : {
+            "max" : 310,
+            "ms" : 310,
+            "n" : 1
+          },
+          "miniPaint" : {
+            "max" : 20,
+            "ms" : 374,
+            "n" : 4755
+          },
+          "MPS" : {
+            "max" : 180,
+            "ms" : 180,
+            "n" : 1
+          },
+          "particlesFrame" : {
+            "max" : 10,
+            "ms" : 117,
+            "n" : 4142
+          },
+          "rebuildLand" : {
+            "max" : 8,
+            "ms" : 232,
+            "n" : 613
+          },
+          "STEPF" : {
+            "max" : 25,
+            "ms" : 822,
+            "n" : 3650
+          },
+          "trailsFrame" : {
+            "max" : 18,
+            "ms" : 257,
+            "n" : 4142
+          }
+        },
+        "webgl" : true,
+        "width" : 402
+      },
+      "seconds" : 256.10000000000002,
+      "step" : "08-results"
+    },
+    {
+      "page" : {
+        "card" : "5th You held 0.1% of the map 1 🤖 Blaze 14% 2 🤖 Nova 5% 3 🤖 Mira 4% 4 🤖 Kabir 3% 5 You 0% Watch replay Saved for 7 days Play again Change class Menu ",
+        "drawCalls" : 35,
+        "envSafeArea" : {
+          "b" : 34,
+          "l" : 0,
+          "r" : 0,
+          "t" : 62
+        },
+        "fpsText" : "1 fps  1073.4 ms  (cpu 5.0)\nmed x0.60  0.32 MP  35 calls  35k tris",
+        "frameGaps" : [
+          [
+            107598,
+            136
+          ],
+          [
+            115247,
+            630
+          ],
+          [
+            115758,
+            474
+          ],
+          [
+            116195,
+            411
+          ],
+          [
+            116662,
+            411
+          ],
+          [
+            120140,
+            311
+          ],
+          [
+            120499,
+            359
+          ],
+          [
+            144253,
+            123
+          ],
+          [
+            144488,
+            121
+          ],
+          [
+            154656,
+            228
+          ],
+          [
+            244905,
+            140
+          ],
+          [
+            249190,
+            176
+          ]
+        ],
+        "frames" : 4229,
+        "height" : 874,
+        "overlay" : "pn",
+        "paused" : 0,
+        "phone" : true,
+        "pixelRatio" : 3,
+        "programs" : {
+          "loading" : 34,
+          "play" : 4
+        },
+        "quality" : "med",
+        "refreshHz" : 60,
+        "safeArea" : {
+          "b" : 34,
+          "l" : 0,
+          "r" : 0,
+          "t" : 62
+        },
+        "scale" : 0.59999999999999998,
+        "screen" : "result",
+        "state" : "over",
+        "timings" : {
+          "buildIsland" : {
+            "max" : 115,
+            "ms" : 115,
+            "n" : 1
+          },
+          "capture" : {
+            "max" : 5,
+            "ms" : 184,
+            "n" : 549
+          },
+          "carBuild" : {
+            "max" : 19,
+            "ms" : 22,
+            "n" : 3
+          },
+          "carsFrame" : {
+            "max" : 23,
+            "ms" : 356,
+            "n" : 4144
+          },
+          "draw" : {
+            "max" : 179,
+            "ms" : 14513,
+            "n" : 4144
+          },
+          "drawHUD" : {
+            "max" : 172,
+            "ms" : 3774,
+            "n" : 4144
+          },
+          "frame3d" : {
+            "max" : 71,
+            "ms" : 9990,
+            "n" : 4144
+          },
+          "genMap" : {
+            "max" : 177,
+            "ms" : 177,
+            "n" : 1
+          },
+          "gfxRender" : {
+            "max" : 46,
+            "ms" : 8169,
+            "n" : 4144
+          },
+          "gwBuild" : {
+            "max" : 61,
+            "ms" : 61,
+            "n" : 1
+          },
+          "gwFrame" : {
+            "max" : 5,
+            "ms" : 590,
+            "n" : 4144
+          },
+          "gwMask" : {
+            "max" : 3,
+            "ms" : 207,
+            "n" : 4144
+          },
+          "gwScar" : {
+            "max" : 5,
+            "ms" : 310,
+            "n" : 4144
+          },
+          "localFrame" : {
+            "max" : 87,
+            "ms" : 1200,
+            "n" : 3732
+          },
+          "localMatch" : {
+            "max" : 310,
+            "ms" : 310,
+            "n" : 1
+          },
+          "miniPaint" : {
+            "max" : 20,
+            "ms" : 374,
+            "n" : 4757
+          },
+          "MPS" : {
+            "max" : 180,
+            "ms" : 180,
+            "n" : 1
+          },
+          "particlesFrame" : {
+            "max" : 10,
+            "ms" : 117,
+            "n" : 4144
+          },
+          "rebuildLand" : {
+            "max" : 8,
+            "ms" : 232,
+            "n" : 613
+          },
+          "STEPF" : {
+            "max" : 25,
+            "ms" : 822,
+            "n" : 3650
+          },
+          "trailsFrame" : {
+            "max" : 18,
+            "ms" : 258,
+            "n" : 4144
+          }
+        },
+        "webgl" : true,
+        "width" : 402
+      },
+      "seconds" : 261.39999999999998,
+      "step" : "99-done"
+    }
+  ],
+  "system" : "iOS 26.5"
+}

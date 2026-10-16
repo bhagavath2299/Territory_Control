@@ -1,0 +1,142 @@
+getpwuid_r did not find a match for uid 501
+Timestamp               Ty Process[PID:TID]
+2026-10-16 01:49:37.776 E  TerritoryControl[14525:b848] [com.apple.CFBundle:plugin] AddInstanceForFactory: No factory registered for id <CFUUID 0x1018697e0> F8BB1C28-BAE8-11D6-9C31-00039315CD46
+2026-10-16 01:49:38.996 E  TerritoryControl[14525:b85b] [com.apple.extensionkit:default] Failed to resolve host network app id to config: bundleID: com.apple.WebKit.Networking instance ID: Optional([_EXExtensionInstanceIdentifier: 9FB2EB63-0355-47FA-BF6D-9FCE20011B66])
+2026-10-16 01:49:39.164 E  com.apple.WebKit.GPU[14539:b8bb] [com.apple.browserEngineKit:RenderingExtension] sandbox_enable_local_state_flag failed: errno = 22
+2026-10-16 01:49:40.380 E  com.apple.WebKit.GPU[14539:b90f] (libCoreFSCache.dylib) fopen failed for data file: errno = 2 (No such file or directory)
+2026-10-16 01:49:40.651 E  com.apple.WebKit.GPU[14539:b90f] (libCoreFSCache.dylib) fopen failed for data file: errno = 2 (No such file or directory)
+2026-10-16 01:49:40.985 E  TerritoryControl[14525:b848] [com.apple.WebKit:ResourceLoadStatistics] Failed to request storage access quirks from WebPrivacy.
+2026-10-16 01:49:40.985 E  TerritoryControl[14525:b848] [com.apple.WebKit:ResourceLoadStatistics] Failed to request storage access user agent string quirks from WebPrivacy.
+2026-10-16 01:49:40.985 E  TerritoryControl[14525:b848] [com.apple.WebKit:ResourceLoadStatistics] Failed to request known fingerprinting scripts from WebPrivacy: Error Domain=WebPrivacyErrorDomain Code=1001 "List data not found" UserInfo={NSLocalizedDescription=List data not found}
+2026-10-16 01:49:40.985 E  TerritoryControl[14525:b848] [com.apple.WebKit:ResourceLoadStatistics] Failed to request query parameters from WebPrivacy.
+2026-10-16 01:49:40.992 E  TerritoryControl[14525:b8cc] [com.apple.WebKit:ResourceLoadStatistics] WebContent[14537] Unable to filter tracking query parameters (missing data)
+2026-10-16 01:49:41.204 E  com.apple.WebKit.Networking[14540:b8c8] [com.apple.WebKit:PrivateClickMeasurement] 0x10d14c0c0 - DatabaseUtilities::setBusyTimeout failed, error message: not an error
+2026-10-16 01:49:41.227 E  com.apple.WebKit.Networking[14540:b8c8] [com.apple.WebKit:PrivateClickMeasurement] 0x10d14c0c0 - DatabaseUtilities::migrateDataToNewTablesIfNecessary failed to rename table, error message: not an error
+2026-10-16 01:49:41.228 E  com.apple.WebKit.Networking[14540:b8c8] [com.apple.WebKit:PrivateClickMeasurement] 0x10d14c0c0 - DatabaseUtilities::enableForeignKeys failed, error message: not an error
+2026-10-16 01:49:44.429 E  TerritoryControl[14525:b8cc] [com.apple.WebKit:ResourceLoadStatistics] WebContent[14537] Unable to hide query parameters from script (missing data)
+2026-10-16 01:49:44.440 E  TerritoryControl[14525:b848] [com.apple.WebKit:ResourceLoadStatistics] Failed to request allowed query parameters from WebPrivacy.
+2026-10-16 01:49:44.588 F  com.apple.WebKit.GPU[14539:b8bc] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:49:45.556 E  com.apple.WebKit.GPU[14539:b910] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:49:45.558 E  com.apple.WebKit.GPU[14539:b910] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:49:45.635 E  TerritoryControl[14525:b848] [com.apple.WebKit:ResourceLoadStatistics] Failed to request restricted opener domains from WebPrivacy
+2026-10-16 01:49:45.933 E  com.apple.WebKit.GPU[14539:b910] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:49:45.938 E  com.apple.WebKit.GPU[14539:b910] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:49:45.953 F  com.apple.WebKit.GPU[14539:b926] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:49:45.956 F  com.apple.WebKit.GPU[14539:b926] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:49:45.959 F  com.apple.WebKit.GPU[14539:b926] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:49:45.979 F  com.apple.WebKit.GPU[14539:b8be] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:49:46.050 F  com.apple.WebKit.GPU[14539:bb3c] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:49:46.169 F  com.apple.WebKit.GPU[14539:b8be] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:49:48.097 E  com.apple.WebKit.GPU[14539:b910] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:49:48.097 E  com.apple.WebKit.GPU[14539:b910] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:49:48.098 E  com.apple.WebKit.GPU[14539:b910] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:49:48.098 E  com.apple.WebKit.GPU[14539:b910] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:49:48.099 E  com.apple.WebKit.GPU[14539:b910] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:49:48.101 E  com.apple.WebKit.GPU[14539:b910] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:49:48.326 F  com.apple.WebKit.GPU[14539:bb41] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:49:55.243 F  com.apple.WebKit.GPU[14539:bfa1] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:49:55.253 F  com.apple.WebKit.GPU[14539:bb0d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:49:55.420 F  com.apple.WebKit.GPU[14539:be63] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:49:55.644 F  com.apple.WebKit.GPU[14539:bfa1] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:49:55.994 F  com.apple.WebKit.GPU[14539:b926] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:49:56.057 F  com.apple.WebKit.GPU[14539:bfa1] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:50:05.267 E  com.apple.WebKit.GPU[14539:b8aa] [com.apple.CFBundle:plugin] AddInstanceForFactory: No factory registered for id <CFUUID 0x1060145a0> F8BB1C28-BAE8-11D6-9C31-00039315CD46
+2026-10-16 01:50:05.356 E  com.apple.WebKit.GPU[14539:b8aa] [com.apple.WebKit:WebRTC] Failed to get attribution bundleID from audit token with error: The operation couldn’t be completed. (OSStatus error -9499.).
+2026-10-16 01:50:05.637 E  com.apple.WebKit.GPU[14539:c2b2] [com.apple.coreaudio:AMCP]          HALC_ProxyIOContext.cpp:1623  HALC_ProxyIOContext::IOWorkLoop: skipping cycle due to overload
+2026-10-16 01:50:05.699 E  com.apple.WebKit.GPU[14539:b910] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:50:05.716 E  com.apple.WebKit.GPU[14539:b910] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:50:06.011 F  com.apple.WebKit.GPU[14539:c2ef] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:50:06.056 E  TerritoryControl[14525:b8ac] [com.apple.runningboard:assertion] Error acquiring assertion: <Error Domain=RBSServiceErrorDomain Code=1 "(originator doesn't have entitlement com.apple.runningboard.assertions.webkit AND originator doesn't have entitlement com.apple.multitasking.systemappassertions)" UserInfo={NSLocalizedFailureReason=(originator doesn't have entitlement com.apple.runningboard.assertions.webkit AND originator doesn't have entitlement com.apple.multitasking.systemappassertions)}>
+2026-10-16 01:50:06.056 E  TerritoryControl[14525:b8ac] [com.apple.WebKit:ProcessSuspension] 0x10e2000b0 - ProcessAssertion::acquireSync Failed to acquire RBS assertion 'WebKit Media Playback' for process with PID=14537, error: Error Domain=RBSServiceErrorDomain Code=1 "(originator doesn't have entitlement com.apple.runningboard.assertions.webkit AND originator doesn't have entitlement com.apple.multitasking.systemappassertions)" UserInfo={NSLocalizedFailureReason=(originator doesn't have entitlement com.apple.runningboard.assertions.webkit AND originator doesn't have entitlement com.apple.multitasking.systemappassertions)}
+2026-10-16 01:50:06.057 E  TerritoryControl[14525:b8ac] [com.apple.runningboard:assertion] Error acquiring assertion: <Error Domain=RBSServiceErrorDomain Code=1 "(originator doesn't have entitlement com.apple.runningboard.assertions.webkit AND originator doesn't have entitlement com.apple.multitasking.systemappassertions)" UserInfo={NSLocalizedFailureReason=(originator doesn't have entitlement com.apple.runningboard.assertions.webkit AND originator doesn't have entitlement com.apple.multitasking.systemappassertions)}>
+2026-10-16 01:50:06.057 E  TerritoryControl[14525:b8ac] [com.apple.WebKit:ProcessSuspension] 0x10e200160 - ProcessAssertion::acquireSync Failed to acquire RBS assertion 'WebKit Media Playback' for process with PID=14539, error: Error Domain=RBSServiceErrorDomain Code=1 "(originator doesn't have entitlement com.apple.runningboard.assertions.webkit AND originator doesn't have entitlement com.apple.multitasking.systemappassertions)" UserInfo={NSLocalizedFailureReason=(originator doesn't have entitlement com.apple.runningboard.assertions.webkit AND originator doesn't have entitlement com.apple.multitasking.systemappassertions)}
+2026-10-16 01:50:07.214 E  com.apple.WebKit.GPU[14539:c2b2] [com.apple.coreaudio:AMCP]          HALC_ProxyIOContext.cpp:1623  HALC_ProxyIOContext::IOWorkLoop: skipping cycle due to overload
+2026-10-16 01:50:11.193 E  com.apple.WebKit.GPU[14539:b910] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:50:11.194 E  com.apple.WebKit.GPU[14539:b910] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:50:11.196 E  com.apple.WebKit.GPU[14539:b910] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:50:11.197 E  com.apple.WebKit.GPU[14539:b910] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:50:13.949 E  com.apple.WebKit.GPU[14539:c2b2] [com.apple.coreaudio:AMCP]          HALC_ProxyIOContext.cpp:1623  HALC_ProxyIOContext::IOWorkLoop: skipping cycle due to overload
+2026-10-16 01:50:34.928 E  com.apple.WebKit.GPU[14539:c2b2] [com.apple.coreaudio:AMCP]          HALC_ProxyIOContext.cpp:1623  HALC_ProxyIOContext::IOWorkLoop: skipping cycle due to overload
+2026-10-16 01:50:42.668 F  com.apple.WebKit.GPU[14539:c2f1] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:50:43.256 F  com.apple.WebKit.GPU[14539:bb0d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:50:43.610 F  com.apple.WebKit.GPU[14539:bb3c] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:50:43.920 F  com.apple.WebKit.GPU[14539:bb3c] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:50:49.298 F  com.apple.WebKit.GPU[14539:bb3c] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:51:04.229 F  com.apple.WebKit.GPU[14539:c2f1] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:51:04.408 E  com.apple.WebKit.GPU[14539:b910] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:51:04.453 F  com.apple.WebKit.GPU[14539:c2f1] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:51:07.122 F  com.apple.WebKit.GPU[14539:b8bb] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:51:07.207 F  com.apple.WebKit.GPU[14539:bb3c] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:51:14.155 F  com.apple.WebKit.GPU[14539:cbe6] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:51:28.594 E  com.apple.WebKit.GPU[14539:b910] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:51:29.412 E  com.apple.WebKit.GPU[14539:b910] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:51:29.569 E  com.apple.WebKit.GPU[14539:b910] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:51:29.684 E  com.apple.WebKit.GPU[14539:b910] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:51:29.980 E  com.apple.WebKit.GPU[14539:b910] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:51:30.189 E  com.apple.WebKit.GPU[14539:b910] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:51:30.579 E  com.apple.WebKit.GPU[14539:b910] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:51:39.473 E  com.apple.WebKit.GPU[14539:b910] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:51:39.475 E  com.apple.WebKit.GPU[14539:b910] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:51:39.475 E  com.apple.WebKit.GPU[14539:b910] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:51:40.127 F  com.apple.WebKit.GPU[14539:bb3c] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:51:50.972 F  com.apple.WebKit.GPU[14539:cbe6] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:52:05.137 E  com.apple.WebKit.GPU[14539:b910] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:52:05.204 F  com.apple.WebKit.GPU[14539:d995] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:52:05.418 F  com.apple.WebKit.GPU[14539:cbe6] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:52:05.432 F  com.apple.WebKit.GPU[14539:dd46] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:52:05.500 F  com.apple.WebKit.GPU[14539:d995] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:52:06.221 F  com.apple.WebKit.GPU[14539:dd48] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:52:15.348 F  com.apple.WebKit.GPU[14539:dd48] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:52:17.722 F  com.apple.WebKit.GPU[14539:cbe6] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:52:18.401 F  com.apple.WebKit.GPU[14539:d995] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:52:21.728 F  com.apple.WebKit.GPU[14539:e19e] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:52:23.523 F  com.apple.WebKit.GPU[14539:cbe6] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:52:25.590 F  com.apple.WebKit.GPU[14539:cbe6] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:52:26.083 F  com.apple.WebKit.GPU[14539:cbe6] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:52:27.123 F  com.apple.WebKit.GPU[14539:cbe6] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:52:28.653 F  com.apple.WebKit.GPU[14539:dd48] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:52:29.523 F  com.apple.WebKit.GPU[14539:cbe6] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:52:36.855 F  com.apple.WebKit.GPU[14539:e19f] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:52:41.858 F  com.apple.WebKit.GPU[14539:cbe6] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:52:42.334 F  com.apple.WebKit.GPU[14539:d995] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:52:42.865 F  com.apple.WebKit.GPU[14539:e19f] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:53:12.977 E  com.apple.WebKit.GPU[14539:c2b2] [com.apple.coreaudio:AMCP]          HALC_ProxyIOContext.cpp:1623  HALC_ProxyIOContext::IOWorkLoop: skipping cycle due to overload
+2026-10-16 01:53:50.250 F  com.apple.WebKit.GPU[14539:cbe6] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:54:03.951 F  com.apple.WebKit.GPU[14539:f348] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:54:09.066 F  com.apple.WebKit.GPU[14539:d995] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:54:19.133 E  TerritoryControl[22185:10870] [com.apple.CFBundle:plugin] AddInstanceForFactory: No factory registered for id <CFUUID 0x1014691c0> F8BB1C28-BAE8-11D6-9C31-00039315CD46
+2026-10-16 01:54:20.089 E  TerritoryControl[22185:1087d] [com.apple.extensionkit:default] Failed to resolve host network app id to config: bundleID: com.apple.WebKit.Networking instance ID: Optional([_EXExtensionInstanceIdentifier: B0A6B25A-9FC9-4CB6-8825-AA3A15D43CDC])
+2026-10-16 01:54:20.271 E  com.apple.WebKit.GPU[22193:108c1] [com.apple.browserEngineKit:RenderingExtension] sandbox_enable_local_state_flag failed: errno = 22
+2026-10-16 01:54:20.718 E  com.apple.WebKit.Networking[22196:108ca] [com.apple.WebKit:PrivateClickMeasurement] 0x1111180c0 - DatabaseUtilities::setBusyTimeout failed, error message: not an error
+2026-10-16 01:54:20.720 E  com.apple.WebKit.Networking[22196:108ca] [com.apple.WebKit:PrivateClickMeasurement] 0x1111180c0 - DatabaseUtilities::migrateDataToNewTablesIfNecessary failed to rename table, error message: not an error
+2026-10-16 01:54:20.720 E  com.apple.WebKit.Networking[22196:108ca] [com.apple.WebKit:PrivateClickMeasurement] 0x1111180c0 - DatabaseUtilities::enableForeignKeys failed, error message: not an error
+2026-10-16 01:54:21.299 E  TerritoryControl[22185:108d0] [com.apple.WebKit:ResourceLoadStatistics] WebContent[22192] Unable to hide query parameters from script (missing data)
+2026-10-16 01:54:21.440 F  com.apple.WebKit.GPU[22193:108c3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:54:22.506 E  com.apple.WebKit.GPU[22193:108f8] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:54:22.507 E  com.apple.WebKit.GPU[22193:108f8] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:54:22.573 E  com.apple.WebKit.GPU[22193:108f8] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:54:22.578 E  com.apple.WebKit.GPU[22193:108f8] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:54:22.594 F  com.apple.WebKit.GPU[22193:108c2] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:54:22.599 F  com.apple.WebKit.GPU[22193:108c2] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:54:22.601 F  com.apple.WebKit.GPU[22193:108c2] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:54:22.644 F  com.apple.WebKit.GPU[22193:108f6] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:54:22.686 F  com.apple.WebKit.GPU[22193:108f6] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:54:22.732 F  com.apple.WebKit.GPU[22193:10a2e] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:54:23.203 F  com.apple.WebKit.GPU[22193:108f5] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:54:23.409 E  com.apple.WebKit.GPU[22193:108f8] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:54:23.409 E  com.apple.WebKit.GPU[22193:108f8] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:54:23.409 E  com.apple.WebKit.GPU[22193:108f8] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:54:23.409 E  com.apple.WebKit.GPU[22193:108f8] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:54:23.409 E  com.apple.WebKit.GPU[22193:108f8] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:54:23.409 E  com.apple.WebKit.GPU[22193:108f8] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:54:25.140 F  com.apple.WebKit.GPU[22193:108c2] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:54:25.290 F  com.apple.WebKit.GPU[22193:108f6] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:54:25.354 F  com.apple.WebKit.GPU[22193:10a2e] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:54:25.497 F  com.apple.WebKit.GPU[22193:108f6] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:54:25.854 E  com.apple.WebKit.GPU[22193:108f8] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:54:25.854 E  com.apple.WebKit.GPU[22193:108f8] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:54:25.854 E  com.apple.WebKit.GPU[22193:108f8] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:54:25.854 E  com.apple.WebKit.GPU[22193:108f8] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-10-16 01:54:26.555 F  com.apple.WebKit.GPU[22193:108f5] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:54:31.597 F  com.apple.WebKit.GPU[22193:108f6] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-10-16 01:54:31.655 F  com.apple.WebKit.GPU[22193:108f6] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel

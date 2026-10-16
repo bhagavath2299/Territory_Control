@@ -1,0 +1,93 @@
+Territory Control iPhone app, build 17
+commit: 1cf47d8165ef6ba37c5fd06c6df163ac7b1b4863
+built: 2026-10-16 01:42 UTC with Xcode 26.6 Build version 17F113 
+on: GitHub's macos26 runner, ARM64 (26.6.2, 3 cores)
+
+Info.plist (device build):
+{
+  "BuildMachineOSBuild" => "25G83"
+  "CADisableMinimumFrameDurationOnPhone" => true
+  "CFBundleDevelopmentRegion" => "en"
+  "CFBundleDisplayName" => "Territory"
+  "CFBundleExecutable" => "TerritoryControl"
+  "CFBundleIcons" => {
+    "CFBundlePrimaryIcon" => {
+      "CFBundleIconFiles" => [
+        0 => "AppIcon60x60"
+      ]
+      "CFBundleIconName" => "AppIcon"
+    }
+  }
+  "CFBundleIcons~ipad" => {
+    "CFBundlePrimaryIcon" => {
+      "CFBundleIconFiles" => [
+        0 => "AppIcon60x60"
+        1 => "AppIcon76x76"
+      ]
+    }
+  }
+  "CFBundleIdentifier" => "com.bhagavath2299.territorycontrol"
+  "CFBundleInfoDictionaryVersion" => "6.0"
+  "CFBundleName" => "TerritoryControl"
+  "CFBundlePackageType" => "APPL"
+  "CFBundleShortVersionString" => "1.0"
+  "CFBundleSupportedPlatforms" => [
+    0 => "iPhoneOS"
+  ]
+  "CFBundleVersion" => "17"
+  "DTCompiler" => "com.apple.compilers.llvm.clang.1_0"
+  "DTPlatformBuild" => "23F81a"
+  "DTPlatformName" => "iphoneos"
+  "DTPlatformVersion" => "26.5"
+  "DTSDKBuild" => "23F81a"
+  "DTSDKName" => "iphoneos26.5"
+  "DTXcode" => "2660"
+  "DTXcodeBuild" => "17F113"
+  "GCSupportsGameMode" => true
+  "ITSAppUsesNonExemptEncryption" => false
+  "LSApplicationCategoryType" => "public.app-category.action-games"
+  "LSRequiresIPhoneOS" => true
+  "MinimumOSVersion" => "16.0"
+  "UIApplicationSceneManifest" => {
+    "UIApplicationSupportsMultipleScenes" => false
+    "UISceneConfigurations" => {
+      "UIWindowSceneSessionRoleApplication" => [
+        0 => {
+          "UISceneConfigurationName" => "Default"
+          "UISceneDelegateClassName" => "TerritoryControl.SceneDelegate"
+        }
+      ]
+    }
+  }
+  "UIDeviceFamily" => [
+    0 => 1
+  ]
+  "UILaunchScreen" => {
+    "UIColorName" => "LaunchBackground"
+  }
+  "UIRequiredDeviceCapabilities" => [
+    0 => "arm64"
+  ]
+  "UIRequiresFullScreen" => true
+  "UIStatusBarHidden" => true
+  "UISupportedInterfaceOrientations" => [
+    0 => "UIInterfaceOrientationPortrait"
+    1 => "UIInterfaceOrientationLandscapeLeft"
+    2 => "UIInterfaceOrientationLandscapeRight"
+  ]
+  "UIViewControllerBasedStatusBarAppearance" => true
+}
+
+binary: Non-fat file: build/device/Build/Products/Release-iphoneos/TerritoryControl.app/TerritoryControl is architecture: arm64
+minimum iOS: 16.0
+
+app contents:
+     13754  ./AppIcon60x60@2x.png
+     18657  ./AppIcon76x76@2x~ipad.png
+    245720  ./Assets.car
+      1795  ./Info.plist
+         8  ./PkgInfo
+    178008  ./TerritoryControl
+    959728  ./www/index.html
+
+ipa: 587676 bytes, sha256 4918bf742ef91991fe21142287f6a9eedb52567c067938caab0021d381cd9477

@@ -1,0 +1,81 @@
+[3s] simulator: com.apple.CoreSimulator.SimDeviceType.iPhone-17 on com.apple.CoreSimulator.SimRuntime.iOS-26-5
+[287s] booted
+[339s] installed; letting the new simulator settle
+[440s] launched (pid 14525)
+[444s] app data: /Users/runner/Library/Developer/CoreSimulator/Devices/A01DAABB-1880-40E4-9FE5-AF43FD856801/data/Containers/Data/Application/2B93EF1C-DDC4-4FB9-954E-D14619B6B2FF
+[461s] step 1 01-boot
+[467s] screenshot 01-boot took 5s
+[475s] step 2 02-menu
+[504s] screenshot 02-menu took 27s
+[516s] step 3 03-match-portrait
+[526s] screenshot 03-match-portrait took 9s
+[533s] step 4 04-match-landscape
+[537s] screenshot 04-match-landscape took 3s
+[540s] step 5 05-paused-landscape
+[544s] screenshot 05-paused-landscape took 3s
+[581s] step 6 06-match-landscape-later
+[587s] screenshot 06-match-landscape-later took 5s
+[594s] step 7 07-match-portrait-again
+[597s] screenshot 07-match-portrait-again took 2s
+[699s] step 8 08-results
+[702s] screenshot 08-results took 2s
+[704s] step 9 99-done
+[706s] screenshot 99-done took 1s
+[715s] app (pid 14525) ended
+[721s] relaunched: com.bhagavath2299.territorycontrol: 22185
+[732s] screenshot 10-relaunch took 2s
+[741s] done
+system: iOS 26.5 402x874 @3.0x
+page: app://localhost/index.html | secure: True | storage: ok | haptics bridge: True | service worker API: False
+webgl: Apple GPU | game version: 20 | web build: v20 asphalt | cores: 4 | starting tier: med
+frame rate: screen max 60 fps | WebKit 60 fps hold: 60 fps hold switched off (now off)
+boot ready after 17.6 s
+  01-boot                    t=17.6s state=menu screen= 402x874 q=med hz=60 calls=81 bootReady=True bootSeconds=17.6
+  02-menu                    t=30.8s state=menu screen=menu 402x874 q=med hz=60 calls=85 
+  03-match-portrait          t=72.1s state=play screen=play 402x874 q=med hz=60 calls=47 
+  04-match-landscape         t=90s state=play screen=play 874x402 q=med hz=60 calls=45 
+  05-paused-landscape        t=97.3s state=play screen=play 874x402 q=med hz=60 calls=39 
+  06-match-landscape-later   t=136.7s state=play screen=play 874x402 q=med hz=60 calls=44 framesPerSecondOver15s=29.4
+  07-match-portrait-again    t=150.7s state=play screen=play 402x874 q=med hz=60 calls=66 
+  08-results                 t=256.1s state=over screen=result 402x874 q=med hz=60 calls=35 matchEnded=True
+  99-done                    t=261.4s state=over screen=result 402x874 q=med hz=60 calls=35 
+GPU programs built (by what the game was doing), at the paused step: {'loading': 34} | at the end (the cost test builds 4 floor variants): {'loading': 34, 'play': 4}
+time spent in the game's heavy functions (calls, total ms, longest ms):
+    localMatch        1      310.0    310.0
+    MPS               1      180.0    180.0
+    draw           4144    14513.0    179.0
+    genMap            1      177.0    177.0
+    drawHUD        4144     3774.0    172.0
+    buildIsland       1      115.0    115.0
+    localFrame     3732     1200.0     87.0
+    frame3d        4144     9990.0     71.0
+    gwBuild           1       61.0     61.0
+    gfxRender      4144     8169.0     46.0
+    STEPF          3650      822.0     25.0
+    carsFrame      4144      356.0     23.0
+    miniPaint      4757      374.0     20.0
+    carBuild          3       22.0     19.0
+    trailsFrame    4144      258.0     18.0
+    particlesFrame   4144      117.0     10.0
+    rebuildLand     613      232.0      8.0
+    capture         549      184.0      5.0
+    gwFrame        4144      590.0      5.0
+    gwScar         4144      310.0      5.0
+    gwMask         4144      207.0      3.0
+what the picture costs (paused, 1398x643 med x1, 210 trail points on screen):
+    frames per second: fullUploads 28.7 | no3d 31 | noHud 24.7 | paused 30.7
+    ms per 3D picture: all 6 | allAt60pct 7.4 | floorFlat 10.6 | floorNoLand 6.8 | floorNoShadow 9.6 | floorNoSurface 6.8 | floorOnly 6 | landUpdate 4.4 | noCars 7.6 | noFloor 6.4 | noPads 6.6 | noSparks 6 | nothing 5.2 | noTrails 7.2
+  long frames by 01-boot: 2000 ms at 7.1s, 5220 ms at 12.5s, 1527 ms at 14.1s
+  long frames by 02-menu: 2000 ms at 7.1s, 5220 ms at 12.5s, 1527 ms at 14.1s, 977 ms at 24.9s
+  long frames by 03-match-portrait: 1527 ms at 14.1s, 977 ms at 24.9s, 874 ms at 62.4s
+  long frames by 04-match-landscape: 977 ms at 24.9s, 874 ms at 62.4s, 2088 ms at 85.6s
+  long frames by 05-paused-landscape: 977 ms at 24.9s, 874 ms at 62.4s, 2088 ms at 85.6s
+  long frames by 06-match-landscape-later: 874 ms at 62.4s, 2088 ms at 85.6s, 630 ms at 115.2s
+  long frames by 07-match-portrait-again: 2088 ms at 85.6s, 630 ms at 115.2s
+  long frames by 08-results: 630 ms at 115.2s
+  long frames by 99-done: 630 ms at 115.2s
+notes (1):
+    0.5s self-test started
+after relaunch: {'bestScore': None, 'bootReady': True, 'frameRateSetting': 1, 'pageErrors': [], 'probe': '1792115378', 'replaysSaved': 1}
+PASS: played through in the simulator
+::notice title=Simulator test passed::boot ready after 17.6 s; landscape match 29.4 fps; programs at pause {'loading': 34}; page errors 0; console errors 0
