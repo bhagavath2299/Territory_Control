@@ -138,7 +138,9 @@ final class GameViewController: UIViewController {
     // A swipe in from a screen edge first wakes the system handle and only a second swipe leaves the game,
     // so steering near the edge of the screen does not throw you out of a match.
     override var preferredScreenEdgesDeferringSystemGestures: UIRectEdge { .all }
-    override var supportedInterfaceOrientations: UIInterfaceOrientationMask { .allButUpsideDown }
+    // The game is played sideways only (World Test 6).
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask { .landscape }
+    override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation { .landscapeRight }
 }
 
 extension GameViewController: WKNavigationDelegate, WKUIDelegate {

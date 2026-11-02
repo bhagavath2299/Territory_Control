@@ -5,8 +5,7 @@ import os
 import pathlib
 import sys
 
-STEPS = ["01-boot", "02-drive-portrait", "03-drive-landscape", "04-heavy-landscape", "05-landscape-later",
-         "06-chase-landscape", "07-portrait-again", "99-done"]
+STEPS = ["01-boot", "02-drive", "03-abilities", "04-later", "05-chase", "06-portrait-refused", "99-done"]
 
 
 def main(folder: str) -> int:
@@ -30,19 +29,25 @@ def main(folder: str) -> int:
         problems.append("the page never finished loading")
     if not (boot.get("page") or {}).get("webgl"):
         problems.append("3D (WebGL) did not start")
-    drive = steps.get("02-drive-portrait", {}).get("page") or {}
+    drive = steps.get("02-drive", {}).get("page") or {}
     if not drive.get("ready"):
         problems.append("the world test was not running at the first drive step")
-    land = steps.get("03-drive-landscape", {}).get("page") or {}
-    if land and not land.get("width", 0) > land.get("height", 0):
-        problems.append("the screen did not turn to landscape")
-    # The test iPhone has a Dynamic Island and a home bar: the page's layout must see them from the start.
+    if drive and not drive.get("width", 0) > drive.get("height", 0):
+        problems.append("the app did not start in landscape")
+    if drive and (drive.get("players") or 0) != 6:
+        problems.append(f"expected six players, found {drive.get('players')}")
+    # The test iPhone has a Dynamic Island and a home bar: held sideways they sit at the left/right and the bottom.
     safe = drive.get("envSafeArea") or {}
-    if not (safe.get("t", 0) >= 40 and safe.get("b", 0) >= 20):
-        problems.append(f"portrait page read the safe areas as {safe} (island and home bar not cleared)")
-    heavy = steps.get("04-heavy-landscape", {}).get("page") or {}
-    if not (heavy.get("craters") or 0) >= 1:
-        problems.append(f"no crater after the artillery salvo and the charge (craters={heavy.get('craters')})")
+    if not (max(safe.get("l", 0), safe.get("r", 0)) >= 40 and safe.get("b", 0) >= 15):
+        problems.append(f"landscape page read the safe areas as {safe} (island and home bar not cleared)")
+    ab = steps.get("03-abilities", {}).get("page") or {}
+    if not (ab.get("burns") or 0) >= 1:
+        problems.append(f"no burnt ground after the strike (burns={ab.get('burns')})")
+    if not (ab.get("abilities") or 0) >= 5:
+        problems.append(f"too few abilities fired ({ab.get('abilities')})")
+    upright = steps.get("06-portrait-refused", {}).get("page") or {}
+    if upright and not upright.get("width", 0) > upright.get("height", 0):
+        problems.append("the app turned to portrait (it should stay landscape)")
     if report.get("pageErrors"):
         problems.append(f"{len(report['pageErrors'])} page error(s)")
 
@@ -58,9 +63,9 @@ def main(folder: str) -> int:
         p = s.get("page") or {}
         print(f"  {s['step']:26s} t={s.get('seconds')}s {p.get('width')}x{p.get('height')} q={p.get('quality')} "
               f"res={p.get('scale')} hz={p.get('refreshHz')} cpu={p.get('cpuMs')}ms calls={p.get('drawCalls')} tris={p.get('triangles')} "
-              f"view={p.get('camera')} craters={p.get('craters')} land={p.get('land')} | {p.get('fpsText')} "
+              f"view={p.get('camera')} burns={p.get('burns')} abilities={p.get('abilities')} land={p.get('land')} | {p.get('fpsText')} "
               + " ".join(f"{k}={v}" for k, v in s.items() if k not in ("step", "seconds", "page")))
-    last = (steps.get("99-done") or steps.get("07-portrait-again") or {}).get("page") or {}
+    last = (steps.get("99-done") or steps.get("06-portrait-refused") or {}).get("page") or {}
     if last.get("programs") is not None:
         print("GPU programs built (while loading / while playing):", last.get("programs"))
     if last.get("timings"):
@@ -96,7 +101,7 @@ def main(folder: str) -> int:
         problems.append("no result from the relaunch check")
 
     # the same verdict as a note on the run page, readable from the API when the logs are not
-    fps = (steps.get("05-landscape-later") or {}).get("framesPerSecondOver15s")
+    fps = (steps.get("04-later") or {}).get("framesPerSecondOver15s")
     progs = last.get("programs")
     summary = (f"loaded after {boot.get('bootSeconds')} s; landscape {fps} fps (simulator); programs {progs}; "
                f"page errors {len(report.get('pageErrors') or [])}; console errors {len(report.get('consoleErrors') or [])}")

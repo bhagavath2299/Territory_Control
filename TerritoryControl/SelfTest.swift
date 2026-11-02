@@ -5,9 +5,9 @@ import WebKit
 /// Simulator self-test. It is compiled only into the CI test build (Swift flag SELFTEST); the app you install
 /// contains none of it.
 ///
-/// Launched with `-selftest`, it plays the world test the way a tester would: loading, the car on autopilot against
-/// the rival in portrait, then landscape, the heavy abilities (an artillery salvo and a charge: craters), the frame
-/// rate over 15 s, the close chase view, and back to portrait.
+/// Launched with `-selftest`, it plays the world test the way a tester would (the app runs in landscape only):
+/// loading, the car on autopilot against the five rivals, every ability fired (a strike burns the ground), the frame
+/// rate over 15 s, the close chase view, and a request to turn to portrait (which the app must refuse).
 /// At each step it writes Documents/selftest/state.txt and waits until the CI script has taken a screenshot
 /// and written the step number to ack.txt. Page errors, timings and frame counts go to report.json.
 ///
@@ -123,8 +123,10 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
         quality: g(function () { return T.state.quality; }), scale: g(function () { return T.stats().pr; }),
         refreshHz: g(function () { return T.pace.hz; }), cpuMs: g(function () { return Math.round(T.pace.cpu * 100) / 100; }),
         drawCalls: g(function () { return T.stats().calls; }), triangles: g(function () { return T.stats().tris; }),
-        camera: g(function () { return T.state.camMode; }), craters: g(function () { return T.craters.list.length; }),
-        land: g(function () { return [T.territory.share(T.me), T.territory.share(T.rival)].map(function (x) { return Math.round(x * 1000) / 10; }); }),
+        camera: g(function () { return T.state.camMode; }), burns: g(function () { return T.territory.zones.length; }),
+        players: g(function () { return T.game.players.length; }),
+        abilities: g(function () { return T.events.filter(function (e) { return ['launch', 'mines', 'shield', 'blink', 'strikeCall', 'emp', 'boost'].indexOf(e.type) >= 0; }).length; }),
+        land: g(function () { return T.game.players.map(function (p) { return Math.round(T.territory.share(p) * 1000) / 10; }); }),
         frames: window.__stFrames, fpsText: String((document.getElementById('fps') || {}).textContent || '').slice(0, 200),
         frameGaps: (window.__stGaps || []).slice(-12), programs: window.__stProg || null
       };
@@ -284,36 +286,33 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
         await js("(function(){var b=document.getElementById('bFps');if(b&&!window.__tc.state.fpsOn)b.click();return 1})()")
         await mark("01-boot", ["bootReady": bootReady, "bootSeconds": round1(bootSeconds)])
 
-        // your car on autopilot against the rival bot
-        await js("(function(){var T=window.__tc;T.state.auto=new T.Bot(T.me,T.territory,T.props,T.terrain,11,T.Bot.ctx);return 1})()")
+        // your car on autopilot against the five rival drivers
+        await js("(function(){var T=window.__tc;var B=T.bots[0].constructor;var b=new B(T.me,T.game,{props:T.props,seed:11});T.state.auto={update:function(dt){b.update(dt)}};return 1})()")
         await sleep(12)
-        await mark("02-drive-portrait")
+        await mark("02-drive")
 
-        await rotate(.landscapeRight)
-        await sleep(6)
-        await mark("03-drive-landscape")
-
-        // the heavy abilities: hold the Battery and the Depot, call a salvo and drop a charge (craters)
-        await js("(function(){var T=window.__tc;T.territory.base(T.me,-135,65,16);T.territory.base(T.me,135,-65,16);T.territory.flush();setTimeout(function(){T.me.artyQueued=true;T.me.chargeQueued=true;},600);return 1})()")
+        // every ability: hand your car every structure, then fire them all (the strike burns the ground ahead)
+        await js("(function(){var T=window.__tc,G=T.game,tr=T.territory;G.structures.list.forEach(function(s){tr.setOwner(tr.idx(s.x,s.z),T.me.id)});setTimeout(function(){['missile','mines','shield','strike','emp','boost'].forEach(function(k){T.me.want[k]=1});T.me.want.strikeAt=null;},600);setTimeout(function(){T.me.want.blink=1},1400);return 1})()")
         await sleep(7)
-        await mark("04-heavy-landscape")
+        await mark("03-abilities")
 
         let f0 = await jsNumber("window.__stFrames") ?? 0
         await sleep(15)
         let f1 = await jsNumber("window.__stFrames") ?? 0
-        await mark("05-landscape-later", ["framesPerSecondOver15s": round1((f1 - f0) / 15)])
+        await mark("04-later", ["framesPerSecondOver15s": round1((f1 - f0) / 15)])
 
-        // the close view draws the full car models
+        // the close view draws your car's full model
         await js("(function(){window.__tc.setCam('chase');return 1})()")
         let c0 = await jsNumber("window.__stFrames") ?? 0
         await sleep(8)
         let c1 = await jsNumber("window.__stFrames") ?? 0
-        await mark("06-chase-landscape", ["framesPerSecondOver8s": round1((c1 - c0) / 8)])
+        await mark("05-chase", ["framesPerSecondOver8s": round1((c1 - c0) / 8)])
 
+        // asked to turn upright, the app must stay sideways
         await js("(function(){window.__tc.setCam('game');return 1})()")
         await rotate(.portrait)
         await sleep(4)
-        await mark("07-portrait-again")
+        await mark("06-portrait-refused")
 
         writeReport(finished: true)
         await mark("99-done")
