@@ -1,0 +1,43 @@
+[1s] simulator: com.apple.CoreSimulator.SimDeviceType.iPhone-17 on com.apple.CoreSimulator.SimRuntime.iOS-26-5
+[161s] booted
+[184s] installed; letting the new simulator settle
+[305s] launched (pid unknown)
+[332s] app data: /Users/runner/Library/Developer/CoreSimulator/Devices/575EF067-2170-4646-82C0-A443E465AFAB/data/Containers/Data/Application/B64249D9-4459-4CB3-B6E5-FE7BC2980242
+[416s] step 1 01-boot
+[430s] screenshot 01-boot took 13s
+[445s] step 2 02-drive
+[460s] screenshot 02-drive took 14s
+[472s] step 3 03-abilities
+[475s] screenshot 03-abilities took 2s
+[493s] step 4 04-later
+[495s] screenshot 04-later took 1s
+[505s] step 5 05-chase
+[508s] screenshot 05-chase took 2s
+[519s] step 6 06-portrait-refused
+[521s] screenshot 06-portrait-refused took 1s
+[524s] step 7 99-done
+[526s] screenshot 99-done took 1s
+[554s] relaunched: com.bhagavath2299.territoryworld: 18912
+[580s] screenshot 10-relaunch took 10s
+[589s] done
+system: iOS 26.5 874x402 @3.0x
+page: app://localhost/index.html | secure: True | storage: ok | haptics bridge: True | service worker API: False
+webgl: Apple GPU | game version: Territory Control World Test 6 | web build: None | cores: 4 | starting tier: None
+frame rate: screen max 60 fps | WebKit 60 fps hold: 60 fps hold switched off (now off)
+boot ready after 64.7 s
+  01-boot                    t=69.2s 874x402 q=medium res=1.5 hz=60 cpu=482.1ms calls=81 tris=329979 view=game burns=0 abilities=0 land=[0.2, 0.2, 0.2, 0.2, 0.2, 0.2] |  bootReady=True bootSeconds=64.7
+  02-drive                   t=110s 874x402 q=medium res=0.6 hz=30 cpu=8.83ms calls=111 tris=344849 view=game burns=0 abilities=5 land=[0.2, 0.4, 0.2, 0.6, 0.4, 0.5] | 29 fps of 30 · 9.0 ms cpu · 0.60x · 111 draws · 345k tris 
+  03-abilities               t=137.2s 874x402 q=medium res=0.6 hz=30 cpu=25.61ms calls=124 tris=409939 view=game burns=1 abilities=17 land=[0, 1.3, 1.6, 1, 0.8, 0.2] | 16 fps of 30 · 23.3 ms cpu · 0.60x · 160 draws · 435k tris 
+  04-later                   t=158s 874x402 q=medium res=0.6 hz=30 cpu=39.82ms calls=97 tris=401693 view=game burns=1 abilities=22 land=[1.2, 2.4, 0.2, 1.7, 0, 1.2] | 29 fps of 30 · 14.9 ms cpu · 0.60x · 112 draws · 447k tris framesPerSecondOver15s=24.5
+  05-chase                   t=170.3s 874x402 q=medium res=0.6 hz=30 cpu=30.99ms calls=348 tris=886578 view=chase burns=2 abilities=27 land=[0, 2.7, 0.2, 2, 0.2, 1.5] | 18 fps of 30 · 36.4 ms cpu · 0.60x · 346 draws · 895k tris framesPerSecondOver8s=16.8
+  06-portrait-refused        t=183.1s 874x402 q=medium res=0.6 hz=30 cpu=24.19ms calls=147 tris=471993 view=game burns=2 abilities=30 land=[0.2, 3.7, 0.2, 2.4, 0.5, 1.8] | 22 fps of 30 · 26.8 ms cpu · 0.60x · 145 draws · 472k tris 
+  99-done                    t=188.4s 874x402 q=medium res=0.6 hz=30 cpu=33.79ms calls=140 tris=434643 view=game burns=3 abilities=30 land=[0.2, 3.7, 0.2, 2.3, 0.5, 1.8] | 22 fps of 30 · 26.8 ms cpu · 0.60x · 145 draws · 472k tris 
+GPU programs built (while loading / while playing): {'loading': 66, 'play': 2}
+  long frames by 01-boot: 1694 ms at 17.1s, 4037 ms at 21.1s, 16243 ms at 57.3s
+  long frames by 03-abilities: 537 ms at 120.4s
+notes (2):
+    0.5s self-test started
+    174.8s rotation refused: None of the requested orientations are supported by the view controller. Requested: portrait; Supported: landscapeLeft, landscapeRight
+after relaunch: {'bootReady': True, 'href': 'app://localhost/index.html', 'pageErrors': [], 'title': 'Territory Control World Test 6'}
+PASS: the world test ran through in the simulator
+::notice title=Simulator test passed::loaded after 64.7 s; landscape 24.5 fps (simulator); programs {'loading': 66, 'play': 2}; page errors 0; console errors 0

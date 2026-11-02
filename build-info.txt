@@ -1,0 +1,123 @@
+Territory Control iPhone app, build 22
+commit: 68b896889e2ac3e7daf4eac3402aac23f2ceda2a
+built: 2026-11-02 22:49 UTC with Xcode 26.6 Build version 17F113 
+on: GitHub's macos26 runner, ARM64 (26.6.2, 3 cores)
+
+Info.plist (device build):
+{
+  "BuildMachineOSBuild" => "25G83"
+  "CADisableMinimumFrameDurationOnPhone" => true
+  "CFBundleDevelopmentRegion" => "en"
+  "CFBundleDisplayName" => "TC World"
+  "CFBundleExecutable" => "TerritoryControl"
+  "CFBundleIcons" => {
+    "CFBundlePrimaryIcon" => {
+      "CFBundleIconFiles" => [
+        0 => "AppIcon60x60"
+      ]
+      "CFBundleIconName" => "AppIcon"
+    }
+  }
+  "CFBundleIcons~ipad" => {
+    "CFBundlePrimaryIcon" => {
+      "CFBundleIconFiles" => [
+        0 => "AppIcon60x60"
+        1 => "AppIcon76x76"
+      ]
+    }
+  }
+  "CFBundleIdentifier" => "com.bhagavath2299.territoryworld"
+  "CFBundleInfoDictionaryVersion" => "6.0"
+  "CFBundleName" => "TerritoryControl"
+  "CFBundlePackageType" => "APPL"
+  "CFBundleShortVersionString" => "1.0"
+  "CFBundleSupportedPlatforms" => [
+    0 => "iPhoneOS"
+  ]
+  "CFBundleVersion" => "22"
+  "DTCompiler" => "com.apple.compilers.llvm.clang.1_0"
+  "DTPlatformBuild" => "23F81a"
+  "DTPlatformName" => "iphoneos"
+  "DTPlatformVersion" => "26.5"
+  "DTSDKBuild" => "23F81a"
+  "DTSDKName" => "iphoneos26.5"
+  "DTXcode" => "2660"
+  "DTXcodeBuild" => "17F113"
+  "GCSupportsGameMode" => true
+  "ITSAppUsesNonExemptEncryption" => false
+  "LSApplicationCategoryType" => "public.app-category.action-games"
+  "LSRequiresIPhoneOS" => true
+  "MinimumOSVersion" => "16.0"
+  "UIApplicationSceneManifest" => {
+    "UIApplicationSupportsMultipleScenes" => false
+    "UISceneConfigurations" => {
+      "UIWindowSceneSessionRoleApplication" => [
+        0 => {
+          "UISceneConfigurationName" => "Default"
+          "UISceneDelegateClassName" => "TerritoryControl.SceneDelegate"
+        }
+      ]
+    }
+  }
+  "UIDeviceFamily" => [
+    0 => 1
+  ]
+  "UILaunchScreen" => {
+    "UIColorName" => "LaunchBackground"
+  }
+  "UIRequiredDeviceCapabilities" => [
+    0 => "arm64"
+  ]
+  "UIRequiresFullScreen" => true
+  "UIStatusBarHidden" => true
+  "UISupportedInterfaceOrientations" => [
+    0 => "UIInterfaceOrientationLandscapeRight"
+    1 => "UIInterfaceOrientationLandscapeLeft"
+  ]
+  "UIViewControllerBasedStatusBarAppearance" => true
+}
+
+binary: Non-fat file: build/device/Build/Products/Release-iphoneos/TerritoryControl.app/TerritoryControl is architecture: arm64
+minimum iOS: 16.0
+
+app contents:
+     13754  ./AppIcon60x60@2x.png
+     18657  ./AppIcon76x76@2x~ipad.png
+    245720  ./Assets.car
+      1756  ./Info.plist
+         8  ./PkgInfo
+    178200  ./TerritoryControl
+    719410  ./www/draco/draco_decoder.js
+    285747  ./www/draco/draco_decoder.wasm
+     58763  ./www/draco/draco_wasm_wrapper.js
+   1001851  ./www/index.html
+  12664050  ./www/models/concept.json
+   4996394  ./www/models/gt3.json
+   4471982  ./www/models/rubicon.json
+    135642  ./www/props/boulder_a_lod1.json
+   1236522  ./www/props/boulder_a.json
+    111690  ./www/props/boulder_b_lod1.json
+   1195674  ./www/props/boulder_b.json
+     82414  ./www/props/boulder_c_lod1.json
+    921306  ./www/props/boulder_c.json
+       143  ./www/props/props.json
+   1710746  ./www/props/shrub_a.json
+   1141046  ./www/terrain/data.png
+    173320  ./www/terrain/far_color.png
+    701786  ./www/terrain/height_far.json
+   2801670  ./www/terrain/height_near.json
+    681491  ./www/terrain/splat.png
+       268  ./www/terrain/terrain.json
+    199494  ./www/terrain/tint.png
+    611449  ./www/tex/gravel_albedo.jpg
+    740438  ./www/tex/gravel_nh.webp
+    669386  ./www/tex/ground_albedo.jpg
+    658020  ./www/tex/ground_nh.webp
+    481326  ./www/tex/playa_albedo.jpg
+    369124  ./www/tex/playa_nh.webp
+    299734  ./www/tex/red_albedo.jpg
+    488882  ./www/tex/red_nh.webp
+    303966  ./www/tex/rock_albedo.jpg
+    511058  ./www/tex/rock_nh.webp
+
+ipa: 28446623 bytes, sha256 15234dc44f127ed857b66263c172a4f343cb1e0c9440cad7a436a1e14cf8fabf
