@@ -5,8 +5,9 @@ import WebKit
 /// Simulator self-test. It is compiled only into the CI test build (Swift flag SELFTEST); the app you install
 /// contains none of it.
 ///
-/// Launched with `-selftest`, it plays through the game the way a player would: boot screen, menu, a match
-/// against bots in portrait, then landscape, pause and resume, back to portrait, and on to the results screen.
+/// Launched with `-selftest`, it plays the world test the way a tester would: loading, the car on autopilot against
+/// the rival in portrait, then landscape, the heavy abilities (an artillery salvo and a charge: craters), the frame
+/// rate over 15 s, the close chase view, and back to portrait.
 /// At each step it writes Documents/selftest/state.txt and waits until the CI script has taken a screenshot
 /// and written the step number to ack.txt. Page errors, timings and frame counts go to report.json.
 ///
@@ -72,7 +73,7 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
         var link = C.prototype.linkProgram;
         C.prototype.linkProgram = function (p) {
           try {
-            var s = (typeof BOOTED !== 'undefined' && BOOTED) ? (typeof state !== 'undefined' ? state : '?') : 'loading';
+            var s = (window.__tc && window.__tc.ready) ? 'play' : 'loading';
             window.__stProg[s] = (window.__stProg[s] || 0) + 1;
           } catch (e) {}
           return link.call(this, p);
@@ -103,16 +104,14 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
     })();
     """#
 
-    // What the game shows at a step (read from the game's own variables).
+    // What the page shows at a step (read from the world test's hooks, window.__tc).
     private static let pageState = #"""
     (function () {
       var g = function (f) { try { return f(); } catch (e) { return null; } };
-      var el = function (id) { return document.getElementById(id) || {}; };
+      var T = window.__tc || {};
       return {
-        state: g(function () { return state; }), screen: g(function () { return scr; }),
-        paused: g(function () { return PAUSED; }), phone: g(function () { return PHONE; }),
-        width: innerWidth, height: innerHeight, pixelRatio: devicePixelRatio,
-        safeArea: g(function () { return SAFE; }), webgl: g(function () { return !!GFX.ok; }),
+        ready: !!T.ready, width: innerWidth, height: innerHeight, pixelRatio: devicePixelRatio,
+        webgl: g(function () { return !!T.renderer.getContext(); }),
         envSafeArea: g(function () {
           var d = document.createElement('div');
           d.style.cssText = 'position:fixed;visibility:hidden;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)';
@@ -121,11 +120,13 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
           d.remove();
           return r;
         }),
-        quality: g(function () { return QNAME; }), scale: g(function () { return GFX.scale; }), refreshHz: g(function () { return QC.hz; }),
-        drawCalls: g(function () { return GFX.stats.calls; }), frames: window.__stFrames,
-        fpsText: String(el('fps').textContent || '').slice(0, 200), overlay: el('ov').className || '',
-        card: String(el('card').innerText || '').replace(/\s+/g, ' ').slice(0, 200),
-        timings: window.__stT || null, frameGaps: (window.__stGaps || []).slice(-12), programs: window.__stProg || null
+        quality: g(function () { return T.state.quality; }), scale: g(function () { return T.stats().pr; }),
+        refreshHz: g(function () { return T.pace.hz; }), cpuMs: g(function () { return Math.round(T.pace.cpu * 100) / 100; }),
+        drawCalls: g(function () { return T.stats().calls; }), triangles: g(function () { return T.stats().tris; }),
+        camera: g(function () { return T.state.camMode; }), craters: g(function () { return T.craters.list.length; }),
+        land: g(function () { return [T.territory.share(T.me), T.territory.share(T.rival)].map(function (x) { return Math.round(x * 1000) / 10; }); }),
+        frames: window.__stFrames, fpsText: String((document.getElementById('fps') || {}).textContent || '').slice(0, 200),
+        frameGaps: (window.__stGaps || []).slice(-12), programs: window.__stProg || null
       };
     })()
     """#
@@ -246,8 +247,8 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
         href: location.href, userAgent: navigator.userAgent, secureContext: window.isSecureContext,
         serviceWorkerApi: 'serviceWorker' in navigator, vibrateBridge: typeof navigator.vibrate === 'function',
         wakeLockApi: 'wakeLock' in navigator, webgl2Renderer: gl, localStorage: ls,
-        cores: navigator.hardwareConcurrency || null, startTier: (function () { try { return tierGuess(); } catch (e) { return null; } })(),
-        webSource: meta ? meta.content : null, gameVersion: (function () { try { return VER; } catch (e) { return null; } })()
+        cores: navigator.hardwareConcurrency || null, startTier: null,
+        webSource: meta ? meta.content : null, gameVersion: document.title
       };
     })()
     """#
@@ -273,66 +274,54 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
 
     private func run() async {
         note("self-test started")
-        let bootReady = await waitFor(seconds: 180) { await self.bootState() == "rdy" }
+        let bootReady = await waitFor(seconds: 240) { await self.bootState() == "rdy" }
         let bootSeconds = Date().timeIntervalSince(started)
         environment = (await jsObject(Self.environmentProbe)) ?? [:]
         // what became of WebKit's 60 frames-a-second hold (see GameViewController.allowFullFrameRate), and the screen's top rate
         environment["frameRateSwitch"] = GameViewController.frameRateNote
         environment["screenMaxFPS"] = controller?.view.window?.windowScene?.screen.maximumFramesPerSecond
-        // Frame-rate read-out on (it shows in the screenshots); mark this run so the second launch can find it.
-        await js("(function(){SET.fps=1;saveSet();fpsShow();localStorage.setItem('st-probe','\(Int(started.timeIntervalSince1970))');return 1})()")
+        // Frame-rate read-out on (it shows in the screenshots)
+        await js("(function(){var b=document.getElementById('bFps');if(b&&!window.__tc.state.fpsOn)b.click();return 1})()")
         await mark("01-boot", ["bootReady": bootReady, "bootSeconds": round1(bootSeconds)])
-        await js(Self.timerScript)
 
-        await tap("start")
-        await sleep(3)
-        await mark("02-menu")
-
-        await tap("quick")  // PLAY: offline, a match against four bots
-        await sleep(8)
-        await mark("03-match-portrait")
+        // your car on autopilot against the rival bot
+        await js("(function(){var T=window.__tc;T.state.auto=new T.Bot(T.me,T.territory,T.props,T.terrain,11,T.Bot.ctx);return 1})()")
+        await sleep(12)
+        await mark("02-drive-portrait")
 
         await rotate(.landscapeRight)
-        await mark("04-match-landscape")
+        await sleep(6)
+        await mark("03-drive-landscape")
 
-        await tap("pause")
-        await sleep(1.5)
-        await mark("05-paused-landscape")
-        // what the picture costs, part by part (see renderCostScript), while the match is paused
-        await js(Self.renderCostScript)
-        if await waitFor(seconds: 240, { await self.jsString("window.__stGPU?'done':''") == "done" }) {
-            environment["renderCost"] = await jsObject("window.__stGPU")
-        } else {
-            note("render cost: no result after 240 s")
-        }
-        await tap("resume")
+        // the heavy abilities: hold the Battery and the Depot, call a salvo and drop a charge (craters)
+        await js("(function(){var T=window.__tc;T.territory.base(T.me,-135,65,16);T.territory.base(T.me,135,-65,16);T.territory.flush();setTimeout(function(){T.me.artyQueued=true;T.me.chargeQueued=true;},600);return 1})()")
+        await sleep(7)
+        await mark("04-heavy-landscape")
 
         let f0 = await jsNumber("window.__stFrames") ?? 0
         await sleep(15)
         let f1 = await jsNumber("window.__stFrames") ?? 0
-        await mark("06-match-landscape-later", ["framesPerSecondOver15s": round1((f1 - f0) / 15)])
+        await mark("05-landscape-later", ["framesPerSecondOver15s": round1((f1 - f0) / 15)])
 
+        // the close view draws the full car models
+        await js("(function(){window.__tc.setCam('chase');return 1})()")
+        let c0 = await jsNumber("window.__stFrames") ?? 0
+        await sleep(8)
+        let c1 = await jsNumber("window.__stFrames") ?? 0
+        await mark("06-chase-landscape", ["framesPerSecondOver8s": round1((c1 - c0) / 8)])
+
+        await js("(function(){window.__tc.setCam('game');return 1})()")
         await rotate(.portrait)
-        await mark("07-match-portrait-again")
-
-        let ended = await waitFor(seconds: 200) { await self.jsString("typeof state!=='undefined'?state:''") == "over" }
         await sleep(4)
-        await mark("08-results", ["matchEnded": ended])
+        await mark("07-portrait-again")
 
         writeReport(finished: true)
         await mark("99-done")
     }
 
     private func persistCheck() async {
-        let bootReady = await waitFor(seconds: 180) { await self.bootState() == "rdy" }
-        var result: [String: Any] = await jsObject(#"""
-        ({
-          probe: localStorage.getItem('st-probe'),
-          frameRateSetting: (function () { try { return JSON.parse(localStorage.getItem('ct-set') || '{}').fps; } catch (e) { return null; } })(),
-          replaysSaved: (function () { try { return JSON.parse(localStorage.getItem('ct-rpx') || '[]').length; } catch (e) { return -1; } })(),
-          bestScore: localStorage.getItem('ct-best')
-        })
-        """#) ?? [:]
+        let bootReady = await waitFor(seconds: 240) { await self.bootState() == "rdy" }
+        var result: [String: Any] = await jsObject("({ title: document.title, href: location.href })") ?? [:]
         result["bootReady"] = bootReady
         result["pageErrors"] = pageErrors
         write("persist.json", json(result))
@@ -374,7 +363,7 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
     }
 
     private func bootState() async -> String? {
-        await jsString("(document.getElementById('boot')||{}).className")
+        await jsString("(window.__tc&&window.__tc.ready)?'rdy':''")
     }
 
     // MARK: Page messages

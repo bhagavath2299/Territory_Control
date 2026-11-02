@@ -1,8 +1,8 @@
-name: iPhone app
+name: iPhone world app
 
 on:
   push:
-    branches: [ios-app]
+    branches: [ios-world]
   workflow_dispatch:
     inputs:
       runner:
@@ -12,10 +12,10 @@ on:
         options: [macos-26, macos-26-intel]
 
 permissions:
-  contents: write  # to save the build to the ios-build branch
+  contents: write  # to save the build to the ios-world-build branch
 
 concurrency:
-  group: iphone-app-${{ inputs.runner || 'macos-26' }}
+  group: iphone-world-${{ inputs.runner || 'macos-26' }}
   cancel-in-progress: true
 
 jobs:
@@ -28,11 +28,11 @@ jobs:
       - name: Build the app (iPhone and simulator)
         run: bash ci/build.sh
 
-      - name: Play through it in the iPhone simulator
+      - name: Run the world test in the iPhone simulator
         timeout-minutes: 65
         run: bash ci/selftest.sh
 
-      - name: Save the build to the ios-build branch
+      - name: Save the build to the ios-world-build branch
         if: always()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -43,7 +43,7 @@ jobs:
         continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
-          name: territory-control-iphone-${{ github.run_number }}
+          name: territory-control-world-iphone-${{ github.run_number }}
           path: |
             out/
             !out/.git

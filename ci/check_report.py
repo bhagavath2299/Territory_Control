@@ -5,8 +5,8 @@ import os
 import pathlib
 import sys
 
-STEPS = ["01-boot", "02-menu", "03-match-portrait", "04-match-landscape", "05-paused-landscape",
-         "06-match-landscape-later", "07-match-portrait-again", "08-results", "99-done"]
+STEPS = ["01-boot", "02-drive-portrait", "03-drive-landscape", "04-heavy-landscape", "05-landscape-later",
+         "06-chase-landscape", "07-portrait-again", "99-done"]
 
 
 def main(folder: str) -> int:
@@ -27,34 +27,24 @@ def main(folder: str) -> int:
 
     boot = steps.get("01-boot", {})
     if not boot.get("bootReady"):
-        problems.append("the boot screen never became ready")
+        problems.append("the page never finished loading")
     if not (boot.get("page") or {}).get("webgl"):
         problems.append("3D (WebGL) did not start")
-    match = steps.get("03-match-portrait", {}).get("page") or {}
-    if match.get("state") != "play":
-        problems.append(f"no match running after PLAY (state={match.get('state')})")
-    land = steps.get("04-match-landscape", {}).get("page") or {}
+    drive = steps.get("02-drive-portrait", {}).get("page") or {}
+    if not drive.get("ready"):
+        problems.append("the world test was not running at the first drive step")
+    land = steps.get("03-drive-landscape", {}).get("page") or {}
     if land and not land.get("width", 0) > land.get("height", 0):
         problems.append("the screen did not turn to landscape")
-    # The test iPhone has a Dynamic Island and a home bar: the game must keep its controls clear of them
-    # from the first match, not only after the phone has been turned.
-    safe = match.get("safeArea") or {}
+    # The test iPhone has a Dynamic Island and a home bar: the page's layout must see them from the start.
+    safe = drive.get("envSafeArea") or {}
     if not (safe.get("t", 0) >= 40 and safe.get("b", 0) >= 20):
-        problems.append(f"portrait match read the safe areas as {safe} (island and home bar not cleared)")
-    lsafe = land.get("safeArea") or {}
-    if land and not (max(lsafe.get("l", 0), lsafe.get("r", 0)) >= 40):
-        problems.append(f"landscape match read the safe areas as {lsafe}")
-    paused = steps.get("05-paused-landscape", {}).get("page") or {}
-    if paused and paused.get("paused") != 1:
-        problems.append("pause did not pause the match")
-    if not steps.get("08-results", {}).get("matchEnded"):
-        problems.append("the match did not reach the results screen")
+        problems.append(f"portrait page read the safe areas as {safe} (island and home bar not cleared)")
+    heavy = steps.get("04-heavy-landscape", {}).get("page") or {}
+    if not (heavy.get("craters") or 0) >= 1:
+        problems.append(f"no crater after the artillery salvo and the charge (craters={heavy.get('craters')})")
     if report.get("pageErrors"):
         problems.append(f"{len(report['pageErrors'])} page error(s)")
-    # a loading step that failed (the game carries on, but something did not get built)
-    failed = [e for e in report.get("consoleErrors") or [] if "loading step" in e or "reflections not made" in e or "showreel failed" in e]
-    if failed:
-        problems.append(f"{len(failed)} loading step(s) failed")
 
     env = report.get("environment", {})
     print("system:", report.get("system"), report.get("screen"))
@@ -66,14 +56,13 @@ def main(folder: str) -> int:
     print("boot ready after", boot.get("bootSeconds"), "s")
     for s in report.get("steps", []):
         p = s.get("page") or {}
-        print(f"  {s['step']:26s} t={s.get('seconds')}s state={p.get('state')} screen={p.get('screen')} "
-              f"{p.get('width')}x{p.get('height')} q={p.get('quality')} hz={p.get('refreshHz')} calls={p.get('drawCalls')} "
+        print(f"  {s['step']:26s} t={s.get('seconds')}s {p.get('width')}x{p.get('height')} q={p.get('quality')} "
+              f"res={p.get('scale')} hz={p.get('refreshHz')} cpu={p.get('cpuMs')}ms calls={p.get('drawCalls')} tris={p.get('triangles')} "
+              f"view={p.get('camera')} craters={p.get('craters')} land={p.get('land')} | {p.get('fpsText')} "
               + " ".join(f"{k}={v}" for k, v in s.items() if k not in ("step", "seconds", "page")))
-    last = (steps.get("99-done") or steps.get("08-results") or {}).get("page") or {}
+    last = (steps.get("99-done") or steps.get("07-portrait-again") or {}).get("page") or {}
     if last.get("programs") is not None:
-        print("GPU programs built (by what the game was doing), at the paused step:",
-              (steps.get("05-paused-landscape", {}).get("page") or {}).get("programs"),
-              "| at the end (the cost test builds 4 floor variants):", last.get("programs"))
+        print("GPU programs built (while loading / while playing):", last.get("programs"))
     if last.get("timings"):
         print("time spent in the game's heavy functions (calls, total ms, longest ms):")
         for name, t in sorted(last["timings"].items(), key=lambda kv: -kv[1].get("max", 0)):
@@ -101,23 +90,21 @@ def main(folder: str) -> int:
     try:
         persist = json.loads((out / "persist.json").read_text())
         print("after relaunch:", persist)
-        if not persist.get("probe"):
-            problems.append("saved data was gone after the app was closed and opened again")
-        if persist.get("frameRateSetting") != 1:
-            problems.append("a changed setting did not survive a relaunch")
+        if not persist.get("bootReady"):
+            problems.append("the page did not load again after the app was closed and opened again")
     except (OSError, ValueError):
         problems.append("no result from the relaunch check")
 
     # the same verdict as a note on the run page, readable from the API when the logs are not
-    fps = (steps.get("06-match-landscape-later") or {}).get("framesPerSecondOver15s")
-    progs = (steps.get("05-paused-landscape", {}).get("page") or {}).get("programs")
-    summary = (f"boot ready after {boot.get('bootSeconds')} s; landscape match {fps} fps; programs at pause {progs}; "
+    fps = (steps.get("05-landscape-later") or {}).get("framesPerSecondOver15s")
+    progs = last.get("programs")
+    summary = (f"loaded after {boot.get('bootSeconds')} s; landscape {fps} fps (simulator); programs {progs}; "
                f"page errors {len(report.get('pageErrors') or [])}; console errors {len(report.get('consoleErrors') or [])}")
     if problems:
         print("FAIL:", "; ".join(problems))
         annotate("error", "Simulator test failed", "; ".join(problems) + " | " + summary)
         return 1
-    print("PASS: played through in the simulator")
+    print("PASS: the world test ran through in the simulator")
     annotate("notice", "Simulator test passed", summary)
     return 0
 
