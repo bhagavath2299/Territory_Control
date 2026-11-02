@@ -291,9 +291,10 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
         await sleep(12)
         await mark("02-drive")
 
-        // every ability: hand your car every structure, then fire them all (the strike burns the ground ahead)
-        await js("(function(){var T=window.__tc,G=T.game,tr=T.territory;G.structures.list.forEach(function(s){tr.setOwner(tr.idx(s.x,s.z),T.me.id)});setTimeout(function(){['missile','mines','shield','strike','emp','boost'].forEach(function(k){T.me.want[k]=1});T.me.want.strikeAt=null;},600);setTimeout(function(){T.me.want.blink=1},1400);return 1})()")
-        await sleep(7)
+        // every ability: hand your car every structure, then fire them all (the strike burns the ground ahead);
+        // if your car is a wreck just then, wait until it is back (a slow simulator can take a while)
+        await js("(function(){var T=window.__tc,G=T.game,tr=T.territory;var go=function(){if(T.me.dead){setTimeout(go,300);return;}G.structures.list.forEach(function(s){tr.setOwner(tr.idx(s.x,s.z),T.me.id)});setTimeout(function(){if(T.me.dead){go();return;}['missile','mines','shield','strike','emp','boost'].forEach(function(k){T.me.want[k]=1});T.me.want.strikeAt=null;setTimeout(function(){T.me.want.blink=1},800);},600);};go();return 1})()")
+        await sleep(10)
         await mark("03-abilities")
 
         let f0 = await jsNumber("window.__stFrames") ?? 0
