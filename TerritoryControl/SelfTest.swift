@@ -6,7 +6,7 @@ import WebKit
 /// contains none of it.
 ///
 /// Launched with `-selftest`, it plays the world test the way a tester would (the app runs in landscape only):
-/// loading, the car on autopilot against the five rivals, every ability fired (a strike burns the ground), the frame
+/// loading, the craft on autopilot against the five rivals, both weapons fired (missiles and mines), the frame
 /// rate over 15 s, the close chase view, and a request to turn to portrait (which the app must refuse).
 /// At each step it writes Documents/selftest/state.txt and waits until the CI script has taken a screenshot
 /// and written the step number to ack.txt. Page errors, timings and frame counts go to report.json.
@@ -127,6 +127,9 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
         players: g(function () { return T.game.players.length; }),
         abilities: g(function () { return T.events.filter(function (e) { return ['launch', 'mines', 'shield', 'blink', 'strikeCall', 'emp', 'boost'].indexOf(e.type) >= 0; }).length; }),
         land: g(function () { return T.game.players.map(function (p) { return Math.round(T.territory.share(p) * 1000) / 10; }); }),
+        pads: g(function () { return T.structures.list.length; }),
+        padsMine: g(function () { return T.structures.list.filter(function (s) { return s.owner === T.me.id; }).length; }),
+        sound: g(function () { var A = T.S12 && T.S12.audio; if (!A) return null; return { state: A.ctx && A.ctx.state, sfx: A.ready.sfx, voice: A.ready.voice, music: A.ready.music, track: A.cur && A.cur.name, starts: Object.keys(A.tracks).map(function (k) { return k + ':' + Math.round(A.tracks[k].off * A.ctx.sampleRate); }).join(' ') }; }),
         frames: window.__stFrames, fpsText: String((document.getElementById('fps') || {}).textContent || '').slice(0, 200),
         frameGaps: (window.__stGaps || []).slice(-12), programs: window.__stProg || null
       };

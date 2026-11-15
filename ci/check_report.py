@@ -41,10 +41,15 @@ def main(folder: str) -> int:
     if not (max(safe.get("l", 0), safe.get("r", 0)) >= 40 and safe.get("b", 0) >= 15):
         problems.append(f"landscape page read the safe areas as {safe} (island and home bar not cleared)")
     ab = steps.get("03-abilities", {}).get("page") or {}
-    if not (ab.get("burns") or 0) >= 1:
-        problems.append(f"no burnt ground after the strike (burns={ab.get('burns')})")
-    if not (ab.get("abilities") or 0) >= 5:
-        problems.append(f"too few abilities fired ({ab.get('abilities')})")
+    # World Test 12: thirteen pads on the ground (missiles and mines); the self-test hands them all to your craft
+    if (ab.get("pads") or 0) != 13:
+        problems.append(f"expected 13 pads, found {ab.get('pads')}")
+    if not (ab.get("abilities") or 0) >= 3:
+        problems.append(f"too few weapons fired ({ab.get('abilities')})")
+    # the sound: effects, announcer and music decoded by the end of the run
+    snd = ((steps.get("99-done") or steps.get("06-portrait-refused") or {}).get("page") or {}).get("sound") or {}
+    if not (snd.get("sfx") and snd.get("voice") and snd.get("music")):
+        problems.append(f"the sound did not load ({snd})")
     upright = steps.get("06-portrait-refused", {}).get("page") or {}
     if upright and not upright.get("width", 0) > upright.get("height", 0):
         problems.append("the app turned to portrait (it should stay landscape)")
@@ -63,7 +68,7 @@ def main(folder: str) -> int:
         p = s.get("page") or {}
         print(f"  {s['step']:26s} t={s.get('seconds')}s {p.get('width')}x{p.get('height')} q={p.get('quality')} "
               f"res={p.get('scale')} hz={p.get('refreshHz')} cpu={p.get('cpuMs')}ms calls={p.get('drawCalls')} tris={p.get('triangles')} "
-              f"view={p.get('camera')} burns={p.get('burns')} abilities={p.get('abilities')} land={p.get('land')} | {p.get('fpsText')} "
+              f"view={p.get('camera')} pads={p.get('padsMine')}/{p.get('pads')} abilities={p.get('abilities')} land={p.get('land')} sound={p.get('sound')} | {p.get('fpsText')} "
               + " ".join(f"{k}={v}" for k, v in s.items() if k not in ("step", "seconds", "page")))
     last = (steps.get("99-done") or steps.get("06-portrait-refused") or {}).get("page") or {}
     if last.get("programs") is not None:

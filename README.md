@@ -1,6 +1,6 @@
 # Territory Control world test: iPhone app (TC World)
 
-This branch puts the **world test** (step 6, "World Test 6": six players, landscape only, land claimed with a cable, barricades you get through by the land you own, seven structures at fixed spots with their abilities: guns, missiles, mines, shield, blink, strike, EMP; five-minute matches) inside an iPhone app, so it can be played on a phone at full screen and, on iPhones with a 120 Hz screen, at up to 120 frames a second. It is built from the `ios-app` branch (the v20 app) and changes only what the world test needs. The same page is live on the web at https://territory-control-world.onrender.com (its own Render site, from the branch `world-live`).
+This branch puts the **world test** inside an iPhone app, so it can be played on a phone at full screen and, on iPhones with a 120 Hz screen, at up to 120 frames a second. It now carries **World Test 12** (14 Nov 2026): six hover craft at 195 km/h in a 240 m cartoon arena, land claimed with a cable and shown as glossy colour, no barricades, a kill hands you the victim's land, thirteen flat pads on the ground (missiles and mines) that you fly straight across, baked ground textures, a soundtrack, sound effects and an announcer, three-minute matches. Until 14 Nov it carried World Test 6 (build 22, commit `68b8968`; the web copy of World Test 6 stays live at https://territory-control-world.onrender.com). It is built from the `ios-app` branch (the v20 app) and changes only what the world test needs.
 
 - Name on the home screen: **TC World**. Bundle ID: `com.bhagavath2299.territoryworld`, so it installs **next to** the Territory app (v20), not over it. iOS 16 or later.
 - `main`, the live game on Render, `ios-app`, `ios-build`, `app-test` and the `unity-client` branch are not touched by this branch.
@@ -16,7 +16,7 @@ This branch puts the **world test** (step 6, "World Test 6": six players, landsc
 Every push to this branch runs `.github/workflows/ios.yml` ("iPhone world app") on GitHub's macOS machines:
 
 1. `ci/build.sh` builds an unsigned `.ipa` for the phone and a simulator copy with the self-test compiled in.
-2. `ci/selftest.sh` runs the world test in the iPhone simulator: loading, your car on autopilot against the five rival drivers, every ability fired (a strike burns the ground), the frame rate over 15 s, the close chase view, and a request to turn upright (the app must stay sideways); then closes and reopens the app. A screenshot at every step. `ci/check_report.py` fails the run if a step is missing, 3D did not start, the app was not in landscape, there were not six players, the safe areas were not read, no burn appeared, too few abilities fired, or the page reported errors.
+2. `ci/selftest.sh` runs the world test in the iPhone simulator: loading, your craft on autopilot against the five rival drivers, every pad handed to you and both weapons fired, the frame rate over 15 s, the close chase view, and a request to turn upright (the app must stay sideways); then closes and reopens the app. A screenshot at every step. `ci/check_report.py` fails the run if a step is missing, 3D did not start, the app was not in landscape, there were not six players or thirteen pads, the safe areas were not read, too few weapons fired, the sound (effects, announcer, music) did not load, or the page reported errors.
 3. `ci/publish.sh` saves the `.ipa`, screenshots, test report and logs to the branch `ios-world-build` (rewritten on each build; `ios-build` keeps the v20 app).
 
 When GitHub has no Apple silicon Mac free, a run fails after 15 minutes ("not acquired by Runner"); start it again by hand on an Intel Mac: Actions > iPhone world app > Run workflow > `macos-26-intel`.
@@ -36,5 +36,6 @@ Then commit and push to `ios-world`: GitHub builds and tests the new app.
 ## Files
 
 - `TerritoryControl/`: the app (Swift). `GameViewController.swift` shows the page; `BundleSchemeHandler.swift` serves the files; `SelfTest.swift` (simulator test only, rewritten for the world test); `Info.plist`.
-- `www/`: the world test as the app serves it (World Test 6, world-test branch `release/world-6`).
+- `www/`: the world test as the app serves it (World Test 12, world-test branch `release/world-12`: `index.html`, `terrain/`, `tex/` the baked ground textures, `snd/` the music, effects and announcer as base64 MP3 inside JSON).
+- Sound: `AppDelegate` sets the audio session to "playback" mixed with other apps, so the game is heard even with the side switch on silent; the page starts its sound on the first touch.
 - `ci/`: build, simulator test, report check, saving the build. `tools/`: `sync_world.sh`, `make_icon.py`.
