@@ -1,13 +1,13 @@
 # Territory Control world test: iPhone app (TC World)
 
-This branch puts the **world test** inside an iPhone app, so it can be played on a phone at full screen and, on iPhones with a 120 Hz screen, at up to 120 frames a second. It now carries **World Test 12** (14 Nov 2026): six hover craft at 195 km/h in a 240 m cartoon arena, land claimed with a cable and shown as glossy colour, no barricades, a kill hands you the victim's land, thirteen flat pads on the ground (missiles and mines) that you fly straight across, baked ground textures, a soundtrack, sound effects and an announcer, three-minute matches. Until 14 Nov it carried World Test 6 (build 22, commit `68b8968`; the web copy of World Test 6 stays live at https://territory-control-world.onrender.com). It is built from the `ios-app` branch (the v20 app) and changes only what the world test needs.
+This branch puts the **world test** inside an iPhone app, so it can be played on a phone at full screen and, on iPhones with a 120 Hz screen, at up to 120 frames a second. It now carries **World Test 13** (16 Nov 2026): six hover craft at 195 km/h in a 240 m cartoon arena, land claimed with a plain line in your colour, a kill hands you the victim's land, five ability pads (missiles, mines, shield, EMP, strike) taken by holding them under your colour, two a craft at most, a repair pad in the middle (health no longer comes back by itself), three ramps (a trial), a soundtrack, sound effects and an announcer, three-minute matches; and it plays **upright as well as sideways**. From 14 Nov it carried World Test 12 (build 24, commit `3e907cb`), before that World Test 6 (build 22, commit `68b8968`; the web copy of World Test 6 stays live at https://territory-control-world.onrender.com). It is built from the `ios-app` branch (the v20 app) and changes only what the world test needs.
 
 - Name on the home screen: **TC World**. Bundle ID: `com.bhagavath2299.territoryworld`, so it installs **next to** the Territory app (v20), not over it. iOS 16 or later.
 - `main`, the live game on Render, `ios-app`, `ios-build`, `app-test` and the `unity-client` branch are not touched by this branch.
 
 ## What the app does
 
-- Opens straight into the world test: no address bar, no status bar, home bar hidden. Landscape only (either way round).
+- Opens straight into the world test: no address bar, no status bar, home bar hidden. Sideways (either way round) or upright; the page lays its HUD out again when the phone is turned (World Tests 6 to 12 were sideways only).
 - Every file is inside the app (served at `app://localhost`), so it needs no connection (the page's font falls back to the system font offline).
 - Frame rate: the app asks iOS for the full rate (`CADisableMinimumFrameDurationOnPhone`) and switches off WebKit's 60 fps hold (`GameViewController.allowFullFrameRate`, a private WebKit setting: fine for a sideloaded test app, to be revisited before the App Store). The page learns the screen's refresh rate and trades resolution to stay inside it. Settings > Show frame rate shows frames per second against the screen's rate, CPU time per frame, resolution, draw calls and triangles.
 
@@ -16,7 +16,7 @@ This branch puts the **world test** inside an iPhone app, so it can be played on
 Every push to this branch runs `.github/workflows/ios.yml` ("iPhone world app") on GitHub's macOS machines:
 
 1. `ci/build.sh` builds an unsigned `.ipa` for the phone and a simulator copy with the self-test compiled in.
-2. `ci/selftest.sh` runs the world test in the iPhone simulator: loading, your craft on autopilot against the five rival drivers, every pad handed to you and both weapons fired, the frame rate over 15 s, the close chase view, and a request to turn upright (the app must stay sideways); then closes and reopens the app. A screenshot at every step. `ci/check_report.py` fails the run if a step is missing, 3D did not start, the app was not in landscape, there were not six players or thirteen pads, the safe areas were not read, too few weapons fired, the sound (effects, announcer, music) did not load, or the page reported errors.
+2. `ci/selftest.sh` runs the world test in the iPhone simulator: loading, your craft on autopilot against the five rival drivers, the five ability pads handed to you and every ability used, the frame rate over 15 s, the close chase view, the phone turned upright (the game must carry on in its upright layout; the frame rate over 8 s) and sideways again; then closes and reopens the app. A screenshot at every step. `ci/check_report.py` fails the run if a step is missing, 3D did not start, the app did not start sideways, there were not six players or six pads (five abilities and the repair pad), the safe areas were not read (sideways and upright), your craft used fewer than four kinds of ability, the app did not turn upright or the game paused or stood still there, it did not turn back, the sound (effects, announcer, music) did not load, or the page reported errors.
 3. `ci/publish.sh` saves the `.ipa`, screenshots, test report and logs to the branch `ios-world-build` (rewritten on each build; `ios-build` keeps the v20 app).
 
 When GitHub has no Apple silicon Mac free, a run fails after 15 minutes ("not acquired by Runner"); start it again by hand on an Intel Mac: Actions > iPhone world app > Run workflow > `macos-26-intel`.
@@ -36,6 +36,6 @@ Then commit and push to `ios-world`: GitHub builds and tests the new app.
 ## Files
 
 - `TerritoryControl/`: the app (Swift). `GameViewController.swift` shows the page; `BundleSchemeHandler.swift` serves the files; `SelfTest.swift` (simulator test only, rewritten for the world test); `Info.plist`.
-- `www/`: the world test as the app serves it (World Test 12, world-test branch `release/world-12`: `index.html`, `terrain/`, `tex/` the baked ground textures, `snd/` the music, effects and announcer as base64 MP3 inside JSON).
+- `www/`: the world test as the app serves it (World Test 13, world-test branch `release/world-13`: `index.html`, `terrain/`, `tex/` the baked ground textures, `snd/` the music, effects and announcer as base64 MP3 inside JSON).
 - Sound: `AppDelegate` sets the audio session to "playback" mixed with other apps, so the game is heard even with the side switch on silent; the page starts its sound on the first touch.
 - `ci/`: build, simulator test, report check, saving the build. `tools/`: `sync_world.sh`, `make_icon.py`.

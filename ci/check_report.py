@@ -5,7 +5,7 @@ import os
 import pathlib
 import sys
 
-STEPS = ["01-boot", "02-drive", "03-abilities", "04-later", "05-chase", "06-portrait-refused", "99-done"]
+STEPS = ["01-boot", "02-drive", "03-abilities", "04-later", "05-chase", "06-upright", "07-sideways-again", "99-done"]
 
 
 def main(folder: str) -> int:
@@ -41,18 +41,40 @@ def main(folder: str) -> int:
     if not (max(safe.get("l", 0), safe.get("r", 0)) >= 40 and safe.get("b", 0) >= 15):
         problems.append(f"landscape page read the safe areas as {safe} (island and home bar not cleared)")
     ab = steps.get("03-abilities", {}).get("page") or {}
-    # World Test 12: thirteen pads on the ground (missiles and mines); the self-test hands them all to your craft
-    if (ab.get("pads") or 0) != 13:
-        problems.append(f"expected 13 pads, found {ab.get('pads')}")
-    if not (ab.get("abilities") or 0) >= 3:
-        problems.append(f"too few weapons fired ({ab.get('abilities')})")
+    # World Test 13: five ability pads and the repair pad; the self-test hands the five to your craft and uses
+    # every ability (a missile, three mines, the shield, a strike, an EMP, a boost: eight events when all fire)
+    if (ab.get("pads") or 0) != 6:
+        problems.append(f"expected 6 pads, found {ab.get('pads')}")
+    # (your craft may be destroyed between the hand-over and the screenshot, so the pads it holds then are not
+    # checked; what counts is which abilities it used: at least four of the six kinds, the boost included)
+    kinds = ab.get("myAbilityKinds") or []
+    if len(kinds) < 4:
+        problems.append(f"your craft used too few kinds of ability ({kinds})")
     # the sound: effects, announcer and music decoded by the end of the run
-    snd = ((steps.get("99-done") or steps.get("06-portrait-refused") or {}).get("page") or {}).get("sound") or {}
+    snd = ((steps.get("99-done") or steps.get("07-sideways-again") or {}).get("page") or {}).get("sound") or {}
     if not (snd.get("sfx") and snd.get("voice") and snd.get("music")):
         problems.append(f"the sound did not load ({snd})")
-    upright = steps.get("06-portrait-refused", {}).get("page") or {}
-    if upright and not upright.get("width", 0) > upright.get("height", 0):
-        problems.append("the app turned to portrait (it should stay landscape)")
+    # World Test 13 plays upright too: turned upright the page must be taller than wide, in its upright layout,
+    # still running (not paused, the match clock moving on), with the island at the top and the home bar cleared
+    upright = steps.get("06-upright", {}).get("page") or {}
+    chase = steps.get("05-chase", {}).get("page") or {}
+    if upright:
+        if not upright.get("height", 0) > upright.get("width", 0):
+            problems.append("the app did not turn upright")
+        elif not upright.get("upright"):
+            problems.append("the page is upright but not in its upright layout")
+        if upright.get("paused"):
+            problems.append("the game paused when the phone was turned upright")
+        if chase and not (upright.get("gameTime") or 0) > (chase.get("gameTime") or 0):
+            problems.append("the match clock stood still while upright")
+        usafe = upright.get("envSafeArea") or {}
+        if upright.get("height", 0) > upright.get("width", 0) and not (usafe.get("t", 0) >= 40 and usafe.get("b", 0) >= 15):
+            problems.append(f"upright page read the safe areas as {usafe} (island and home bar not cleared)")
+    again = steps.get("07-sideways-again", {}).get("page") or {}
+    if again and not again.get("width", 0) > again.get("height", 0):
+        problems.append("the app did not turn sideways again")
+    if again and again.get("upright"):
+        problems.append("sideways again, the page kept its upright layout")
     if report.get("pageErrors"):
         problems.append(f"{len(report['pageErrors'])} page error(s)")
 
@@ -68,9 +90,9 @@ def main(folder: str) -> int:
         p = s.get("page") or {}
         print(f"  {s['step']:26s} t={s.get('seconds')}s {p.get('width')}x{p.get('height')} q={p.get('quality')} "
               f"res={p.get('scale')} hz={p.get('refreshHz')} cpu={p.get('cpuMs')}ms calls={p.get('drawCalls')} tris={p.get('triangles')} "
-              f"view={p.get('camera')} pads={p.get('padsMine')}/{p.get('pads')} abilities={p.get('abilities')} land={p.get('land')} sound={p.get('sound')} | {p.get('fpsText')} "
+              f"view={p.get('camera')} upright={p.get('upright')} pads={p.get('padsMine')}/{p.get('pads')} abilities={p.get('abilities')} mine={','.join(p.get('myAbilityKinds') or [])} health={p.get('health')} land={p.get('land')} sound={p.get('sound')} | {p.get('fpsText')} "
               + " ".join(f"{k}={v}" for k, v in s.items() if k not in ("step", "seconds", "page")))
-    last = (steps.get("99-done") or steps.get("06-portrait-refused") or {}).get("page") or {}
+    last = (steps.get("99-done") or steps.get("07-sideways-again") or {}).get("page") or {}
     if last.get("programs") is not None:
         print("GPU programs built (while loading / while playing):", last.get("programs"))
     if last.get("timings"):
@@ -107,8 +129,9 @@ def main(folder: str) -> int:
 
     # the same verdict as a note on the run page, readable from the API when the logs are not
     fps = (steps.get("04-later") or {}).get("framesPerSecondOver15s")
+    ufps = (steps.get("06-upright") or {}).get("framesPerSecondOver8s")
     progs = last.get("programs")
-    summary = (f"loaded after {boot.get('bootSeconds')} s; landscape {fps} fps (simulator); programs {progs}; "
+    summary = (f"loaded after {boot.get('bootSeconds')} s; sideways {fps} fps, upright {ufps} fps (simulator); programs {progs}; "
                f"page errors {len(report.get('pageErrors') or [])}; console errors {len(report.get('consoleErrors') or [])}")
     if problems:
         print("FAIL:", "; ".join(problems))

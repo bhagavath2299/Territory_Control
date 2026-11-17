@@ -5,9 +5,10 @@ import WebKit
 /// Simulator self-test. It is compiled only into the CI test build (Swift flag SELFTEST); the app you install
 /// contains none of it.
 ///
-/// Launched with `-selftest`, it plays the world test the way a tester would (the app runs in landscape only):
-/// loading, the craft on autopilot against the five rivals, both weapons fired (missiles and mines), the frame
-/// rate over 15 s, the close chase view, and a request to turn to portrait (which the app must refuse).
+/// Launched with `-selftest`, it plays the world test the way a tester would (the app starts sideways):
+/// loading, the craft on autopilot against the five rivals, every ability used (missile, mines, shield, strike,
+/// EMP, boost), the frame rate over 15 s, the close chase view, then the phone turned upright (the game must
+/// carry on in its upright layout; the frame rate over 8 s) and sideways again.
 /// At each step it writes Documents/selftest/state.txt and waits until the CI script has taken a screenshot
 /// and written the step number to ack.txt. Page errors, timings and frame counts go to report.json.
 ///
@@ -126,8 +127,12 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
         camera: g(function () { return T.state.camMode; }), burns: g(function () { return T.territory.zones.length; }),
         players: g(function () { return T.game.players.length; }),
         abilities: g(function () { return T.events.filter(function (e) { return ['launch', 'mines', 'shield', 'blink', 'strikeCall', 'emp', 'boost'].indexOf(e.type) >= 0; }).length; }),
+        myAbilityKinds: g(function () { var k = {}; T.events.forEach(function (e) { if (e.p === T.me.id && ['launch', 'mines', 'shield', 'strikeCall', 'emp', 'boost'].indexOf(e.type) >= 0) k[e.type] = 1; }); return Object.keys(k).sort(); }),
         land: g(function () { return T.game.players.map(function (p) { return Math.round(T.territory.share(p) * 1000) / 10; }); }),
         pads: g(function () { return T.structures.list.length; }),
+        upright: document.body.classList.contains('upright'), paused: g(function () { return !!T.state.paused; }),
+        gameTime: g(function () { return Math.round(T.game.time * 10) / 10; }),
+        health: g(function () { return Math.round(T.me.hp); }),
         padsMine: g(function () { return T.structures.list.filter(function (s) { return s.owner === T.me.id; }).length; }),
         sound: g(function () { var A = T.S12 && T.S12.audio; if (!A) return null; return { state: A.ctx && A.ctx.state, sfx: A.ready.sfx, voice: A.ready.voice, music: A.ready.music, track: A.cur && A.cur.name, starts: Object.keys(A.tracks).map(function (k) { return k + ':' + Math.round(A.tracks[k].off * A.ctx.sampleRate); }).join(' ') }; }),
         frames: window.__stFrames, fpsText: String((document.getElementById('fps') || {}).textContent || '').slice(0, 200),
@@ -285,6 +290,9 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
         // what became of WebKit's 60 frames-a-second hold (see GameViewController.allowFullFrameRate), and the screen's top rate
         environment["frameRateSwitch"] = GameViewController.frameRateNote
         environment["screenMaxFPS"] = controller?.view.window?.windowScene?.screen.maximumFramesPerSecond
+        // The app follows the phone now, and the simulator holds its phone upright: turn sideways for the first
+        // steps (the upright layout has its own steps further down)
+        await rotate(.landscapeRight)
         // Frame-rate read-out on (it shows in the screenshots)
         await js("(function(){var b=document.getElementById('bFps');if(b&&!window.__tc.state.fpsOn)b.click();return 1})()")
         await mark("01-boot", ["bootReady": bootReady, "bootSeconds": round1(bootSeconds)])
@@ -294,11 +302,13 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
         await sleep(12)
         await mark("02-drive")
 
-        // every ability: hand your car every structure, then fire them all (the strike burns the ground ahead);
-        // if your car is a wreck just then, wait until it is back (a slow simulator can take a while)
-        await js("(function(){var T=window.__tc,G=T.game,tr=T.territory;var go=function(){if(T.me.dead){setTimeout(go,300);return;}G.structures.list.forEach(function(s){tr.setOwner(tr.idx(s.x,s.z),T.me.id)});setTimeout(function(){if(T.me.dead){go();return;}['missile','mines','shield','strike','emp','boost'].forEach(function(k){T.me.want[k]=1});T.me.want.strikeAt=null;setTimeout(function(){T.me.want.blink=1},800);},600);};go();return 1})()")
+        // every ability: hand your craft all five ability pads (for this step the limit of two pads a craft is
+        // lifted), then use them all (the strike burns the ground ahead); if your craft is a wreck just then,
+        // wait until it is back (a slow simulator can take a while)
+        await js("(function(){var T=window.__tc,G=T.game,tr=T.territory,R=T.S13.RULES;window.__stMax=R.maxPads;R.maxPads=9;var go=function(){if(T.me.dead){setTimeout(go,300);return;}G.structures.list.forEach(function(s){if(s.kind.neutral)return;tr.setOwner(tr.idx(s.x,s.z),T.me.id);s.owner=T.me.id;s.capBy=0;s.capT=0;});G.structures.built=false;setTimeout(function(){if(T.me.dead){go();return;}T.me.jamT=0;['missile','mines','shield','strike','emp','boost'].forEach(function(k){T.me.want[k]=1});T.me.want.strikeAt=null;},600);};go();return 1})()")
         await sleep(10)
         await mark("03-abilities")
+        await js("(function(){window.__tc.S13.RULES.maxPads=window.__stMax||2;return 1})()")
 
         let f0 = await jsNumber("window.__stFrames") ?? 0
         await sleep(15)
@@ -312,11 +322,18 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
         let c1 = await jsNumber("window.__stFrames") ?? 0
         await mark("05-chase", ["framesPerSecondOver8s": round1((c1 - c0) / 8)])
 
-        // asked to turn upright, the app must stay sideways
+        // turned upright, the game carries on in its upright layout (World Test 13)
         await js("(function(){window.__tc.setCam('game');return 1})()")
         await rotate(.portrait)
+        let u0 = await jsNumber("window.__stFrames") ?? 0
+        await sleep(8)
+        let u1 = await jsNumber("window.__stFrames") ?? 0
+        await mark("06-upright", ["framesPerSecondOver8s": round1((u1 - u0) / 8)])
+
+        // and sideways again
+        await rotate(.landscapeRight)
         await sleep(4)
-        await mark("06-portrait-refused")
+        await mark("07-sideways-again")
 
         writeReport(finished: true)
         await mark("99-done")
