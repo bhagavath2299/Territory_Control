@@ -8,7 +8,8 @@ import WebKit
 /// Launched with `-selftest`, it plays the world test the way a tester would (the app starts sideways):
 /// loading, the craft on autopilot against the five rivals, every ability used (missile, mines, shield, strike,
 /// EMP, boost), the frame rate over 15 s, the close chase view, then the phone turned upright (the game must
-/// carry on in its upright layout; the frame rate over 8 s) and sideways again.
+/// carry on in its upright layout; the frame rate over 8 s) and sideways again. World Test 14: each step also
+/// records the game's own frame times (median, 99th percentile), the screen's rate and the frame-rate setting.
 /// At each step it writes Documents/selftest/state.txt and waits until the CI script has taken a screenshot
 /// and written the step number to ack.txt. Page errors, timings and frame counts go to report.json.
 ///
@@ -122,7 +123,10 @@ final class SelfTest: NSObject, WKScriptMessageHandler {
           return r;
         }),
         quality: g(function () { return T.state.quality; }), scale: g(function () { return T.stats().pr; }),
-        refreshHz: g(function () { return T.pace.hz; }), cpuMs: g(function () { return Math.round(T.pace.cpu * 100) / 100; }),
+        refreshHz: g(function () { return (T.perf || T.pace).hz; }), cpuMs: g(function () { return Math.round((T.perf || T.pace).cpu * 100) / 100; }),
+        // World Test 14: the frame times (median and 99th percentile of the time between drawn frames, ms), the screen's
+        // rate, whether the game holds a steady 60, the frame-rate setting
+        frameStats: g(function () { var s = T.S14.stats(); return { medianMs: Math.round(s.median * 10) / 10, p99Ms: Math.round(s.p99 * 10) / 10, frames: s.frames, screenHz: s.screenHz, held60: s.lock60, mode: s.mode }; }),
         drawCalls: g(function () { return T.stats().calls; }), triangles: g(function () { return T.stats().tris; }),
         camera: g(function () { return T.state.camMode; }), burns: g(function () { return T.territory.zones.length; }),
         players: g(function () { return T.game.players.length; }),

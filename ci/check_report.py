@@ -90,11 +90,14 @@ def main(folder: str) -> int:
         p = s.get("page") or {}
         print(f"  {s['step']:26s} t={s.get('seconds')}s {p.get('width')}x{p.get('height')} q={p.get('quality')} "
               f"res={p.get('scale')} hz={p.get('refreshHz')} cpu={p.get('cpuMs')}ms calls={p.get('drawCalls')} tris={p.get('triangles')} "
-              f"view={p.get('camera')} upright={p.get('upright')} pads={p.get('padsMine')}/{p.get('pads')} abilities={p.get('abilities')} mine={','.join(p.get('myAbilityKinds') or [])} health={p.get('health')} land={p.get('land')} sound={p.get('sound')} | {p.get('fpsText')} "
+              f"view={p.get('camera')} upright={p.get('upright')} pads={p.get('padsMine')}/{p.get('pads')} abilities={p.get('abilities')} mine={','.join(p.get('myAbilityKinds') or [])} health={p.get('health')} land={p.get('land')} sound={p.get('sound')} frames={p.get('frameStats')} | {p.get('fpsText')} "
               + " ".join(f"{k}={v}" for k, v in s.items() if k not in ("step", "seconds", "page")))
     last = (steps.get("99-done") or steps.get("07-sideways-again") or {}).get("page") or {}
     if last.get("programs") is not None:
         print("GPU programs built (while loading / while playing):", last.get("programs"))
+        # World Test 14 builds every shader while loading: one built during play is a stall on a phone (reported, not failed)
+        if (last.get("programs") or {}).get("play"):
+            print(f"note: {last['programs']['play']} GPU program(s) were built during play")
     if last.get("timings"):
         print("time spent in the game's heavy functions (calls, total ms, longest ms):")
         for name, t in sorted(last["timings"].items(), key=lambda kv: -kv[1].get("max", 0)):
@@ -131,7 +134,9 @@ def main(folder: str) -> int:
     fps = (steps.get("04-later") or {}).get("framesPerSecondOver15s")
     ufps = (steps.get("06-upright") or {}).get("framesPerSecondOver8s")
     progs = last.get("programs")
-    summary = (f"loaded after {boot.get('bootSeconds')} s; sideways {fps} fps, upright {ufps} fps (simulator); programs {progs}; "
+    fst = ((steps.get("04-later") or {}).get("page") or {}).get("frameStats") or {}
+    summary = (f"loaded after {boot.get('bootSeconds')} s; sideways {fps} fps, upright {ufps} fps (simulator); "
+               f"frame times median {fst.get('medianMs')} ms, 99th percentile {fst.get('p99Ms')} ms, screen {fst.get('screenHz')} Hz; programs {progs}; "
                f"page errors {len(report.get('pageErrors') or [])}; console errors {len(report.get('consoleErrors') or [])}")
     if problems:
         print("FAIL:", "; ".join(problems))

@@ -102,12 +102,18 @@ final class GameViewController: UIViewController {
     """#
 
     /// On iPhones with a 120 Hz screen (ProMotion), WebKit holds web pages to about 60 frames a second: its feature
-    /// "PreferPageRenderingUpdatesNear60FPSEnabled" is on. The feature list and its switch are not public API, so they are
-    /// looked up at run time and used only when WebKit has them; otherwise nothing happens and the game runs at 60.
+    /// "PreferPageRenderingUpdatesNear60FPSEnabled" is on. And in Low Power Mode it holds them to 30 ("Rendering
+    /// update throttling"). The game wants 60 at the least and the screen's own rate when it can (World Test 14), so
+    /// both are switched off. The feature list and its switch are not public API, so they are looked up at run time
+    /// and used only when WebKit has them; otherwise nothing happens (the game then runs at whatever WebKit allows).
     /// Info.plist also sets CADisableMinimumFrameDurationOnPhone, which lets the app's screen run above 60 Hz at all.
-    /// Whether a given iOS honours the switch shows in the game's frame-rate read-out (Settings > Show frame rate).
-    /// Note for an App Store release: this private switch would have to go (or be replaced by public API, if one appears).
+    /// What happened to each shows in the self-test report; the game's frame-rate read-out shows the screen's rate.
+    /// Note for an App Store release: these private switches would have to go (or be replaced by public API, if one appears).
     private(set) static var frameRateNote = "not tried"
+    private static let frameRateFeatures: [(key: String, label: String)] = [
+        ("PreferPageRenderingUpdatesNear60FPSEnabled", "60 fps hold"),
+        ("RenderingUpdateThrottlingEnabled", "Low Power Mode 30 fps hold"),
+    ]
     static func allowFullFrameRate(_ preferences: WKPreferences) {
         let list = NSSelectorFromString("_features"), set = NSSelectorFromString("_setEnabled:forFeature:"), key = NSSelectorFromString("key")
         let cls: AnyObject = WKPreferences.self
@@ -116,15 +122,18 @@ final class GameViewController: UIViewController {
             frameRateNote = "WebKit has no feature list"
             return
         }
-        for feature in features where feature.responds(to: key) {
-            guard (feature.perform(key)?.takeUnretainedValue() as? String) == "PreferPageRenderingUpdatesNear60FPSEnabled" else { continue }
+        var notes: [String] = []
+        for wanted in frameRateFeatures {
+            guard let feature = features.first(where: { $0.responds(to: key) && ($0.perform(key)?.takeUnretainedValue() as? String) == wanted.key }) else {
+                notes.append("\(wanted.label): not in this WebKit")
+                continue
+            }
             typealias SetEnabled = @convention(c) (AnyObject, Selector, Bool, AnyObject) -> Void
             let setEnabled = unsafeBitCast(preferences.method(for: set), to: SetEnabled.self)
             setEnabled(preferences, set, false, feature)
-            frameRateNote = "60 fps hold switched off (\(isEnabled(preferences, feature).map { $0 ? "still on" : "now off" } ?? "state unknown"))"
-            return
+            notes.append("\(wanted.label) switched off (\(isEnabled(preferences, feature).map { $0 ? "still on" : "now off" } ?? "state unknown"))")
         }
-        frameRateNote = "WebKit has no 60 fps hold feature"
+        frameRateNote = notes.joined(separator: "; ")
     }
     private static func isEnabled(_ preferences: WKPreferences, _ feature: NSObject) -> Bool? {
         let get = NSSelectorFromString("_isEnabledForFeature:")
