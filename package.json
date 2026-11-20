@@ -1,0 +1,15 @@
+{
+  "name": "territory-control-world-online",
+  "version": "15.0.0",
+  "private": true,
+  "description": "Territory Control World Test 15: the online server (matchmaking, relay, records) and the game page.",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "optionalDependencies": {
+    "pg": "^8.11.0"
+  },
+  "engines": {
+    "node": "22.x"
+  }
+}
