@@ -1,0 +1,50 @@
+[5s] simulator: com.apple.CoreSimulator.SimDeviceType.iPhone-17 on com.apple.CoreSimulator.SimRuntime.iOS-26-5
+[349s] booted
+[403s] installed; letting the new simulator settle
+[506s] launched (pid 16861)
+[511s] app data: /Users/runner/Library/Developer/CoreSimulator/Devices/E12C0C99-92C6-4B5F-8F08-FDA79D81FBA7/data/Containers/Data/Application/BF79D918-587E-4723-BAD8-A0E6DC7B28CE
+[541s] step 1 01-boot
+[546s] screenshot 01-boot took 4s
+[561s] step 2 02-drive
+[568s] screenshot 02-drive took 6s
+[581s] step 3 03-abilities
+[584s] screenshot 03-abilities took 1s
+[602s] step 4 04-later
+[604s] screenshot 04-later took 1s
+[615s] step 5 05-chase
+[625s] screenshot 05-chase took 9s
+[639s] step 6 06-upright
+[644s] screenshot 06-upright took 4s
+[654s] step 7 07-sideways-again
+[662s] screenshot 07-sideways-again took 7s
+[664s] step 8 99-done
+[666s] screenshot 99-done took 1s
+[675s] app (pid 16861) ended
+[685s] relaunched: com.bhagavath2299.territoryworld: 21615
+[705s] screenshot 10-relaunch took 9s
+[717s] done
+system: iOS 26.5 874x402 @3.0x
+page: app://localhost/index.html | secure: True | storage: ok | haptics bridge: True | service worker API: False
+webgl: Apple GPU | game version: Territory Control World Test 14 | web build: None | cores: 4 | starting tier: None
+frame rate: screen max 60 fps | WebKit 60 fps hold: 60 fps hold switched off (now off); Low Power Mode 30 fps hold: not in this WebKit
+boot ready after 27.2 s
+  01-boot                    t=32.3s 874x402 q=low res=0.7 hz=60 cpu=4.91ms calls=27 tris=60098 view=game upright=False pads=0/6 abilities=0 mine= health=100 land=[0.4, 0.4, 0.4, 0.4, 0.4, 0.4] sound={'music': True, 'sfx': True, 'starts': 'main:627 rush:627 win:0 lose:0 results:627', 'state': 'running', 'track': 'main', 'voice': True} frames={'frames': 61, 'held60': False, 'medianMs': 33, 'mode': 'auto', 'p99Ms': 112, 'screenHz': 0} |  bootReady=True bootSeconds=27.2
+  02-drive                   t=51.9s 874x402 q=low res=0.7 hz=60 cpu=4.23ms calls=47 tris=79024 view=game upright=False pads=1/6 abilities=13 mine=boost,launch health=100 land=[3.4, 3.5, 2.7, 3.4, 2.5, 2.6] sound={'music': True, 'sfx': True, 'starts': 'main:627 rush:627 win:0 lose:0 results:627', 'state': 'running', 'track': 'main', 'voice': True} frames={'frames': 336, 'held60': False, 'medianMs': 34, 'mode': 'auto', 'p99Ms': 207, 'screenHz': 60} | 25 fps · target 60 · screen 60 Hz · 1% low 5 · 299 dropped of 335 · 4.1 ms cpu · 0.70x · 47 draws · fx 0 
+  03-abilities               t=72.2s 874x402 q=low res=0.7 hz=60 cpu=4.54ms calls=59 tris=51855 view=game upright=False pads=1/6 abilities=29 mine=boost,emp,launch,mines,shield,strikeCall health=100 land=[5.5, 4.6, 0, 17.1, 0.4, 0] sound={'music': True, 'sfx': True, 'starts': 'main:627 rush:627 win:0 lose:0 results:627', 'state': 'running', 'track': 'main', 'voice': True} frames={'frames': 552, 'held60': False, 'medianMs': 34, 'mode': 'auto', 'p99Ms': 139, 'screenHz': 60} | 29 fps · target 60 · screen 60 Hz · 1% low 7 · 489 dropped of 538 · 5.5 ms cpu · 0.70x · 52 draws · fx 0 
+  04-later                   t=92.9s 874x402 q=low res=0.7 hz=60 cpu=6.71ms calls=58 tris=78093 view=game upright=False pads=2/6 abilities=44 mine=boost,emp,launch,mines,shield,strikeCall health=100 land=[10.4, 2.1, 5.4, 21.7, 1.6, 2.7] sound={'music': True, 'sfx': True, 'starts': 'main:627 rush:627 win:0 lose:0 results:627', 'state': 'running', 'track': 'main', 'voice': True} frames={'frames': 600, 'held60': False, 'medianMs': 34, 'mode': 'auto', 'p99Ms': 114, 'screenHz': 60} | 22 fps · target 60 · screen 60 Hz · 1% low 9 · 556 dropped of 600 · 6.4 ms cpu · 0.70x · 63 draws · fx 0 framesPerSecondOver15s=26.3
+  05-chase                   t=106s 874x402 q=low res=0.7 hz=60 cpu=5.42ms calls=90 tris=252454 view=chase upright=False pads=2/6 abilities=47 mine=boost,emp,launch,mines,shield,strikeCall health=100 land=[10.3, 3.2, 7.6, 22.6, 3.1, 3.2] sound={'music': True, 'sfx': True, 'starts': 'main:627 rush:627 win:0 lose:0 results:627', 'state': 'running', 'track': 'main', 'voice': True} frames={'frames': 600, 'held60': False, 'medianMs': 34, 'mode': 'auto', 'p99Ms': 103, 'screenHz': 60} | 26 fps · target 60 · screen 60 Hz · 1% low 10 · 553 dropped of 600 · 5.4 ms cpu · 0.70x · 90 draws · fx 0 framesPerSecondOver8s=27.3
+  06-upright                 t=130.1s 402x874 q=low res=0.7 hz=60 cpu=4.41ms calls=37 tris=39440 view=game upright=True pads=2/6 abilities=55 mine=boost,emp,launch,mines,shield,strikeCall health=100 land=[8.2, 5, 10.8, 19.9, 10.5, 0.4] sound={'music': True, 'sfx': True, 'starts': 'main:627 rush:627 win:0 lose:0 results:627', 'state': 'running', 'track': 'main', 'voice': True} frames={'frames': 600, 'held60': False, 'medianMs': 33, 'mode': 'auto', 'p99Ms': 127, 'screenHz': 60} | 28 fps · target 60 · screen 60 Hz · 1% low 8 · 554 dropped of 600 · 3.8 ms cpu · 0.70x · 37 draws · fx 0 framesPerSecondOver8s=28.3
+  07-sideways-again          t=145.7s 874x402 q=low res=0.7 hz=60 cpu=3.89ms calls=45 tris=56678 view=game upright=False pads=0/6 abilities=65 mine=boost,emp,launch,mines,shield,strikeCall health=100 land=[0.4, 14.4, 11.5, 18, 11.5, 2.2] sound={'music': True, 'sfx': True, 'starts': 'main:627 rush:627 win:0 lose:0 results:627', 'state': 'running', 'track': 'main', 'voice': True} frames={'frames': 600, 'held60': False, 'medianMs': 33, 'mode': 'auto', 'p99Ms': 133, 'screenHz': 60} | 28 fps · target 60 · screen 60 Hz · 1% low 8 · 560 dropped of 600 · 4.0 ms cpu · 0.70x · 45 draws · fx 0 
+  99-done                    t=155.1s 874x402 q=low res=0.7 hz=60 cpu=11.16ms calls=54 tris=57236 view=game upright=False pads=0/6 abilities=65 mine=boost,emp,launch,mines,shield,strikeCall health=0 land=[0, 14.4, 0, 17.9, 23.4, 2.4] sound={'music': True, 'sfx': True, 'starts': 'main:627 rush:627 win:0 lose:0 results:627', 'state': 'running', 'track': 'main', 'voice': True} frames={'frames': 600, 'held60': False, 'medianMs': 33, 'mode': 'auto', 'p99Ms': 136, 'screenHz': 60} | 28 fps · target 60 · screen 60 Hz · 1% low 8 · 560 dropped of 600 · 4.0 ms cpu · 0.70x · 45 draws · fx 0 
+GPU programs built (while loading / while playing): {'loading': 96}
+  long frames by 01-boot: 3920 ms at 4.1s, 1110 ms at 5.2s, 5480 ms at 18.1s, 2437 ms at 20.5s
+  long frames by 02-drive: 2437 ms at 20.5s, 538 ms at 34.7s
+  long frames by 05-chase: 528 ms at 89.2s
+  long frames by 06-upright: 528 ms at 89.2s
+  long frames by 07-sideways-again: 528 ms at 89.2s
+  long frames by 99-done: 528 ms at 89.2s
+notes (1):
+    1.9s self-test started
+after relaunch: {'bootReady': True, 'href': 'app://localhost/index.html', 'pageErrors': [], 'title': 'Territory Control World Test 14'}
+PASS: the world test ran through in the simulator
+::notice title=Simulator test passed::loaded after 27.2 s; sideways 26.3 fps, upright 28.3 fps (simulator); frame times median 34 ms, 99th percentile 114 ms, screen 60 Hz; programs {'loading': 96}; page errors 0; console errors 0

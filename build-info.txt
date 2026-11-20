@@ -1,0 +1,115 @@
+Territory Control iPhone app, build 26
+commit: 6d53362874c0f804999ce8c5bed8dd06219d8ef4
+built: 2026-11-20 00:54 UTC with Xcode 26.6 Build version 17F113 
+on: GitHub's macos26 runner, ARM64 (26.7.2, 3 cores)
+
+Info.plist (device build):
+{
+  "BuildMachineOSBuild" => "25G332"
+  "CADisableMinimumFrameDurationOnPhone" => true
+  "CFBundleDevelopmentRegion" => "en"
+  "CFBundleDisplayName" => "TC World"
+  "CFBundleExecutable" => "TerritoryControl"
+  "CFBundleIcons" => {
+    "CFBundlePrimaryIcon" => {
+      "CFBundleIconFiles" => [
+        0 => "AppIcon60x60"
+      ]
+      "CFBundleIconName" => "AppIcon"
+    }
+  }
+  "CFBundleIcons~ipad" => {
+    "CFBundlePrimaryIcon" => {
+      "CFBundleIconFiles" => [
+        0 => "AppIcon60x60"
+        1 => "AppIcon76x76"
+      ]
+    }
+  }
+  "CFBundleIdentifier" => "com.bhagavath2299.territoryworld"
+  "CFBundleInfoDictionaryVersion" => "6.0"
+  "CFBundleName" => "TerritoryControl"
+  "CFBundlePackageType" => "APPL"
+  "CFBundleShortVersionString" => "1.0"
+  "CFBundleSupportedPlatforms" => [
+    0 => "iPhoneOS"
+  ]
+  "CFBundleVersion" => "26"
+  "DTCompiler" => "com.apple.compilers.llvm.clang.1_0"
+  "DTPlatformBuild" => "23F81a"
+  "DTPlatformName" => "iphoneos"
+  "DTPlatformVersion" => "26.5"
+  "DTSDKBuild" => "23F81a"
+  "DTSDKName" => "iphoneos26.5"
+  "DTXcode" => "2660"
+  "DTXcodeBuild" => "17F113"
+  "GCSupportsGameMode" => true
+  "ITSAppUsesNonExemptEncryption" => false
+  "LSApplicationCategoryType" => "public.app-category.action-games"
+  "LSRequiresIPhoneOS" => true
+  "MinimumOSVersion" => "16.0"
+  "UIApplicationSceneManifest" => {
+    "UIApplicationSupportsMultipleScenes" => false
+    "UISceneConfigurations" => {
+      "UIWindowSceneSessionRoleApplication" => [
+        0 => {
+          "UISceneConfigurationName" => "Default"
+          "UISceneDelegateClassName" => "TerritoryControl.SceneDelegate"
+        }
+      ]
+    }
+  }
+  "UIDeviceFamily" => [
+    0 => 1
+  ]
+  "UILaunchScreen" => {
+    "UIColorName" => "LaunchBackground"
+  }
+  "UIRequiredDeviceCapabilities" => [
+    0 => "arm64"
+  ]
+  "UIRequiresFullScreen" => true
+  "UIStatusBarHidden" => true
+  "UISupportedInterfaceOrientations" => [
+    0 => "UIInterfaceOrientationPortrait"
+    1 => "UIInterfaceOrientationLandscapeRight"
+    2 => "UIInterfaceOrientationLandscapeLeft"
+  ]
+  "UIViewControllerBasedStatusBarAppearance" => true
+}
+
+binary: Non-fat file: build/device/Build/Products/Release-iphoneos/TerritoryControl.app/TerritoryControl is architecture: arm64
+minimum iOS: 16.0
+
+app contents:
+     13754  ./AppIcon60x60@2x.png
+     18657  ./AppIcon76x76@2x~ipad.png
+    245720  ./Assets.car
+      1793  ./Info.plist
+         8  ./PkgInfo
+    195712  ./TerritoryControl
+   1265675  ./www/index.html
+   2440758  ./www/snd/music.json
+    393066  ./www/snd/sfx.json
+    181504  ./www/snd/sfx13.json
+    657743  ./www/snd/voice.json
+    446472  ./www/snd/voice13.json
+   1141046  ./www/terrain/data.png
+    173320  ./www/terrain/far_color.png
+    701786  ./www/terrain/height_far.json
+   2801670  ./www/terrain/height_near.json
+    681491  ./www/terrain/splat.png
+       268  ./www/terrain/terrain.json
+    199494  ./www/terrain/tint.png
+    159519  ./www/tex/icons_a.png
+     79302  ./www/tex/icons_n.jpg
+     97231  ./www/tex/land_a.jpg
+    256421  ./www/tex/land_n.jpg
+    269366  ./www/tex/pad_a.png
+    200984  ./www/tex/pad_n.jpg
+    167612  ./www/tex/stone_a.jpg
+    252169  ./www/tex/stone_n.jpg
+    648051  ./www/tex/turf_a.jpg
+   1033467  ./www/tex/turf_n.jpg
+
+ipa: 10980670 bytes, sha256 b952dcf726bbfe30dab7d65743decba94239e3072f6b3eb6b8c3e5f391ccb0f2

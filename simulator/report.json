@@ -1,0 +1,966 @@
+{
+  "consoleErrors" : [
+
+  ],
+  "consoleWarnings" : [
+
+  ],
+  "environment" : {
+    "cores" : 4,
+    "frameRateSwitch" : "60 fps hold switched off (now off); Low Power Mode 30 fps hold: not in this WebKit",
+    "gameVersion" : "Territory Control World Test 14",
+    "href" : "app:\/\/localhost\/index.html",
+    "localStorage" : "ok",
+    "screenMaxFPS" : 60,
+    "secureContext" : true,
+    "serviceWorkerApi" : false,
+    "startTier" : null,
+    "userAgent" : "Mozilla\/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit\/605.1.15 (KHTML, like Gecko) Mobile\/15E148",
+    "vibrateBridge" : true,
+    "wakeLockApi" : true,
+    "webgl2Renderer" : "Apple GPU",
+    "webSource" : null
+  },
+  "finished" : false,
+  "notes" : [
+    "1.9s self-test started"
+  ],
+  "pageErrors" : [
+
+  ],
+  "resourceErrors" : [
+
+  ],
+  "screen" : "874x402 @3.0x",
+  "steps" : [
+    {
+      "bootReady" : true,
+      "bootSeconds" : 27.199999999999999,
+      "page" : {
+        "abilities" : 0,
+        "burns" : 0,
+        "camera" : "game",
+        "cpuMs" : 4.9100000000000001,
+        "drawCalls" : 27,
+        "envSafeArea" : {
+          "b" : 20,
+          "l" : 62,
+          "r" : 62,
+          "t" : 0
+        },
+        "fpsText" : "",
+        "frameGaps" : [
+          [
+            4085,
+            3920
+          ],
+          [
+            5195,
+            1110
+          ],
+          [
+            18055,
+            5480
+          ],
+          [
+            20492,
+            2437
+          ],
+          [
+            20747,
+            255
+          ]
+        ],
+        "frames" : 288,
+        "frameStats" : {
+          "frames" : 61,
+          "held60" : false,
+          "medianMs" : 33,
+          "mode" : "auto",
+          "p99Ms" : 112,
+          "screenHz" : 0
+        },
+        "gameTime" : 2.7000000000000002,
+        "health" : 100,
+        "height" : 402,
+        "land" : [
+          0.40000000000000002,
+          0.40000000000000002,
+          0.40000000000000002,
+          0.40000000000000002,
+          0.40000000000000002,
+          0.40000000000000002
+        ],
+        "myAbilityKinds" : [
+
+        ],
+        "pads" : 6,
+        "padsMine" : 0,
+        "paused" : false,
+        "pixelRatio" : 3,
+        "players" : 6,
+        "programs" : {
+          "loading" : 96
+        },
+        "quality" : "low",
+        "ready" : true,
+        "refreshHz" : 60,
+        "scale" : 0.69999999999999996,
+        "sound" : {
+          "music" : true,
+          "sfx" : true,
+          "starts" : "main:627 rush:627 win:0 lose:0 results:627",
+          "state" : "running",
+          "track" : "main",
+          "voice" : true
+        },
+        "triangles" : 60098,
+        "upright" : false,
+        "webgl" : true,
+        "width" : 874
+      },
+      "seconds" : 32.299999999999997,
+      "step" : "01-boot"
+    },
+    {
+      "page" : {
+        "abilities" : 13,
+        "burns" : 1,
+        "camera" : "game",
+        "cpuMs" : 4.2300000000000004,
+        "drawCalls" : 47,
+        "envSafeArea" : {
+          "b" : 20,
+          "l" : 62,
+          "r" : 62,
+          "t" : 0
+        },
+        "fpsText" : "25 fps · target 60 · screen 60 Hz · 1% low 5 · 299 dropped of 335 · 4.1 ms cpu · 0.70x · 47 draws · fx 0",
+        "frameGaps" : [
+          [
+            20492,
+            2437
+          ],
+          [
+            20747,
+            255
+          ],
+          [
+            30244,
+            236
+          ],
+          [
+            32854,
+            129
+          ],
+          [
+            34201,
+            207
+          ],
+          [
+            34739,
+            538
+          ],
+          [
+            35011,
+            272
+          ],
+          [
+            35722,
+            249
+          ],
+          [
+            41097,
+            138
+          ],
+          [
+            41456,
+            231
+          ],
+          [
+            41900,
+            401
+          ],
+          [
+            42785,
+            133
+          ]
+        ],
+        "frames" : 567,
+        "frameStats" : {
+          "frames" : 336,
+          "held60" : false,
+          "medianMs" : 34,
+          "mode" : "auto",
+          "p99Ms" : 207,
+          "screenHz" : 60
+        },
+        "gameTime" : 14.199999999999999,
+        "health" : 100,
+        "height" : 402,
+        "land" : [
+          3.3999999999999999,
+          3.5,
+          2.7000000000000002,
+          3.3999999999999999,
+          2.5,
+          2.6000000000000001
+        ],
+        "myAbilityKinds" : [
+          "boost",
+          "launch"
+        ],
+        "pads" : 6,
+        "padsMine" : 1,
+        "paused" : false,
+        "pixelRatio" : 3,
+        "players" : 6,
+        "programs" : {
+          "loading" : 96
+        },
+        "quality" : "low",
+        "ready" : true,
+        "refreshHz" : 60,
+        "scale" : 0.69999999999999996,
+        "sound" : {
+          "music" : true,
+          "sfx" : true,
+          "starts" : "main:627 rush:627 win:0 lose:0 results:627",
+          "state" : "running",
+          "track" : "main",
+          "voice" : true
+        },
+        "triangles" : 79024,
+        "upright" : false,
+        "webgl" : true,
+        "width" : 874
+      },
+      "seconds" : 51.899999999999999,
+      "step" : "02-drive"
+    },
+    {
+      "page" : {
+        "abilities" : 29,
+        "burns" : 2,
+        "camera" : "game",
+        "cpuMs" : 4.54,
+        "drawCalls" : 59,
+        "envSafeArea" : {
+          "b" : 20,
+          "l" : 62,
+          "r" : 62,
+          "t" : 0
+        },
+        "fpsText" : "29 fps · target 60 · screen 60 Hz · 1% low 7 · 489 dropped of 538 · 5.5 ms cpu · 0.70x · 52 draws · fx 0",
+        "frameGaps" : [
+          [
+            41097,
+            138
+          ],
+          [
+            41456,
+            231
+          ],
+          [
+            41900,
+            401
+          ],
+          [
+            42785,
+            133
+          ],
+          [
+            53162,
+            349
+          ],
+          [
+            53412,
+            250
+          ],
+          [
+            53551,
+            139
+          ],
+          [
+            53962,
+            347
+          ],
+          [
+            54146,
+            184
+          ],
+          [
+            54276,
+            130
+          ],
+          [
+            55349,
+            138
+          ],
+          [
+            58412,
+            132
+          ]
+        ],
+        "frames" : 787,
+        "frameStats" : {
+          "frames" : 552,
+          "held60" : false,
+          "medianMs" : 34,
+          "mode" : "auto",
+          "p99Ms" : 139,
+          "screenHz" : 60
+        },
+        "gameTime" : 23.600000000000001,
+        "health" : 100,
+        "height" : 402,
+        "land" : [
+          5.5,
+          4.5999999999999996,
+          0,
+          17.100000000000001,
+          0.40000000000000002,
+          0
+        ],
+        "myAbilityKinds" : [
+          "boost",
+          "emp",
+          "launch",
+          "mines",
+          "shield",
+          "strikeCall"
+        ],
+        "pads" : 6,
+        "padsMine" : 1,
+        "paused" : false,
+        "pixelRatio" : 3,
+        "players" : 6,
+        "programs" : {
+          "loading" : 96
+        },
+        "quality" : "low",
+        "ready" : true,
+        "refreshHz" : 60,
+        "scale" : 0.69999999999999996,
+        "sound" : {
+          "music" : true,
+          "sfx" : true,
+          "starts" : "main:627 rush:627 win:0 lose:0 results:627",
+          "state" : "running",
+          "track" : "main",
+          "voice" : true
+        },
+        "triangles" : 51855,
+        "upright" : false,
+        "webgl" : true,
+        "width" : 874
+      },
+      "seconds" : 72.200000000000003,
+      "step" : "03-abilities"
+    },
+    {
+      "framesPerSecondOver15s" : 26.300000000000001,
+      "page" : {
+        "abilities" : 44,
+        "burns" : 1,
+        "camera" : "game",
+        "cpuMs" : 6.71,
+        "drawCalls" : 58,
+        "envSafeArea" : {
+          "b" : 20,
+          "l" : 62,
+          "r" : 62,
+          "t" : 0
+        },
+        "fpsText" : "22 fps · target 60 · screen 60 Hz · 1% low 9 · 556 dropped of 600 · 6.4 ms cpu · 0.70x · 63 draws · fx 0",
+        "frameGaps" : [
+          [
+            41456,
+            231
+          ],
+          [
+            41900,
+            401
+          ],
+          [
+            42785,
+            133
+          ],
+          [
+            53162,
+            349
+          ],
+          [
+            53412,
+            250
+          ],
+          [
+            53551,
+            139
+          ],
+          [
+            53962,
+            347
+          ],
+          [
+            54146,
+            184
+          ],
+          [
+            54276,
+            130
+          ],
+          [
+            55349,
+            138
+          ],
+          [
+            58412,
+            132
+          ],
+          [
+            68576,
+            220
+          ]
+        ],
+        "frames" : 1183,
+        "frameStats" : {
+          "frames" : 600,
+          "held60" : false,
+          "medianMs" : 34,
+          "mode" : "auto",
+          "p99Ms" : 114,
+          "screenHz" : 60
+        },
+        "gameTime" : 38.600000000000001,
+        "health" : 100,
+        "height" : 402,
+        "land" : [
+          10.4,
+          2.1000000000000001,
+          5.4000000000000004,
+          21.699999999999999,
+          1.6000000000000001,
+          2.7000000000000002
+        ],
+        "myAbilityKinds" : [
+          "boost",
+          "emp",
+          "launch",
+          "mines",
+          "shield",
+          "strikeCall"
+        ],
+        "pads" : 6,
+        "padsMine" : 2,
+        "paused" : false,
+        "pixelRatio" : 3,
+        "players" : 6,
+        "programs" : {
+          "loading" : 96
+        },
+        "quality" : "low",
+        "ready" : true,
+        "refreshHz" : 60,
+        "scale" : 0.69999999999999996,
+        "sound" : {
+          "music" : true,
+          "sfx" : true,
+          "starts" : "main:627 rush:627 win:0 lose:0 results:627",
+          "state" : "running",
+          "track" : "main",
+          "voice" : true
+        },
+        "triangles" : 78093,
+        "upright" : false,
+        "webgl" : true,
+        "width" : 874
+      },
+      "seconds" : 92.900000000000006,
+      "step" : "04-later"
+    },
+    {
+      "framesPerSecondOver8s" : 27.300000000000001,
+      "page" : {
+        "abilities" : 47,
+        "burns" : 0,
+        "camera" : "chase",
+        "cpuMs" : 5.4199999999999999,
+        "drawCalls" : 90,
+        "envSafeArea" : {
+          "b" : 20,
+          "l" : 62,
+          "r" : 62,
+          "t" : 0
+        },
+        "fpsText" : "26 fps · target 60 · screen 60 Hz · 1% low 10 · 553 dropped of 600 · 5.4 ms cpu · 0.70x · 90 draws · fx 0",
+        "frameGaps" : [
+          [
+            42785,
+            133
+          ],
+          [
+            53162,
+            349
+          ],
+          [
+            53412,
+            250
+          ],
+          [
+            53551,
+            139
+          ],
+          [
+            53962,
+            347
+          ],
+          [
+            54146,
+            184
+          ],
+          [
+            54276,
+            130
+          ],
+          [
+            55349,
+            138
+          ],
+          [
+            58412,
+            132
+          ],
+          [
+            68576,
+            220
+          ],
+          [
+            88658,
+            130
+          ],
+          [
+            89186,
+            528
+          ]
+        ],
+        "frames" : 1403,
+        "frameStats" : {
+          "frames" : 600,
+          "held60" : false,
+          "medianMs" : 34,
+          "mode" : "auto",
+          "p99Ms" : 103,
+          "screenHz" : 60
+        },
+        "gameTime" : 46.600000000000001,
+        "health" : 100,
+        "height" : 402,
+        "land" : [
+          10.300000000000001,
+          3.2000000000000002,
+          7.5999999999999996,
+          22.600000000000001,
+          3.1000000000000001,
+          3.2000000000000002
+        ],
+        "myAbilityKinds" : [
+          "boost",
+          "emp",
+          "launch",
+          "mines",
+          "shield",
+          "strikeCall"
+        ],
+        "pads" : 6,
+        "padsMine" : 2,
+        "paused" : false,
+        "pixelRatio" : 3,
+        "players" : 6,
+        "programs" : {
+          "loading" : 96
+        },
+        "quality" : "low",
+        "ready" : true,
+        "refreshHz" : 60,
+        "scale" : 0.69999999999999996,
+        "sound" : {
+          "music" : true,
+          "sfx" : true,
+          "starts" : "main:627 rush:627 win:0 lose:0 results:627",
+          "state" : "running",
+          "track" : "main",
+          "voice" : true
+        },
+        "triangles" : 252454,
+        "upright" : false,
+        "webgl" : true,
+        "width" : 874
+      },
+      "seconds" : 106,
+      "step" : "05-chase"
+    },
+    {
+      "framesPerSecondOver8s" : 28.300000000000001,
+      "page" : {
+        "abilities" : 55,
+        "burns" : 1,
+        "camera" : "game",
+        "cpuMs" : 4.4100000000000001,
+        "drawCalls" : 37,
+        "envSafeArea" : {
+          "b" : 34,
+          "l" : 0,
+          "r" : 0,
+          "t" : 62
+        },
+        "fpsText" : "28 fps · target 60 · screen 60 Hz · 1% low 8 · 554 dropped of 600 · 3.8 ms cpu · 0.70x · 37 draws · fx 0",
+        "frameGaps" : [
+          [
+            54146,
+            184
+          ],
+          [
+            54276,
+            130
+          ],
+          [
+            55349,
+            138
+          ],
+          [
+            58412,
+            132
+          ],
+          [
+            68576,
+            220
+          ],
+          [
+            88658,
+            130
+          ],
+          [
+            89186,
+            528
+          ],
+          [
+            109073,
+            230
+          ],
+          [
+            109245,
+            172
+          ],
+          [
+            109390,
+            127
+          ],
+          [
+            110998,
+            136
+          ],
+          [
+            113044,
+            133
+          ]
+        ],
+        "frames" : 1726,
+        "frameStats" : {
+          "frames" : 600,
+          "held60" : false,
+          "medianMs" : 33,
+          "mode" : "auto",
+          "p99Ms" : 127,
+          "screenHz" : 60
+        },
+        "gameTime" : 58.600000000000001,
+        "health" : 100,
+        "height" : 874,
+        "land" : [
+          8.1999999999999993,
+          5,
+          10.800000000000001,
+          19.899999999999999,
+          10.5,
+          0.40000000000000002
+        ],
+        "myAbilityKinds" : [
+          "boost",
+          "emp",
+          "launch",
+          "mines",
+          "shield",
+          "strikeCall"
+        ],
+        "pads" : 6,
+        "padsMine" : 2,
+        "paused" : false,
+        "pixelRatio" : 3,
+        "players" : 6,
+        "programs" : {
+          "loading" : 96
+        },
+        "quality" : "low",
+        "ready" : true,
+        "refreshHz" : 60,
+        "scale" : 0.69999999999999996,
+        "sound" : {
+          "music" : true,
+          "sfx" : true,
+          "starts" : "main:627 rush:627 win:0 lose:0 results:627",
+          "state" : "running",
+          "track" : "main",
+          "voice" : true
+        },
+        "triangles" : 39440,
+        "upright" : true,
+        "webgl" : true,
+        "width" : 402
+      },
+      "seconds" : 130.09999999999999,
+      "step" : "06-upright"
+    },
+    {
+      "page" : {
+        "abilities" : 65,
+        "burns" : 1,
+        "camera" : "game",
+        "cpuMs" : 3.8900000000000001,
+        "drawCalls" : 45,
+        "envSafeArea" : {
+          "b" : 20,
+          "l" : 62,
+          "r" : 62,
+          "t" : 0
+        },
+        "fpsText" : "28 fps · target 60 · screen 60 Hz · 1% low 8 · 560 dropped of 600 · 4.0 ms cpu · 0.70x · 45 draws · fx 0",
+        "frameGaps" : [
+          [
+            58412,
+            132
+          ],
+          [
+            68576,
+            220
+          ],
+          [
+            88658,
+            130
+          ],
+          [
+            89186,
+            528
+          ],
+          [
+            109073,
+            230
+          ],
+          [
+            109245,
+            172
+          ],
+          [
+            109390,
+            127
+          ],
+          [
+            110998,
+            136
+          ],
+          [
+            113044,
+            133
+          ],
+          [
+            128533,
+            258
+          ],
+          [
+            128732,
+            199
+          ],
+          [
+            128951,
+            151
+          ]
+        ],
+        "frames" : 1927,
+        "frameStats" : {
+          "frames" : 600,
+          "held60" : false,
+          "medianMs" : 33,
+          "mode" : "auto",
+          "p99Ms" : 133,
+          "screenHz" : 60
+        },
+        "gameTime" : 66.599999999999994,
+        "health" : 100,
+        "height" : 402,
+        "land" : [
+          0.40000000000000002,
+          14.4,
+          11.5,
+          18,
+          11.5,
+          2.2000000000000002
+        ],
+        "myAbilityKinds" : [
+          "boost",
+          "emp",
+          "launch",
+          "mines",
+          "shield",
+          "strikeCall"
+        ],
+        "pads" : 6,
+        "padsMine" : 0,
+        "paused" : false,
+        "pixelRatio" : 3,
+        "players" : 6,
+        "programs" : {
+          "loading" : 96
+        },
+        "quality" : "low",
+        "ready" : true,
+        "refreshHz" : 60,
+        "scale" : 0.69999999999999996,
+        "sound" : {
+          "music" : true,
+          "sfx" : true,
+          "starts" : "main:627 rush:627 win:0 lose:0 results:627",
+          "state" : "running",
+          "track" : "main",
+          "voice" : true
+        },
+        "triangles" : 56678,
+        "upright" : false,
+        "webgl" : true,
+        "width" : 874
+      },
+      "seconds" : 145.69999999999999,
+      "step" : "07-sideways-again"
+    },
+    {
+      "page" : {
+        "abilities" : 65,
+        "burns" : 1,
+        "camera" : "game",
+        "cpuMs" : 11.16,
+        "drawCalls" : 54,
+        "envSafeArea" : {
+          "b" : 20,
+          "l" : 62,
+          "r" : 62,
+          "t" : 0
+        },
+        "fpsText" : "28 fps · target 60 · screen 60 Hz · 1% low 8 · 560 dropped of 600 · 4.0 ms cpu · 0.70x · 45 draws · fx 0",
+        "frameGaps" : [
+          [
+            68576,
+            220
+          ],
+          [
+            88658,
+            130
+          ],
+          [
+            89186,
+            528
+          ],
+          [
+            109073,
+            230
+          ],
+          [
+            109245,
+            172
+          ],
+          [
+            109390,
+            127
+          ],
+          [
+            110998,
+            136
+          ],
+          [
+            113044,
+            133
+          ],
+          [
+            128533,
+            258
+          ],
+          [
+            128732,
+            199
+          ],
+          [
+            128951,
+            151
+          ],
+          [
+            146157,
+            197
+          ]
+        ],
+        "frames" : 1929,
+        "frameStats" : {
+          "frames" : 600,
+          "held60" : false,
+          "medianMs" : 33,
+          "mode" : "auto",
+          "p99Ms" : 136,
+          "screenHz" : 60
+        },
+        "gameTime" : 66.799999999999997,
+        "health" : 0,
+        "height" : 402,
+        "land" : [
+          0,
+          14.4,
+          0,
+          17.899999999999999,
+          23.399999999999999,
+          2.3999999999999999
+        ],
+        "myAbilityKinds" : [
+          "boost",
+          "emp",
+          "launch",
+          "mines",
+          "shield",
+          "strikeCall"
+        ],
+        "pads" : 6,
+        "padsMine" : 0,
+        "paused" : false,
+        "pixelRatio" : 3,
+        "players" : 6,
+        "programs" : {
+          "loading" : 96
+        },
+        "quality" : "low",
+        "ready" : true,
+        "refreshHz" : 60,
+        "scale" : 0.69999999999999996,
+        "sound" : {
+          "music" : true,
+          "sfx" : true,
+          "starts" : "main:627 rush:627 win:0 lose:0 results:627",
+          "state" : "running",
+          "track" : "main",
+          "voice" : true
+        },
+        "triangles" : 57236,
+        "upright" : false,
+        "webgl" : true,
+        "width" : 874
+      },
+      "seconds" : 155.09999999999999,
+      "step" : "99-done"
+    }
+  ],
+  "system" : "iOS 26.5"
+}

@@ -1,0 +1,901 @@
+getpwuid_r did not find a match for uid 501
+Timestamp               Ty Process[PID:TID]
+2026-11-20 01:03:28.765 E  TerritoryControl[16861:cc29] [com.apple.CFBundle:plugin] AddInstanceForFactory: No factory registered for id <CFUUID 0x10222cc80> F8BB1C28-BAE8-11D6-9C31-00039315CD46
+2026-11-20 01:03:31.248 E  TerritoryControl[16861:cc3e] [com.apple.app_launch_measurement:General] Failed to send CA Event for app launch measurements for ca_event_type: 0 event_name: com.apple.app_launch_measurement.FirstFramePresentationMetric
+2026-11-20 01:03:31.308 E  TerritoryControl[16861:cc38] [com.apple.extensionkit:default] Failed to resolve host network app id to config: bundleID: com.apple.WebKit.Networking instance ID: Optional([_EXExtensionInstanceIdentifier: D8AD6A1F-9A9D-431D-8C8B-8563807919D5])
+2026-11-20 01:03:35.231 E  TerritoryControl[16861:cc3d] [com.apple.app_launch_measurement:General] Failed to send CA Event for app launch measurements for ca_event_type: 1 event_name: com.apple.app_launch_measurement.ExtendedLaunchMetrics
+2026-11-20 01:03:35.650 F  TerritoryControl[16861:cc29] [com.apple.WebKit:Process] WebContent process (0x10d0f40c0) took 6.076875 seconds to launch
+2026-11-20 01:03:35.719 E  com.apple.WebKit.GPU[17204:cfd5] [com.apple.browserEngineKit:RenderingExtension] sandbox_enable_local_state_flag failed: errno = 22
+2026-11-20 01:03:35.722 F  TerritoryControl[16861:cc29] [com.apple.WebKit:Process] GPU process (0x10d1301e0) took 4.912189 seconds to launch
+2026-11-20 01:03:35.964 F  TerritoryControl[16861:cc29] [com.apple.WebKit:Process] Networking process (0x10d14c190) took 4.679659 seconds to launch
+2026-11-20 01:03:36.035 E  TerritoryControl[16861:cc29] [com.apple.WebKit:ResourceLoadStatistics] Failed to request storage access quirks from WebPrivacy.
+2026-11-20 01:03:36.038 E  TerritoryControl[16861:cc29] [com.apple.WebKit:ResourceLoadStatistics] Failed to request known fingerprinting scripts from WebPrivacy: Error Domain=WebPrivacyErrorDomain Code=1001 "List data not found" UserInfo={NSLocalizedDescription=List data not found}
+2026-11-20 01:03:36.038 E  TerritoryControl[16861:cc29] [com.apple.WebKit:ResourceLoadStatistics] Failed to request storage access user agent string quirks from WebPrivacy.
+2026-11-20 01:03:36.152 E  com.apple.WebKit.Networking[17205:cfdb] [com.apple.WebKit:PrivateClickMeasurement] 0x10f1080c0 - DatabaseUtilities::setBusyTimeout failed, error message: not an error
+2026-11-20 01:03:36.171 E  com.apple.WebKit.Networking[17205:cfdb] [com.apple.WebKit:PrivateClickMeasurement] 0x10f1080c0 - DatabaseUtilities::migrateDataToNewTablesIfNecessary failed to rename table, error message: not an error
+2026-11-20 01:03:36.171 E  com.apple.WebKit.Networking[17205:cfdb] [com.apple.WebKit:PrivateClickMeasurement] 0x10f1080c0 - DatabaseUtilities::enableForeignKeys failed, error message: not an error
+2026-11-20 01:03:36.786 E  TerritoryControl[16861:cc29] [com.apple.WebKit:ResourceLoadStatistics] Failed to request query parameters from WebPrivacy.
+2026-11-20 01:03:36.936 E  com.apple.WebKit.GPU[17204:d02d] (libCoreFSCache.dylib) fopen failed for data file: errno = 2 (No such file or directory)
+2026-11-20 01:03:37.283 E  com.apple.WebKit.GPU[17204:d02d] (libCoreFSCache.dylib) fopen failed for data file: errno = 2 (No such file or directory)
+2026-11-20 01:03:38.504 E  TerritoryControl[16861:cfee] [com.apple.WebKit:ResourceLoadStatistics] WebContent[16894] Unable to hide query parameters from script (missing data)
+2026-11-20 01:03:38.511 E  TerritoryControl[16861:cc29] [com.apple.WebKit:ResourceLoadStatistics] Failed to request allowed query parameters from WebPrivacy.
+2026-11-20 01:03:39.110 E  TerritoryControl[16861:cc29] [com.apple.WebKit:ResourceLoadStatistics] Failed to request restricted opener domains from WebPrivacy
+2026-11-20 01:03:40.472 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:03:40.473 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:03:40.712 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:03:40.712 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:03:40.713 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:03:42.569 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:03:42.570 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:03:42.570 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:03:42.570 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:03:42.570 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:03:42.570 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:03:42.570 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:03:42.802 F  com.apple.WebKit.GPU[17204:d120] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:03:42.818 F  com.apple.WebKit.GPU[17204:d120] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:03:42.842 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:03:42.842 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:03:42.843 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:03:43.503 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:03:43.503 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:03:45.173 E  com.apple.WebKit.GPU[17204:d163] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1146:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:45.173 E  com.apple.WebKit.GPU[17204:d161] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1146:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:45.565 E  com.apple.WebKit.GPU[17204:d163] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1146:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:45.576 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:03:45.576 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:03:45.576 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:03:45.576 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:03:45.576 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:03:45.577 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:03:45.577 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:03:45.835 E  com.apple.WebKit.GPU[17204:d161] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:2707:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:46.047 E  com.apple.WebKit.GPU[17204:d163] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1291:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:46.048 E  com.apple.WebKit.GPU[17204:d163] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1291:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:46.298 E  com.apple.WebKit.GPU[17204:d161] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1143:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:47.006 E  com.apple.WebKit.GPU[17204:d161] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1269:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:47.054 E  com.apple.WebKit.GPU[17204:d163] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1219:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:47.054 E  com.apple.WebKit.GPU[17204:d163] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1143:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:47.342 E  com.apple.WebKit.GPU[17204:d162] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1303:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:47.342 E  com.apple.WebKit.GPU[17204:d162] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1291:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:47.461 E  com.apple.WebKit.GPU[17204:d163] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1269:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:47.933 E  com.apple.WebKit.GPU[17204:d161] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1288:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:47.933 E  com.apple.WebKit.GPU[17204:d161] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1291:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:48.321 E  com.apple.WebKit.GPU[17204:d163] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1146:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:49.253 E  com.apple.WebKit.GPU[17204:d163] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:2777:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:49.356 E  com.apple.WebKit.GPU[17204:d161] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1216:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:49.356 E  com.apple.WebKit.GPU[17204:d162] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1216:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:49.356 E  com.apple.WebKit.GPU[17204:d161] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1216:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:49.633 E  com.apple.WebKit.GPU[17204:d163] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1361:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:49.677 E  com.apple.WebKit.GPU[17204:d161] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1213:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:49.763 E  com.apple.WebKit.GPU[17204:d161] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1361:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:50.180 E  com.apple.WebKit.GPU[17204:d162] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1339:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:50.224 E  com.apple.WebKit.GPU[17204:d163] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1373:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:50.517 E  com.apple.WebKit.GPU[17204:d161] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1289:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:50.518 E  com.apple.WebKit.GPU[17204:d162] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1213:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:50.628 E  com.apple.WebKit.GPU[17204:d163] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1339:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:50.628 E  com.apple.WebKit.GPU[17204:d163] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1361:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:50.781 E  com.apple.WebKit.GPU[17204:d163] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1361:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:50.859 E  com.apple.WebKit.GPU[17204:d162] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1358:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:50.859 E  com.apple.WebKit.GPU[17204:d161] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1216:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:54.793 E  com.apple.WebKit.GPU[17204:cfce] [com.apple.CFBundle:plugin] AddInstanceForFactory: No factory registered for id <CFUUID 0x105a08180> F8BB1C28-BAE8-11D6-9C31-00039315CD46
+2026-11-20 01:03:54.852 E  com.apple.WebKit.GPU[17204:cfce] [com.apple.WebKit:WebRTC] Failed to get attribution bundleID from audit token with error: The operation couldn’t be completed. (OSStatus error -9499.).
+2026-11-20 01:03:56.220 E  com.apple.WebKit.GPU[17204:d161] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1218:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:56.252 E  com.apple.WebKit.GPU[17204:d163] [com.apple.Metal:Metal Compiler Warning] Warning: Compilation succeeded with: 
+
+program_source:1148:9: warning: unused variable '_utcSunVis' [-Wunused-variable]
+  float _utcSunVis = _ubakedSunAt(ANGLE_userUniforms, ANGLE_textureEnvs, ANGLE_fragmentIn._uvWPos);
+        ^
+2026-11-20 01:03:56.689 F  com.apple.WebKit.GPU[17204:cfd5] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:03:56.692 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:03:58.110 E  TerritoryControl[16861:ccfd] [com.apple.runningboard:assertion] Error acquiring assertion: <Error Domain=RBSServiceErrorDomain Code=1 "(originator doesn't have entitlement com.apple.runningboard.assertions.webkit AND originator doesn't have entitlement com.apple.multitasking.systemappassertions)" UserInfo={NSLocalizedFailureReason=(originator doesn't have entitlement com.apple.runningboard.assertions.webkit AND originator doesn't have entitlement com.apple.multitasking.systemappassertions)}>
+2026-11-20 01:03:58.110 E  TerritoryControl[16861:ccfd] [com.apple.WebKit:ProcessSuspension] 0x10d138160 - ProcessAssertion::acquireSync Failed to acquire RBS assertion 'WebKit Media Playback' for process with PID=16894, error: Error Domain=RBSServiceErrorDomain Code=1 "(originator doesn't have entitlement com.apple.runningboard.assertions.webkit AND originator doesn't have entitlement com.apple.multitasking.systemappassertions)" UserInfo={NSLocalizedFailureReason=(originator doesn't have entitlement com.apple.runningboard.assertions.webkit AND originator doesn't have entitlement com.apple.multitasking.systemappassertions)}
+2026-11-20 01:03:58.116 E  TerritoryControl[16861:ccfd] [com.apple.runningboard:assertion] Error acquiring assertion: <Error Domain=RBSServiceErrorDomain Code=1 "(originator doesn't have entitlement com.apple.runningboard.assertions.webkit AND originator doesn't have entitlement com.apple.multitasking.systemappassertions)" UserInfo={NSLocalizedFailureReason=(originator doesn't have entitlement com.apple.runningboard.assertions.webkit AND originator doesn't have entitlement com.apple.multitasking.systemappassertions)}>
+2026-11-20 01:03:58.117 E  TerritoryControl[16861:ccfd] [com.apple.WebKit:ProcessSuspension] 0x10d138210 - ProcessAssertion::acquireSync Failed to acquire RBS assertion 'WebKit Media Playback' for process with PID=17204, error: Error Domain=RBSServiceErrorDomain Code=1 "(originator doesn't have entitlement com.apple.runningboard.assertions.webkit AND originator doesn't have entitlement com.apple.multitasking.systemappassertions)" UserInfo={NSLocalizedFailureReason=(originator doesn't have entitlement com.apple.runningboard.assertions.webkit AND originator doesn't have entitlement com.apple.multitasking.systemappassertions)}
+2026-11-20 01:03:58.904 F  com.apple.WebKit.GPU[17204:d02e] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:03:59.192 F  com.apple.WebKit.GPU[17204:cfd5] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:03:59.207 E  com.apple.WebKit.GPU[17204:d6e8] [com.apple.coreaudio:AMCP]          HALC_ProxyIOContext.cpp:1623  HALC_ProxyIOContext::IOWorkLoop: skipping cycle due to overload
+2026-11-20 01:03:59.257 F  com.apple.WebKit.GPU[17204:cfd5] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:03:59.309 F  com.apple.WebKit.GPU[17204:cfd8] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:03:59.586 F  com.apple.WebKit.GPU[17204:cfd8] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:03:59.860 F  com.apple.WebKit.GPU[17204:d02e] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:00.525 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:01.416 F  com.apple.WebKit.GPU[17204:cfd8] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:02.296 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:03.104 F  com.apple.WebKit.GPU[17204:cfd8] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:03.526 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:03.526 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:03.526 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:03.527 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:03.527 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:03.527 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:08.766 F  com.apple.WebKit.GPU[17204:dc37] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:08.835 F  com.apple.WebKit.GPU[17204:dc37] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:08.991 F  com.apple.WebKit.GPU[17204:dc37] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:09.315 F  com.apple.WebKit.GPU[17204:d72f] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:09.421 F  com.apple.WebKit.GPU[17204:dc37] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:10.434 F  com.apple.WebKit.GPU[17204:d72f] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:10.450 F  com.apple.WebKit.GPU[17204:d72f] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:10.827 F  com.apple.WebKit.GPU[17204:dc37] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:10.869 F  com.apple.WebKit.GPU[17204:dc53] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:10.897 F  com.apple.WebKit.GPU[17204:dc37] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:11.364 F  com.apple.WebKit.GPU[17204:d02d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:11.632 F  com.apple.WebKit.GPU[17204:dc37] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:11.702 F  com.apple.WebKit.GPU[17204:d02d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:11.705 F  com.apple.WebKit.GPU[17204:dcbc] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:11.773 F  com.apple.WebKit.GPU[17204:dc37] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:11.782 F  com.apple.WebKit.GPU[17204:dc37] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:12.228 F  com.apple.WebKit.GPU[17204:d72f] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:12.232 F  com.apple.WebKit.GPU[17204:d02d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:12.255 F  com.apple.WebKit.GPU[17204:dcbc] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:12.286 F  com.apple.WebKit.GPU[17204:d72f] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:12.291 F  com.apple.WebKit.GPU[17204:d72f] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:12.454 F  com.apple.WebKit.GPU[17204:dc53] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:13.550 F  com.apple.WebKit.GPU[17204:dcbc] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:13.553 F  com.apple.WebKit.GPU[17204:dcbc] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:13.556 F  com.apple.WebKit.GPU[17204:dcbc] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:13.813 F  com.apple.WebKit.GPU[17204:d02d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:14.534 F  com.apple.WebKit.GPU[17204:dc53] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:14.636 F  com.apple.WebKit.GPU[17204:dcbc] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:14.666 F  com.apple.WebKit.GPU[17204:dc53] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:14.669 F  com.apple.WebKit.GPU[17204:d02d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:14.675 F  com.apple.WebKit.GPU[17204:dc53] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:14.700 F  com.apple.WebKit.GPU[17204:d02d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:15.042 F  com.apple.WebKit.GPU[17204:dcbc] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:15.048 F  com.apple.WebKit.GPU[17204:d72f] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:15.051 F  com.apple.WebKit.GPU[17204:d72f] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:15.109 F  com.apple.WebKit.GPU[17204:dc37] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:15.161 F  com.apple.WebKit.GPU[17204:dc37] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:16.068 F  com.apple.WebKit.GPU[17204:d02d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:16.281 F  com.apple.WebKit.GPU[17204:dc53] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:16.340 F  com.apple.WebKit.GPU[17204:dd57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:16.385 F  com.apple.WebKit.GPU[17204:dc37] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:17.031 F  com.apple.WebKit.GPU[17204:dd57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:17.401 F  com.apple.WebKit.GPU[17204:d72f] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:17.916 F  com.apple.WebKit.GPU[17204:d72f] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:18.091 F  com.apple.WebKit.GPU[17204:dc53] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:18.226 F  com.apple.WebKit.GPU[17204:dd54] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:18.733 F  com.apple.WebKit.GPU[17204:d02d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:19.983 F  com.apple.WebKit.GPU[17204:dd57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:20.461 F  com.apple.WebKit.GPU[17204:dd54] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:20.464 F  com.apple.WebKit.GPU[17204:dd54] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:20.867 F  com.apple.WebKit.GPU[17204:dd56] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:20.919 F  com.apple.WebKit.GPU[17204:dd54] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:20.923 F  com.apple.WebKit.GPU[17204:d02d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:21.099 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:21.235 F  com.apple.WebKit.GPU[17204:dd56] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:21.679 F  com.apple.WebKit.GPU[17204:dd57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:22.831 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:24.396 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:24.396 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:24.397 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:24.397 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:27.099 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:31.956 F  com.apple.WebKit.GPU[17204:dd57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:31.959 F  com.apple.WebKit.GPU[17204:dd57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:32.009 F  com.apple.WebKit.GPU[17204:dcbc] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:32.486 F  com.apple.WebKit.GPU[17204:dcbc] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:32.497 F  com.apple.WebKit.GPU[17204:dcbc] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:32.524 F  com.apple.WebKit.GPU[17204:df92] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:32.533 F  com.apple.WebKit.GPU[17204:df92] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:32.542 F  com.apple.WebKit.GPU[17204:df92] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:32.554 F  com.apple.WebKit.GPU[17204:dcbc] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:32.559 F  com.apple.WebKit.GPU[17204:df8f] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:32.564 F  com.apple.WebKit.GPU[17204:df8f] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:32.570 F  com.apple.WebKit.GPU[17204:df7d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:32.784 F  com.apple.WebKit.GPU[17204:dcbc] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:32.815 F  com.apple.WebKit.GPU[17204:df92] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:32.974 F  com.apple.WebKit.GPU[17204:df92] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:33.052 F  com.apple.WebKit.GPU[17204:df92] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:33.059 F  com.apple.WebKit.GPU[17204:df8f] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:33.065 F  com.apple.WebKit.GPU[17204:df7d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:33.071 F  com.apple.WebKit.GPU[17204:df8f] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:33.089 F  com.apple.WebKit.GPU[17204:df92] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:33.093 F  com.apple.WebKit.GPU[17204:df7d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:33.381 F  com.apple.WebKit.GPU[17204:dcbc] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:33.738 F  com.apple.WebKit.GPU[17204:df8f] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:34.019 F  com.apple.WebKit.GPU[17204:df7d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:34.026 F  com.apple.WebKit.GPU[17204:dcbc] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:34.432 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:34.687 F  com.apple.WebKit.GPU[17204:df92] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:35.321 F  com.apple.WebKit.GPU[17204:df7d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:35.637 F  com.apple.WebKit.GPU[17204:dfb2] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:35.999 F  com.apple.WebKit.GPU[17204:dfb0] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:36.266 F  com.apple.WebKit.GPU[17204:dfb0] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:36.270 F  com.apple.WebKit.GPU[17204:df7d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:36.335 F  com.apple.WebKit.GPU[17204:df7d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:36.370 F  com.apple.WebKit.GPU[17204:dcbc] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:36.948 F  com.apple.WebKit.GPU[17204:df7d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:36.958 F  com.apple.WebKit.GPU[17204:df7d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:37.032 F  com.apple.WebKit.GPU[17204:df7d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:37.372 F  com.apple.WebKit.GPU[17204:dfb0] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:37.412 F  com.apple.WebKit.GPU[17204:dfb2] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:37.415 F  com.apple.WebKit.GPU[17204:dfb2] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:37.442 F  com.apple.WebKit.GPU[17204:dfb2] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:37.558 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:37.625 F  com.apple.WebKit.GPU[17204:df7d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:37.629 F  com.apple.WebKit.GPU[17204:df7d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:37.657 F  com.apple.WebKit.GPU[17204:dfb0] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:37.693 F  com.apple.WebKit.GPU[17204:dfb2] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:37.756 F  com.apple.WebKit.GPU[17204:dfb2] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:37.791 F  com.apple.WebKit.GPU[17204:df7d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:37.806 F  com.apple.WebKit.GPU[17204:dfb0] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:38.109 F  com.apple.WebKit.GPU[17204:dfb2] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:38.129 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:38.224 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:38.264 F  com.apple.WebKit.GPU[17204:dfb0] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:38.352 F  com.apple.WebKit.GPU[17204:dfb2] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:38.394 F  com.apple.WebKit.GPU[17204:dfb2] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:38.396 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:38.400 F  com.apple.WebKit.GPU[17204:dcbc] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:38.408 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:38.434 F  com.apple.WebKit.GPU[17204:dfb2] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:38.440 F  com.apple.WebKit.GPU[17204:dfb2] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:38.486 F  com.apple.WebKit.GPU[17204:dcbc] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:38.524 F  com.apple.WebKit.GPU[17204:dcbc] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:38.593 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:38.697 F  com.apple.WebKit.GPU[17204:dfb2] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:38.772 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:38.995 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:39.151 F  com.apple.WebKit.GPU[17204:df8f] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:39.283 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:39.415 F  com.apple.WebKit.GPU[17204:df7d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:39.444 F  com.apple.WebKit.GPU[17204:df7d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:39.469 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:39.709 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:39.913 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:40.181 F  com.apple.WebKit.GPU[17204:df8f] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:40.185 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:40.263 F  com.apple.WebKit.GPU[17204:dcbc] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:40.308 F  com.apple.WebKit.GPU[17204:df8f] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:40.319 F  com.apple.WebKit.GPU[17204:dcbc] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:40.352 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:40.385 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:40.467 F  com.apple.WebKit.GPU[17204:df8f] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:40.808 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:41.515 F  com.apple.WebKit.GPU[17204:df7d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:41.562 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:42.139 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:43.694 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:43.695 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:43.695 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:43.698 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:46.704 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:46.705 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:47.165 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:47.196 F  com.apple.WebKit.GPU[17204:df7d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:47.219 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:47.237 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:47.455 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:47.548 F  com.apple.WebKit.GPU[17204:df7d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:47.556 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:47.593 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:47.709 F  com.apple.WebKit.GPU[17204:df7d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:47.745 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:47.942 F  com.apple.WebKit.GPU[17204:df7d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:47.993 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:48.186 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:48.325 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:48.393 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:48.477 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:48.531 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:48.677 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:49.427 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:49.480 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:49.508 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:49.693 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:49.855 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:49.879 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:50.070 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:50.741 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:50.948 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:51.445 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:51.495 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:51.531 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:51.790 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:51.803 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:51.916 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:51.964 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:51.964 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:51.964 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:52.190 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:52.840 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:52.892 F  com.apple.WebKit.GPU[17204:df7d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:52.895 F  com.apple.WebKit.GPU[17204:df7d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:52.916 F  com.apple.WebKit.GPU[17204:df7d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:53.462 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:53.466 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:53.468 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:53.524 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:53.527 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:53.559 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:53.972 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:54.034 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:54.094 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:54.130 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:54.163 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:54.365 F  com.apple.WebKit.GPU[17204:df7d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:54.529 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:54.579 F  com.apple.WebKit.GPU[17204:df7d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:54.625 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:54.696 F  com.apple.WebKit.GPU[17204:df7d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:55.598 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:55.866 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:56.341 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:56.404 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:56.443 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:56.517 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:56.578 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:56.702 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:56.708 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:57.140 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:57.145 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:57.299 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:57.405 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:57.573 F  com.apple.WebKit.GPU[17204:df7d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:57.610 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:57.795 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:57.832 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:57.872 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:57.986 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:58.113 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:58.114 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:04:58.202 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:58.213 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:58.272 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:58.533 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:58.654 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:58.672 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:58.677 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:58.714 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:58.751 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:59.271 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:59.454 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:59.885 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:59.911 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:04:59.938 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:01.379 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:01.383 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:01.390 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:01.659 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:01.885 F  com.apple.WebKit.GPU[17204:df7d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:01.893 F  com.apple.WebKit.GPU[17204:df7d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:02.145 F  com.apple.WebKit.GPU[17204:df7d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:02.295 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:02.360 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:02.367 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:02.370 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:02.458 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:03.149 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:04.120 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:04.515 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:04.515 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:06.586 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:06.998 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:07.050 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:07.377 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:07.691 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:07.713 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:07.733 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:07.736 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:07.739 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:07.823 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:08.291 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:08.420 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:08.461 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:08.465 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:08.661 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:08.688 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:08.691 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:08.693 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:08.725 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:08.789 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:09.447 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:09.885 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:10.154 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:10.313 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:10.847 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:10.996 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:10.999 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:11.251 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:11.285 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:11.333 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:11.551 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:11.881 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:12.119 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:12.119 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:12.119 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:12.228 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:12.270 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:12.274 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:12.304 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:12.446 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:12.479 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:12.510 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:12.550 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:12.649 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:12.716 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:12.718 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:12.781 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:13.787 E  com.apple.WebKit.GPU[17204:d6e8] [com.apple.coreaudio:AMCP]          HALC_ProxyIOContext.cpp:1623  HALC_ProxyIOContext::IOWorkLoop: skipping cycle due to overload
+2026-11-20 01:05:14.118 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:14.288 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:14.329 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:14.454 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:14.484 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:14.621 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:15.093 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:15.171 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:15.325 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:15.494 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:15.590 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:15.921 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:16.355 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:16.454 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:16.522 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:16.791 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:16.890 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:16.989 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:17.087 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:17.187 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:17.954 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:18.054 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:18.121 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:18.389 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:18.488 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:18.688 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:18.787 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:19.555 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:19.654 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:19.721 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:19.989 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:20.089 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:20.225 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:20.288 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:20.387 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:21.154 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:21.254 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:21.321 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:21.588 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:21.693 F  com.apple.WebKit.GPU[17204:dfaf] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:21.889 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:21.987 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:22.154 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:22.754 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:22.855 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:22.922 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:23.188 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:23.287 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:23.487 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:23.589 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:24.354 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:24.456 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:24.521 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:24.787 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:24.887 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:25.088 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:25.187 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:25.955 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:26.054 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:26.121 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:26.389 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:26.490 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:26.688 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:26.788 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:27.379 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:27.593 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:27.598 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:27.785 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:27.837 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:27.910 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:27.922 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:27.987 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:27.992 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:28.046 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:28.055 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:28.151 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:28.207 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:28.403 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:28.414 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:28.454 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:28.503 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:28.517 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:28.542 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:28.663 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:28.669 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:29.170 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:29.271 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:29.395 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:29.503 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:29.536 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:29.548 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:29.604 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:29.610 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:29.739 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:29.802 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:29.901 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:29.936 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:30.001 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:30.517 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:30.520 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:30.525 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:30.545 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:30.764 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:30.889 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:30.925 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:30.949 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:30.994 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:31.035 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:31.215 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:31.304 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:31.584 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:31.612 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:31.638 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:31.641 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:31.760 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:31.792 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:31.816 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:32.471 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:32.623 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:32.645 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:32.666 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:32.801 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:32.974 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:33.100 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:33.135 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:33.231 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:33.306 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:33.330 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:33.360 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:33.362 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:33.392 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:33.399 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:33.403 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:33.503 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:33.536 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:33.619 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:33.643 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:33.687 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:33.692 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:33.701 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:33.766 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:34.097 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:34.231 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:34.265 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:34.295 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:34.373 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:34.400 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:34.482 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:34.532 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:34.537 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:34.601 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:35.632 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:35.734 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:35.735 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:35.738 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:36.095 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:36.598 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:37.372 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:37.373 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:37.562 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:37.601 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:37.784 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:37.835 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:37.855 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:37.860 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:37.881 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:38.003 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:38.137 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:38.387 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:38.392 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:38.396 F  com.apple.WebKit.GPU[17204:ef57] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:38.459 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:38.557 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:38.558 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:39.301 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:41.608 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:41.608 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:41.608 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:44.237 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:44.313 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:47.258 F  com.apple.WebKit.GPU[17204:f38d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:47.329 F  com.apple.WebKit.GPU[17204:f38e] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:47.466 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:47.471 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:47.508 F  com.apple.WebKit.GPU[17204:f38d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:47.512 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:47.519 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:47.542 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:47.545 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:47.549 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:47.568 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:47.614 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:47.881 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:47.997 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:48.009 F  com.apple.WebKit.GPU[17204:f38d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:48.066 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:48.130 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:48.393 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:48.473 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:49.089 F  com.apple.WebKit.GPU[17204:f38e] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:49.495 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:49.528 F  com.apple.WebKit.GPU[17204:f38e] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:49.742 F  com.apple.WebKit.GPU[17204:f38e] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:49.830 F  com.apple.WebKit.GPU[17204:f38e] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:49.965 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:50.012 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:50.090 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:50.120 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:50.132 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:50.277 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:50.318 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:50.318 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:50.461 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:50.464 F  com.apple.WebKit.GPU[17204:f38d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:50.474 F  com.apple.WebKit.GPU[17204:f38d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:50.480 F  com.apple.WebKit.GPU[17204:f38d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:50.493 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:50.532 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:50.535 F  com.apple.WebKit.GPU[17204:f38d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:50.546 F  com.apple.WebKit.GPU[17204:f38d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:50.548 F  com.apple.WebKit.GPU[17204:f38d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:50.559 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:50.588 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:50.591 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:50.595 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:50.603 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:50.635 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:50.645 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:51.366 F  com.apple.WebKit.GPU[17204:dfae] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:51.376 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:51.612 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:51.615 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:51.652 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:51.719 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:51.722 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:51.732 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:51.780 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:51.782 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:52.021 F  com.apple.WebKit.GPU[17204:f38e] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:52.379 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:52.420 F  com.apple.WebKit.GPU[17204:f38e] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:52.646 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:52.681 F  com.apple.WebKit.GPU[17204:f38e] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:52.715 F  com.apple.WebKit.GPU[17204:f38d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:52.719 F  com.apple.WebKit.GPU[17204:f38e] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:52.815 F  com.apple.WebKit.GPU[17204:f38d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:54.012 F  com.apple.WebKit.GPU[17204:f38e] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:54.242 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:54.248 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:54.290 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:54.422 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:54.960 F  com.apple.WebKit.GPU[17204:e70d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:05:56.294 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:56.294 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:56.295 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:56.319 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:05:59.615 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:06:04.678 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:04.685 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:04.715 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:09.404 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:09.990 F  com.apple.WebKit.GPU[17204:f9fb] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:10.062 F  com.apple.WebKit.GPU[17204:f9fb] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:10.069 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:10.071 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:10.169 F  com.apple.WebKit.GPU[17204:f38f] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:10.467 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:10.507 F  com.apple.WebKit.GPU[17204:f9fb] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:10.646 F  com.apple.WebKit.GPU[17204:f38f] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:12.298 F  com.apple.WebKit.GPU[17204:f9fd] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:12.810 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:06:12.810 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:06:12.811 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:06:12.812 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:06:12.812 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:06:12.812 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:06:13.016 F  com.apple.WebKit.GPU[17204:f9fb] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:13.682 E  com.apple.WebKit.GPU[17204:d02f] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:06:13.741 F  com.apple.WebKit.GPU[17204:f38f] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:13.745 F  com.apple.WebKit.GPU[17204:f38f] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:13.910 F  com.apple.WebKit.GPU[17204:e4c7] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:14.187 F  com.apple.WebKit.GPU[17204:f9fb] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:14.349 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:14.879 F  com.apple.WebKit.GPU[17204:dfb3] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:14.915 F  com.apple.WebKit.GPU[17204:f9fd] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:15.097 F  com.apple.WebKit.GPU[17204:f9fb] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:15.733 F  com.apple.WebKit.GPU[17204:f38f] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:16.141 F  com.apple.WebKit.GPU[17204:f9fd] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:16.364 F  com.apple.WebKit.GPU[17204:f9fd] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:16.507 F  com.apple.WebKit.GPU[17204:f9fb] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:27.490 E  TerritoryControl[21615:fcdb] [com.apple.CFBundle:plugin] AddInstanceForFactory: No factory registered for id <CFUUID 0x105a181e0> F8BB1C28-BAE8-11D6-9C31-00039315CD46
+2026-11-20 01:06:28.314 E  TerritoryControl[21615:fd44] [com.apple.extensionkit:default] Failed to resolve host network app id to config: bundleID: com.apple.WebKit.Networking instance ID: Optional([_EXExtensionInstanceIdentifier: B016D9FD-B573-4C50-8F37-19EDBEF59AE9])
+2026-11-20 01:06:28.404 E  TerritoryControl[21615:fd48] [com.apple.app_launch_measurement:General] Failed to send CA Event for app launch measurements for ca_event_type: 0 event_name: com.apple.app_launch_measurement.FirstFramePresentationMetric
+2026-11-20 01:06:28.540 E  TerritoryControl[21615:fd45] [com.apple.app_launch_measurement:General] Failed to send CA Event for app launch measurements for ca_event_type: 1 event_name: com.apple.app_launch_measurement.ExtendedLaunchMetrics
+2026-11-20 01:06:28.688 E  com.apple.WebKit.GPU[21667:fd9b] [com.apple.browserEngineKit:RenderingExtension] sandbox_enable_local_state_flag failed: errno = 22
+2026-11-20 01:06:29.145 F  TerritoryControl[21615:fcdb] [com.apple.WebKit:Process] Networking process (0x112160190) took 1.076662 seconds to launch
+2026-11-20 01:06:29.841 E  TerritoryControl[21615:fdb2] [com.apple.WebKit:ResourceLoadStatistics] WebContent[21661] Unable to hide query parameters from script (missing data)
+2026-11-20 01:06:30.341 E  com.apple.WebKit.Networking[21668:fdb1] [com.apple.WebKit:PrivateClickMeasurement] 0x10d1b40c0 - DatabaseUtilities::setBusyTimeout failed, error message: not an error
+2026-11-20 01:06:30.351 E  com.apple.WebKit.Networking[21668:fdb1] [com.apple.WebKit:PrivateClickMeasurement] 0x10d1b40c0 - DatabaseUtilities::migrateDataToNewTablesIfNecessary failed to rename table, error message: not an error
+2026-11-20 01:06:30.351 E  com.apple.WebKit.Networking[21668:fdb1] [com.apple.WebKit:PrivateClickMeasurement] 0x10d1b40c0 - DatabaseUtilities::enableForeignKeys failed, error message: not an error
+2026-11-20 01:06:31.726 F  com.apple.WebKit.GPU[21667:fdef] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:32.068 E  com.apple.WebKit.GPU[21667:fdf6] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:06:32.069 E  com.apple.WebKit.GPU[21667:fdf6] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:06:32.423 E  com.apple.WebKit.GPU[21667:fdf6] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:06:32.424 E  com.apple.WebKit.GPU[21667:fdf6] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:06:32.425 E  com.apple.WebKit.GPU[21667:fdf6] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:06:32.751 F  com.apple.WebKit.GPU[21667:fd9c] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:33.802 E  com.apple.WebKit.GPU[21667:fdf6] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:06:33.991 E  com.apple.WebKit.GPU[21667:fdf6] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:06:33.991 E  com.apple.WebKit.GPU[21667:fdf6] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:06:33.991 E  com.apple.WebKit.GPU[21667:fdf6] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:06:33.991 E  com.apple.WebKit.GPU[21667:fdf6] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:06:35.850 E  com.apple.WebKit.GPU[21667:fd89] [com.apple.CFBundle:plugin] AddInstanceForFactory: No factory registered for id <CFUUID 0x1036270a0> F8BB1C28-BAE8-11D6-9C31-00039315CD46
+2026-11-20 01:06:35.894 E  com.apple.WebKit.GPU[21667:fd89] [com.apple.WebKit:WebRTC] Failed to get attribution bundleID from audit token with error: The operation couldn’t be completed. (OSStatus error -9499.).
+2026-11-20 01:06:37.353 F  com.apple.WebKit.GPU[21667:fd9d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:37.370 E  TerritoryControl[21615:fd48] [com.apple.runningboard:assertion] Error acquiring assertion: <Error Domain=RBSServiceErrorDomain Code=1 "(originator doesn't have entitlement com.apple.runningboard.assertions.webkit AND originator doesn't have entitlement com.apple.multitasking.systemappassertions)" UserInfo={NSLocalizedFailureReason=(originator doesn't have entitlement com.apple.runningboard.assertions.webkit AND originator doesn't have entitlement com.apple.multitasking.systemappassertions)}>
+2026-11-20 01:06:37.370 E  TerritoryControl[21615:fd48] [com.apple.WebKit:ProcessSuspension] 0x11214c160 - ProcessAssertion::acquireSync Failed to acquire RBS assertion 'WebKit Media Playback' for process with PID=21661, error: Error Domain=RBSServiceErrorDomain Code=1 "(originator doesn't have entitlement com.apple.runningboard.assertions.webkit AND originator doesn't have entitlement com.apple.multitasking.systemappassertions)" UserInfo={NSLocalizedFailureReason=(originator doesn't have entitlement com.apple.runningboard.assertions.webkit AND originator doesn't have entitlement com.apple.multitasking.systemappassertions)}
+2026-11-20 01:06:37.371 E  TerritoryControl[21615:fd48] [com.apple.runningboard:assertion] Error acquiring assertion: <Error Domain=RBSServiceErrorDomain Code=1 "(originator doesn't have entitlement com.apple.runningboard.assertions.webkit AND originator doesn't have entitlement com.apple.multitasking.systemappassertions)" UserInfo={NSLocalizedFailureReason=(originator doesn't have entitlement com.apple.runningboard.assertions.webkit AND originator doesn't have entitlement com.apple.multitasking.systemappassertions)}>
+2026-11-20 01:06:37.371 E  TerritoryControl[21615:fd48] [com.apple.WebKit:ProcessSuspension] 0x11214c210 - ProcessAssertion::acquireSync Failed to acquire RBS assertion 'WebKit Media Playback' for process with PID=21667, error: Error Domain=RBSServiceErrorDomain Code=1 "(originator doesn't have entitlement com.apple.runningboard.assertions.webkit AND originator doesn't have entitlement com.apple.multitasking.systemappassertions)" UserInfo={NSLocalizedFailureReason=(originator doesn't have entitlement com.apple.runningboard.assertions.webkit AND originator doesn't have entitlement com.apple.multitasking.systemappassertions)}
+2026-11-20 01:06:37.379 F  com.apple.WebKit.GPU[21667:fd9d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:37.403 F  com.apple.WebKit.GPU[21667:fd9d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:37.409 E  com.apple.WebKit.GPU[21667:fdf6] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:06:37.410 E  com.apple.WebKit.GPU[21667:fdf6] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:06:37.410 E  com.apple.WebKit.GPU[21667:fdf6] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:06:37.410 E  com.apple.WebKit.GPU[21667:fdf6] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:06:37.410 E  com.apple.WebKit.GPU[21667:fdf6] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:06:37.411 E  com.apple.WebKit.GPU[21667:fdf6] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:06:37.411 E  com.apple.WebKit.GPU[21667:fdf6] [com.apple.WebKit:Process] IPC::Signal::signal Could not send mach message, error 10000003
+2026-11-20 01:06:38.303 F  com.apple.WebKit.GPU[21667:fdf9] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:38.307 F  com.apple.WebKit.GPU[21667:fdf9] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:38.309 F  com.apple.WebKit.GPU[21667:fdf9] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:38.659 F  com.apple.WebKit.GPU[21667:fd9c] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:38.929 F  com.apple.WebKit.GPU[21667:fdef] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:40.574 F  com.apple.WebKit.GPU[21667:fd9d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:40.855 F  com.apple.WebKit.GPU[21667:fd9c] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:41.814 F  com.apple.WebKit.GPU[21667:fd9c] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:42.851 F  com.apple.WebKit.GPU[21667:fdf9] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:42.883 F  com.apple.WebKit.GPU[21667:fdf9] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:43.551 F  com.apple.WebKit.GPU[21667:fdf9] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:44.815 E  com.apple.WebKit.GPU[21667:10084] [com.apple.coreaudio:AMCP]          HALC_ProxyIOContext.cpp:1623  HALC_ProxyIOContext::IOWorkLoop: skipping cycle due to overload
+2026-11-20 01:06:45.691 E  com.apple.WebKit.GPU[21667:10084] [com.apple.coreaudio:AMCP]          HALC_ProxyIOContext.cpp:1623  HALC_ProxyIOContext::IOWorkLoop: skipping cycle due to overload
+2026-11-20 01:06:46.595 F  com.apple.WebKit.GPU[21667:fd9d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:46.935 F  com.apple.WebKit.GPU[21667:fd9c] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:47.931 F  com.apple.WebKit.GPU[21667:fd9c] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:48.066 F  com.apple.WebKit.GPU[21667:fdee] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:48.608 F  com.apple.WebKit.GPU[21667:fdee] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:49.627 F  com.apple.WebKit.GPU[21667:fd9d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:50.590 F  com.apple.WebKit.GPU[21667:fdee] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
+2026-11-20 01:06:51.053 F  com.apple.WebKit.GPU[21667:fd9d] (IOSurface) IOSurfaceQueryTransactionList got non-success return from kernel
